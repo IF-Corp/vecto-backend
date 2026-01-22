@@ -1,6 +1,6 @@
 async function errorHandler(error, request, reply) {
     // Log the error
-    request.log.error(error);
+    console.error(error);
 
     // Handle validation errors
     if (error.validation) {

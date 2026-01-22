@@ -22,7 +22,7 @@ class UserController {
                 data: user
             });
         } catch (error) {
-            request.log.error(error);
+            console.error(error);
             return reply.status(500).send({
                 error: 'Internal server error',
                 message: error.message
@@ -58,7 +58,7 @@ class UserController {
                 data: user
             });
         } catch (error) {
-            request.log.error(error);
+            console.error(error);
             return reply.status(500).send({
                 error: 'Internal server error',
                 message: error.message
@@ -102,7 +102,7 @@ class UserController {
                 created
             });
         } catch (error) {
-            request.log.error(error);
+            console.error(error);
             return reply.status(500).send({
                 error: 'Internal server error',
                 message: error.message
@@ -142,7 +142,7 @@ class UserController {
                 data: user
             });
         } catch (error) {
-            request.log.error(error);
+            console.error(error);
             return reply.status(500).send({
                 error: 'Internal server error',
                 message: error.message
@@ -182,7 +182,7 @@ class UserController {
                 data: user
             });
         } catch (error) {
-            request.log.error(error);
+            console.error(error);
             return reply.status(500).send({
                 error: 'Internal server error',
                 message: error.message

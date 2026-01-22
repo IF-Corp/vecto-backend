@@ -1,7 +1,6 @@
 const fastify = require('fastify');
 const cors = require('@fastify/cors');
 const env = require('@fastify/env');
-const logger = require('./utils/logger');
 const errorHandler = require('./middleware/errorHandler');
 const routes = require('./routes');
 
@@ -30,7 +29,7 @@ const schema = {
 
 async function buildApp(opts = {}) {
     const app = fastify({
-        logger: logger,
+        logger: false, // Using console.log instead
         ...opts
     });
 
