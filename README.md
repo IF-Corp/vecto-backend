@@ -176,9 +176,6 @@ Global error handling is implemented in `src/middleware/errorHandler.js` and han
 - Sequelize errors (unique constraints, validation)
 - Generic server errors
 
-### Logging
-
-The application uses Pino logger for structured logging. In development mode, logs are pretty-printed for better readability.
 
 ## License
 
