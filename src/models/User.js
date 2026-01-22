@@ -77,6 +77,16 @@ User.associate = (models) => {
         otherKey: 'group_id',
         as: 'socialGroups'
     });
+
+    // Productivity module
+    User.hasMany(models.Project, {
+        foreignKey: 'user_id',
+        as: 'projects'
+    });
+    User.hasMany(models.Task, {
+        foreignKey: 'user_id',
+        as: 'tasks'
+    });
 };
 
 module.exports = User;
