@@ -24,6 +24,18 @@ const User = sequelize.define('User', {
     name: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    password_hash: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    birth_date: {
+        type: DataTypes.DATEONLY,
+        allowNull: true
+    },
+    avatar_url: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 }, {
     tableName: 'users',
