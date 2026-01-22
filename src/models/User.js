@@ -24,11 +24,69 @@ const User = sequelize.define('User', {
     name: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    password_hash: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    birth_date: {
+        type: DataTypes.DATEONLY,
+        allowNull: true
+    },
+    avatar_url: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 }, {
     tableName: 'users',
     timestamps: true,
     underscored: true
 });
+
+User.associate = (models) => {
+    // Core module
+    User.hasOne(models.UserPreferences, {
+        foreignKey: 'user_id',
+        as: 'preferences'
+    });
+    User.hasOne(models.OnboardingState, {
+        foreignKey: 'user_id',
+        as: 'onboardingState'
+    });
+    User.hasMany(models.GlobalCategory, {
+        foreignKey: 'user_id',
+        as: 'categories'
+    });
+    User.hasMany(models.NotificationConfig, {
+        foreignKey: 'user_id',
+        as: 'notificationConfigs'
+    });
+
+    // Habits module
+    User.hasMany(models.Habit, {
+        foreignKey: 'user_id',
+        as: 'habits'
+    });
+    User.hasMany(models.Routine, {
+        foreignKey: 'user_id',
+        as: 'routines'
+    });
+    User.belongsToMany(models.SocialGroup, {
+        through: models.GroupMember,
+        foreignKey: 'user_id',
+        otherKey: 'group_id',
+        as: 'socialGroups'
+    });
+
+    // Productivity module
+    User.hasMany(models.Project, {
+        foreignKey: 'user_id',
+        as: 'projects'
+    });
+    User.hasMany(models.Task, {
+        foreignKey: 'user_id',
+        as: 'tasks'
+    });
+};
 
 module.exports = User;
