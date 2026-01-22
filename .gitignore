@@ -32,6 +32,8 @@ build/
 
 package-lock.json
 
+.claude
+
 # Database
 *.sqlite
 *.sqlite3
