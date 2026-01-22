@@ -159,6 +159,12 @@ User.associate = (models) => {
         foreignKey: 'user_id',
         as: 'calendarEvents'
     });
+
+    // Freeze Mode module
+    User.hasOne(models.FreezeModeConfig, {
+        foreignKey: 'user_id',
+        as: 'freezeModeConfig'
+    });
 };
 
 module.exports = User;
