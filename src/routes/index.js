@@ -1,4 +1,5 @@
 const userRoutes = require('./userRoutes');
+const coreRoutes = require('./coreRoutes');
 
 async function routes(fastify, options) {
     // Health check endpoint
@@ -12,6 +13,7 @@ async function routes(fastify, options) {
 
     // Register API routes with /api prefix
     fastify.register(userRoutes, { prefix: '/api' });
+    fastify.register(coreRoutes, { prefix: '/api' });
 }
 
 module.exports = routes;
