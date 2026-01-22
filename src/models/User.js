@@ -44,6 +44,7 @@ const User = sequelize.define('User', {
 });
 
 User.associate = (models) => {
+    // Core module
     User.hasOne(models.UserPreferences, {
         foreignKey: 'user_id',
         as: 'preferences'
@@ -59,6 +60,22 @@ User.associate = (models) => {
     User.hasMany(models.NotificationConfig, {
         foreignKey: 'user_id',
         as: 'notificationConfigs'
+    });
+
+    // Habits module
+    User.hasMany(models.Habit, {
+        foreignKey: 'user_id',
+        as: 'habits'
+    });
+    User.hasMany(models.Routine, {
+        foreignKey: 'user_id',
+        as: 'routines'
+    });
+    User.belongsToMany(models.SocialGroup, {
+        through: models.GroupMember,
+        foreignKey: 'user_id',
+        otherKey: 'group_id',
+        as: 'socialGroups'
     });
 };
 
