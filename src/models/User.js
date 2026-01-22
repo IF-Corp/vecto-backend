@@ -119,6 +119,24 @@ User.associate = (models) => {
         foreignKey: 'user_id',
         as: 'sleepMetrics'
     });
+
+    // Study module
+    User.hasMany(models.LibraryShelf, {
+        foreignKey: 'user_id',
+        as: 'libraryShelves'
+    });
+    User.hasMany(models.StudySession, {
+        foreignKey: 'user_id',
+        as: 'studySessions'
+    });
+    User.hasMany(models.SpacedReview, {
+        foreignKey: 'user_id',
+        as: 'spacedReviews'
+    });
+    User.hasMany(models.Note, {
+        foreignKey: 'user_id',
+        as: 'notes'
+    });
 };
 
 module.exports = User;
