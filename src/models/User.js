@@ -101,6 +101,24 @@ User.associate = (models) => {
         foreignKey: 'user_id',
         as: 'budgets'
     });
+
+    // Health module
+    User.hasMany(models.MealLog, {
+        foreignKey: 'user_id',
+        as: 'mealLogs'
+    });
+    User.hasMany(models.Workout, {
+        foreignKey: 'user_id',
+        as: 'workouts'
+    });
+    User.hasMany(models.Medication, {
+        foreignKey: 'user_id',
+        as: 'medications'
+    });
+    User.hasMany(models.SleepMetric, {
+        foreignKey: 'user_id',
+        as: 'sleepMetrics'
+    });
 };
 
 module.exports = User;
