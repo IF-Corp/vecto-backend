@@ -4,6 +4,7 @@ const habitRoutes = require('./habitRoutes');
 const projectRoutes = require('./projectRoutes');
 const financeRoutes = require('./financeRoutes');
 const healthRoutes = require('./healthRoutes');
+const studyRoutes = require('./studyRoutes');
 
 async function routes(fastify, options) {
     // Health check endpoint
@@ -22,6 +23,7 @@ async function routes(fastify, options) {
     fastify.register(projectRoutes, { prefix: '/api' });
     fastify.register(financeRoutes, { prefix: '/api' });
     fastify.register(healthRoutes, { prefix: '/api' });
+    fastify.register(studyRoutes, { prefix: '/api' });
 }
 
 module.exports = routes;
