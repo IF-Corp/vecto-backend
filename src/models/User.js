@@ -87,6 +87,20 @@ User.associate = (models) => {
         foreignKey: 'user_id',
         as: 'tasks'
     });
+
+    // Finance module
+    User.hasMany(models.Account, {
+        foreignKey: 'user_id',
+        as: 'accounts'
+    });
+    User.hasMany(models.RecurringExpense, {
+        foreignKey: 'user_id',
+        as: 'recurringExpenses'
+    });
+    User.hasMany(models.Budget, {
+        foreignKey: 'user_id',
+        as: 'budgets'
+    });
 };
 
 module.exports = User;
