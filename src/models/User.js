@@ -137,6 +137,28 @@ User.associate = (models) => {
         foreignKey: 'user_id',
         as: 'notes'
     });
+
+    // Home & Social module
+    User.hasMany(models.ShoppingList, {
+        foreignKey: 'user_id',
+        as: 'shoppingLists'
+    });
+    User.hasMany(models.HouseholdInventory, {
+        foreignKey: 'user_id',
+        as: 'householdInventory'
+    });
+    User.hasMany(models.HouseholdChore, {
+        foreignKey: 'user_id',
+        as: 'householdChores'
+    });
+    User.hasMany(models.Contact, {
+        foreignKey: 'user_id',
+        as: 'contacts'
+    });
+    User.hasMany(models.CalendarEvent, {
+        foreignKey: 'user_id',
+        as: 'calendarEvents'
+    });
 };
 
 module.exports = User;
