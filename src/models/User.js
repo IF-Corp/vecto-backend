@@ -43,4 +43,23 @@ const User = sequelize.define('User', {
     underscored: true
 });
 
+User.associate = (models) => {
+    User.hasOne(models.UserPreferences, {
+        foreignKey: 'user_id',
+        as: 'preferences'
+    });
+    User.hasOne(models.OnboardingState, {
+        foreignKey: 'user_id',
+        as: 'onboardingState'
+    });
+    User.hasMany(models.GlobalCategory, {
+        foreignKey: 'user_id',
+        as: 'categories'
+    });
+    User.hasMany(models.NotificationConfig, {
+        foreignKey: 'user_id',
+        as: 'notificationConfigs'
+    });
+};
+
 module.exports = User;
