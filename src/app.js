@@ -51,9 +51,21 @@ async function buildApp(opts = {}) {
     });
 
     // Register CORS
+    const allowedOrigins = app.config.NODE_ENV === 'production'
+        ? [app.config.CORS_ORIGIN]
+        : ['http://localhost:3001', 'http://localhost:3000', 'http://127.0.0.1:3001'];
+
     await app.register(cors, {
-        origin: app.config.CORS_ORIGIN || '*',
-        credentials: true
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'), false);
+            }
+        },
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization']
     });
 
     // Register Swagger documentation (before routes to collect schemas)
