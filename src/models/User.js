@@ -36,6 +36,16 @@ const User = sequelize.define('User', {
     avatar_url: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    google_id: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true
+    },
+    auth_provider: {
+        type: DataTypes.ENUM('email', 'google'),
+        defaultValue: 'email',
+        allowNull: false
     }
 }, {
     tableName: 'users',
