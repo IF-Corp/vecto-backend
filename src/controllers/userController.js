@@ -277,6 +277,77 @@ class UserController {
     }
 
     /**
+     * Complete onboarding - updates nickname, preferences and modules in one call
+     */
+    async completeOnboarding(request, reply) {
+        try {
+            const userId = request.user.id;
+            const { nickname, timezone, currency, modules } = request.body;
+
+            const user = await User.findByPk(userId);
+            if (!user) {
+                return reply.status(404).send({
+                    success: false,
+                    error: 'Not Found',
+                    message: 'User not found'
+                });
+            }
+
+            user.nickname = nickname || null;
+            user.is_onboarded = true;
+            await user.save();
+
+            const enabledModules = Object.entries(modules || {})
+                .filter(([, enabled]) => enabled)
+                .map(([key]) => key);
+
+            let preferences = await UserPreferences.findOne({
+                where: { user_id: userId }
+            });
+
+            const preferencesData = {
+                timezone: timezone || 'America/Sao_Paulo',
+                default_currency: currency || 'BRL',
+                enabled_modules: enabledModules
+            };
+
+            if (preferences) {
+                await preferences.update(preferencesData);
+            } else {
+                preferences = await UserPreferences.create({
+                    user_id: userId,
+                    ...preferencesData
+                });
+            }
+
+            return reply.send({
+                success: true,
+                data: {
+                    user: {
+                        id: user.id,
+                        email: user.email,
+                        name: user.name,
+                        nickname: user.nickname,
+                        is_onboarded: user.is_onboarded
+                    },
+                    preferences: {
+                        timezone: preferences.timezone,
+                        default_currency: preferences.default_currency,
+                        enabled_modules: preferences.enabled_modules
+                    }
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            return reply.status(500).send({
+                success: false,
+                error: 'Internal Server Error',
+                message: error.message
+            });
+        }
+    }
+
+    /**
      * Update only module settings for the current user
      */
     async updateMyModuleSettings(request, reply) {
