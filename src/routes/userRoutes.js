@@ -208,6 +208,70 @@ async function userRoutes(fastify, options) {
             }
         }
     }, userController.updateMyModuleSettings);
+
+    // Complete onboarding - updates nickname, preferences and modules
+    fastify.post('/users/me/complete-onboarding', {
+        preHandler: [fastify.authenticate],
+        schema: {
+            description: 'Complete user onboarding with nickname and preferences',
+            tags: ['Users'],
+            security: [{ bearerAuth: [] }],
+            body: {
+                type: 'object',
+                properties: {
+                    nickname: { type: 'string', description: 'How the user wants to be called' },
+                    timezone: { type: 'string' },
+                    currency: { type: 'string', enum: ['BRL', 'USD', 'EUR'] },
+                    modules: {
+                        type: 'object',
+                        properties: {
+                            habits: { type: 'boolean' },
+                            productivity: { type: 'boolean' },
+                            finance: { type: 'boolean' },
+                            health: { type: 'boolean' },
+                            studies: { type: 'boolean' },
+                            work: { type: 'boolean' },
+                            social: { type: 'boolean' },
+                            home: { type: 'boolean' }
+                        }
+                    }
+                },
+                required: ['nickname']
+            },
+            response: {
+                200: {
+                    type: 'object',
+                    properties: {
+                        success: { type: 'boolean' },
+                        data: {
+                            type: 'object',
+                            properties: {
+                                user: {
+                                    type: 'object',
+                                    properties: {
+                                        id: { type: 'string' },
+                                        email: { type: 'string' },
+                                        name: { type: 'string' },
+                                        nickname: { type: 'string' },
+                                        is_onboarded: { type: 'boolean' }
+                                    }
+                                },
+                                preferences: {
+                                    type: 'object',
+                                    properties: {
+                                        timezone: { type: 'string' },
+                                        default_currency: { type: 'string' },
+                                        enabled_modules: { type: 'array', items: { type: 'string' } }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                404: common.errorResponse
+            }
+        }
+    }, userController.completeOnboarding);
 }
 
 module.exports = userRoutes;
