@@ -52,6 +52,11 @@ const UserPreferences = sequelize.define('UserPreferences', {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
         allowNull: false
+    },
+    enabled_modules: {
+        type: DataTypes.JSONB,
+        defaultValue: ['habits', 'projects', 'finance', 'health', 'study', 'home'],
+        allowNull: false
     }
 }, {
     tableName: 'user_preferences',
