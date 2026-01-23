@@ -1,3 +1,4 @@
+const authRoutes = require('./authRoutes');
 const userRoutes = require('./userRoutes');
 const coreRoutes = require('./coreRoutes');
 const habitRoutes = require('./habitRoutes');
@@ -19,6 +20,7 @@ async function routes(fastify, options) {
     });
 
     // Register API routes with /api prefix
+    fastify.register(authRoutes, { prefix: '/api' });
     fastify.register(userRoutes, { prefix: '/api' });
     fastify.register(coreRoutes, { prefix: '/api' });
     fastify.register(habitRoutes, { prefix: '/api' });

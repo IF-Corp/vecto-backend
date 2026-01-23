@@ -3,6 +3,9 @@ const cors = require('@fastify/cors');
 const env = require('@fastify/env');
 const errorHandler = require('./middleware/errorHandler');
 const routes = require('./routes');
+const authPlugin = require('./plugins/auth');
+const rateLimitPlugin = require('./plugins/rateLimit');
+const swaggerPlugin = require('./plugins/swagger');
 
 const schema = {
     type: 'object',
@@ -23,6 +26,14 @@ const schema = {
         CORS_ORIGIN: {
             type: 'string',
             default: '*'
+        },
+        JWT_SECRET: {
+            type: 'string',
+            default: 'development-secret-change-in-production-minimum-32-characters'
+        },
+        JWT_REFRESH_SECRET: {
+            type: 'string',
+            default: ''
         }
     }
 };
@@ -44,6 +55,17 @@ async function buildApp(opts = {}) {
         origin: app.config.CORS_ORIGIN || '*',
         credentials: true
     });
+
+    // Register Swagger documentation (before routes to collect schemas)
+    if (app.config.NODE_ENV !== 'production') {
+        await app.register(swaggerPlugin);
+    }
+
+    // Register rate limiting
+    await app.register(rateLimitPlugin);
+
+    // Register authentication plugin
+    await app.register(authPlugin);
 
     // Set error handler
     app.setErrorHandler(errorHandler);
