@@ -1,4 +1,4 @@
-const { User } = require('../models');
+const { User, UserPreferences } = require('../models');
 
 class UserController {
     /**
@@ -180,6 +180,146 @@ class UserController {
             return reply.send({
                 success: true,
                 data: user
+            });
+        } catch (error) {
+            console.error(error);
+            return reply.status(500).send({
+                error: 'Internal server error',
+                message: error.message
+            });
+        }
+    }
+
+    /**
+     * Get current user's preferences
+     */
+    async getMyPreferences(request, reply) {
+        try {
+            const userId = request.user.id;
+
+            let preferences = await UserPreferences.findOne({
+                where: { user_id: userId }
+            });
+
+            if (!preferences) {
+                // Create default preferences if none exist
+                preferences = await UserPreferences.create({
+                    user_id: userId
+                });
+            }
+
+            return reply.send({
+                success: true,
+                data: preferences
+            });
+        } catch (error) {
+            console.error(error);
+            return reply.status(500).send({
+                error: 'Internal server error',
+                message: error.message
+            });
+        }
+    }
+
+    /**
+     * Update current user's preferences (including modules during onboarding)
+     */
+    async updateMyPreferences(request, reply) {
+        try {
+            const userId = request.user.id;
+            const {
+                default_currency,
+                timezone,
+                language,
+                date_format,
+                week_start_day,
+                theme,
+                sounds_enabled,
+                compact_mode,
+                enabled_modules
+            } = request.body;
+
+            let preferences = await UserPreferences.findOne({
+                where: { user_id: userId }
+            });
+
+            const updateData = {};
+            if (default_currency !== undefined) updateData.default_currency = default_currency;
+            if (timezone !== undefined) updateData.timezone = timezone;
+            if (language !== undefined) updateData.language = language;
+            if (date_format !== undefined) updateData.date_format = date_format;
+            if (week_start_day !== undefined) updateData.week_start_day = week_start_day;
+            if (theme !== undefined) updateData.theme = theme;
+            if (sounds_enabled !== undefined) updateData.sounds_enabled = sounds_enabled;
+            if (compact_mode !== undefined) updateData.compact_mode = compact_mode;
+            if (enabled_modules !== undefined) updateData.enabled_modules = enabled_modules;
+
+            if (preferences) {
+                await preferences.update(updateData);
+            } else {
+                preferences = await UserPreferences.create({
+                    user_id: userId,
+                    ...updateData
+                });
+            }
+
+            return reply.send({
+                success: true,
+                data: preferences
+            });
+        } catch (error) {
+            console.error(error);
+            return reply.status(500).send({
+                error: 'Internal server error',
+                message: error.message
+            });
+        }
+    }
+
+    /**
+     * Update only module settings for the current user
+     */
+    async updateMyModuleSettings(request, reply) {
+        try {
+            const userId = request.user.id;
+            const { modules } = request.body;
+
+            if (!Array.isArray(modules)) {
+                return reply.status(400).send({
+                    error: 'Bad request',
+                    message: 'modules must be an array'
+                });
+            }
+
+            // Validate module names
+            const validModules = ['habits', 'projects', 'finance', 'health', 'study', 'home'];
+            const invalidModules = modules.filter(m => !validModules.includes(m));
+
+            if (invalidModules.length > 0) {
+                return reply.status(400).send({
+                    error: 'Bad request',
+                    message: `Invalid modules: ${invalidModules.join(', ')}. Valid modules: ${validModules.join(', ')}`
+                });
+            }
+
+            let preferences = await UserPreferences.findOne({
+                where: { user_id: userId }
+            });
+
+            if (preferences) {
+                await preferences.update({ enabled_modules: modules });
+            } else {
+                preferences = await UserPreferences.create({
+                    user_id: userId,
+                    enabled_modules: modules
+                });
+            }
+
+            return reply.send({
+                success: true,
+                data: {
+                    enabled_modules: preferences.enabled_modules
+                }
             });
         } catch (error) {
             console.error(error);
