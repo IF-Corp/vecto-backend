@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const { User, UserPreferences } = require('../models');
 const tokenService = require('../services/tokenService');
-const googleAuthService = require('../services/googleAuthService');
+const firebaseAuthService = require('../services/firebaseAuthService');
 
 const SALT_ROUNDS = 12;
 
@@ -122,10 +122,10 @@ class AuthController {
                 });
             }
 
-            // Verify Google token and extract user info
+            // Verify Firebase token and extract user info
             let googleUser;
             try {
-                googleUser = await googleAuthService.verifyToken(idToken);
+                googleUser = await firebaseAuthService.verifyToken(idToken);
             } catch (error) {
                 return reply.status(401).send({
                     success: false,

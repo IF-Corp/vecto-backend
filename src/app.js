@@ -34,6 +34,10 @@ const schema = {
         JWT_REFRESH_SECRET: {
             type: 'string',
             default: ''
+        },
+        FIREBASE_PROJECT_ID: {
+            type: 'string',
+            default: ''
         }
     }
 };
