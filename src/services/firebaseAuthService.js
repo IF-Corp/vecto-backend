@@ -1,7 +1,5 @@
 const admin = require('firebase-admin');
 
-const FIREBASE_PROJECT_ID = process.env.FIREBASE_PROJECT_ID;
-
 class FirebaseAuthService {
     constructor() {
         this.initialized = false;
@@ -10,14 +8,23 @@ class FirebaseAuthService {
     initialize() {
         if (this.initialized) return;
 
-        if (!FIREBASE_PROJECT_ID) {
-            console.warn('FIREBASE_PROJECT_ID not configured - Firebase auth will not work');
+        const projectId = process.env.FIREBASE_PROJECT_ID;
+        const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+        const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+
+        if (!projectId || !clientEmail || !privateKey) {
+            console.warn('Firebase credentials not fully configured');
+            console.warn('Required: FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY');
             return;
         }
 
         try {
             admin.initializeApp({
-                projectId: FIREBASE_PROJECT_ID,
+                credential: admin.credential.cert({
+                    projectId,
+                    clientEmail,
+                    privateKey,
+                }),
             });
             this.initialized = true;
             console.log('Firebase Admin SDK initialized successfully');
@@ -37,7 +44,7 @@ class FirebaseAuthService {
         }
 
         if (!this.initialized) {
-            throw new Error('Firebase Admin SDK not initialized. Check FIREBASE_PROJECT_ID.');
+            throw new Error('Firebase Admin SDK not initialized. Check environment variables.');
         }
 
         try {
