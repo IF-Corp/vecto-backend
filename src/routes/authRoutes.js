@@ -64,6 +64,77 @@ async function authRoutes(fastify, options) {
         }
     }, authController.refresh);
 
+    fastify.post('/auth/google', {
+        schema: {
+            description: 'Login or register with Google SSO',
+            tags: ['Auth'],
+            body: {
+                type: 'object',
+                properties: {
+                    idToken: { type: 'string', description: 'Google ID token from OAuth flow' }
+                },
+                required: ['idToken']
+            },
+            response: {
+                200: {
+                    type: 'object',
+                    properties: {
+                        success: { type: 'boolean' },
+                        data: {
+                            type: 'object',
+                            properties: {
+                                user: {
+                                    type: 'object',
+                                    properties: {
+                                        id: { type: 'string', format: 'uuid' },
+                                        email: { type: 'string', format: 'email' },
+                                        name: { type: 'string' },
+                                        avatar_url: { type: 'string' },
+                                        is_onboarded: { type: 'boolean' }
+                                    }
+                                },
+                                isNewUser: { type: 'boolean' },
+                                accessToken: { type: 'string' },
+                                refreshToken: { type: 'string' }
+                            }
+                        }
+                    }
+                },
+                201: {
+                    type: 'object',
+                    properties: {
+                        success: { type: 'boolean' },
+                        data: {
+                            type: 'object',
+                            properties: {
+                                user: {
+                                    type: 'object',
+                                    properties: {
+                                        id: { type: 'string', format: 'uuid' },
+                                        email: { type: 'string', format: 'email' },
+                                        name: { type: 'string' },
+                                        avatar_url: { type: 'string' },
+                                        is_onboarded: { type: 'boolean' }
+                                    }
+                                },
+                                isNewUser: { type: 'boolean' },
+                                accessToken: { type: 'string' },
+                                refreshToken: { type: 'string' }
+                            }
+                        }
+                    }
+                },
+                401: common.errorResponse
+            }
+        },
+        config: {
+            rateLimit: {
+                max: 10,
+                timeWindow: '1 minute'
+            }
+        }
+    }, authController.googleLogin);
+
     // Protected routes - authentication required
 
     fastify.get('/auth/me', {
