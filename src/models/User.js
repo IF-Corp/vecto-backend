@@ -27,7 +27,14 @@ const User = sequelize.define('User', {
     },
     nickname: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: true,
+        unique: true,
+        validate: {
+            is: {
+                args: /^[a-z0-9.]{3,30}$/,
+                msg: 'Username must be 3-30 characters, lowercase letters, numbers and dots only'
+            }
+        }
     },
     password_hash: {
         type: DataTypes.STRING,
