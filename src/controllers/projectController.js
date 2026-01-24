@@ -159,6 +159,51 @@ class ProjectController {
         }
     }
 
+    async updateTaskStatus(request, reply) {
+        try {
+            const { id } = request.params;
+            const { status } = request.body;
+
+            const validStatuses = ['BACKLOG', 'TODO', 'DOING', 'DONE'];
+            if (!validStatuses.includes(status)) {
+                return reply.status(400).send({
+                    success: false,
+                    error: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
+                });
+            }
+
+            const task = await Task.findByPk(id);
+            if (!task) {
+                return reply.status(404).send({ success: false, error: 'Task not found' });
+            }
+
+            await task.update({ status });
+            return reply.send({ success: true, data: task });
+        } catch (error) {
+            console.error(error);
+            return reply.status(500).send({ success: false, error: error.message });
+        }
+    }
+
+    async getTaskById(request, reply) {
+        try {
+            const { id } = request.params;
+
+            const task = await Task.findByPk(id, {
+                include: [{ model: Project, as: 'project', attributes: ['id', 'name'] }]
+            });
+
+            if (!task) {
+                return reply.status(404).send({ success: false, error: 'Task not found' });
+            }
+
+            return reply.send({ success: true, data: task });
+        } catch (error) {
+            console.error(error);
+            return reply.status(500).send({ success: false, error: error.message });
+        }
+    }
+
     // ==================== MEETINGS ====================
 
     async getMeetings(request, reply) {
