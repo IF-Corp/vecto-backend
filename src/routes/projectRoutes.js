@@ -87,6 +87,31 @@ async function projectRoutes(fastify, options) {
         }
     }, projectController.deleteTask);
 
+    fastify.get('/tasks/:id', {
+        schema: {
+            description: 'Get a single task by ID',
+            tags: ['Tasks'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams
+        }
+    }, projectController.getTaskById);
+
+    fastify.patch('/tasks/:id/status', {
+        schema: {
+            description: 'Update task status (optimized for drag & drop)',
+            tags: ['Tasks'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams,
+            body: {
+                type: 'object',
+                properties: {
+                    status: { type: 'string', enum: ['BACKLOG', 'TODO', 'DOING', 'DONE'] }
+                },
+                required: ['status']
+            }
+        }
+    }, projectController.updateTaskStatus);
+
     // ==================== MEETINGS ====================
     fastify.get('/projects/:projectId/meetings', {
         schema: {
