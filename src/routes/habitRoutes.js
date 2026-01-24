@@ -12,7 +12,13 @@ async function habitRoutes(fastify, options) {
             description: 'Get all habits for a user',
             tags: ['Habits'],
             security: [{ bearerAuth: [] }],
-            params: common.userIdParams
+            params: common.userIdParams,
+            querystring: {
+                type: 'object',
+                properties: {
+                    status: { type: 'string', enum: ['active', 'archived', 'all'], default: 'active' }
+                }
+            }
         }
     }, habitController.getHabits);
 
@@ -46,6 +52,25 @@ async function habitRoutes(fastify, options) {
         }
     }, habitController.deleteHabit);
 
+    fastify.post('/habits/:id/archive', {
+        schema: {
+            description: 'Archive a habit',
+            tags: ['Habits'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams
+        }
+    }, habitController.archiveHabit);
+
+    fastify.post('/habits/:id/reactivate', {
+        schema: {
+            description: 'Reactivate an archived habit',
+            tags: ['Habits'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams,
+            body: habit.reactivateHabitBody
+        }
+    }, habitController.reactivateHabit);
+
     fastify.post('/habits/:id/log', {
         schema: {
             description: 'Log habit completion',
@@ -61,9 +86,15 @@ async function habitRoutes(fastify, options) {
         preHandler: [fastify.authorizeUser],
         schema: {
             description: 'Get all routines for a user',
-            tags: ['Habits'],
+            tags: ['Routines'],
             security: [{ bearerAuth: [] }],
-            params: common.userIdParams
+            params: common.userIdParams,
+            querystring: {
+                type: 'object',
+                properties: {
+                    status: { type: 'string', enum: ['active', 'archived', 'all'], default: 'active' }
+                }
+            }
         }
     }, habitController.getRoutines);
 
@@ -71,7 +102,7 @@ async function habitRoutes(fastify, options) {
         preHandler: [fastify.authorizeUser],
         schema: {
             description: 'Create a new routine',
-            tags: ['Habits'],
+            tags: ['Routines'],
             security: [{ bearerAuth: [] }],
             params: common.userIdParams,
             body: habit.createRoutineBody
@@ -81,7 +112,7 @@ async function habitRoutes(fastify, options) {
     fastify.put('/routines/:id', {
         schema: {
             description: 'Update a routine',
-            tags: ['Habits'],
+            tags: ['Routines'],
             security: [{ bearerAuth: [] }],
             params: common.idParams,
             body: habit.updateRoutineBody
@@ -91,11 +122,146 @@ async function habitRoutes(fastify, options) {
     fastify.delete('/routines/:id', {
         schema: {
             description: 'Delete a routine',
-            tags: ['Habits'],
+            tags: ['Routines'],
             security: [{ bearerAuth: [] }],
             params: common.idParams
         }
     }, habitController.deleteRoutine);
+
+    fastify.post('/routines/:id/archive', {
+        schema: {
+            description: 'Archive a routine',
+            tags: ['Routines'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams
+        }
+    }, habitController.archiveRoutine);
+
+    fastify.post('/routines/:id/executions', {
+        schema: {
+            description: 'Log a routine execution (focus mode)',
+            tags: ['Routines'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams,
+            body: habit.logRoutineExecutionBody
+        }
+    }, habitController.logRoutineExecution);
+
+    fastify.get('/routines/:id/history', {
+        schema: {
+            description: 'Get routine execution history',
+            tags: ['Routines'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams,
+            querystring: {
+                type: 'object',
+                properties: {
+                    limit: { type: 'integer', default: 30 }
+                }
+            }
+        }
+    }, habitController.getRoutineHistory);
+
+    // ==================== FOCUS MODE ====================
+    fastify.post('/routines/:id/executions/start', {
+        schema: {
+            description: 'Start a focus session for a routine',
+            tags: ['Focus Mode'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams
+        }
+    }, habitController.startFocusSession);
+
+    fastify.put('/routines/:id/executions/:executionId/pause', {
+        schema: {
+            description: 'Pause an active focus session',
+            tags: ['Focus Mode'],
+            security: [{ bearerAuth: [] }],
+            params: {
+                type: 'object',
+                required: ['id', 'executionId'],
+                properties: {
+                    id: { type: 'string', format: 'uuid' },
+                    executionId: { type: 'string', format: 'uuid' }
+                }
+            }
+        }
+    }, habitController.pauseFocusSession);
+
+    fastify.put('/routines/:id/executions/:executionId/resume', {
+        schema: {
+            description: 'Resume a paused focus session',
+            tags: ['Focus Mode'],
+            security: [{ bearerAuth: [] }],
+            params: {
+                type: 'object',
+                required: ['id', 'executionId'],
+                properties: {
+                    id: { type: 'string', format: 'uuid' },
+                    executionId: { type: 'string', format: 'uuid' }
+                }
+            }
+        }
+    }, habitController.resumeFocusSession);
+
+    fastify.put('/routines/:id/executions/:executionId/complete', {
+        schema: {
+            description: 'Complete a focus session',
+            tags: ['Focus Mode'],
+            security: [{ bearerAuth: [] }],
+            params: {
+                type: 'object',
+                required: ['id', 'executionId'],
+                properties: {
+                    id: { type: 'string', format: 'uuid' },
+                    executionId: { type: 'string', format: 'uuid' }
+                }
+            },
+            body: habit.completeFocusSessionBody
+        }
+    }, habitController.completeFocusSession);
+
+    fastify.put('/routines/:id/executions/:executionId/cancel', {
+        schema: {
+            description: 'Cancel an active focus session',
+            tags: ['Focus Mode'],
+            security: [{ bearerAuth: [] }],
+            params: {
+                type: 'object',
+                required: ['id', 'executionId'],
+                properties: {
+                    id: { type: 'string', format: 'uuid' },
+                    executionId: { type: 'string', format: 'uuid' }
+                }
+            }
+        }
+    }, habitController.cancelFocusSession);
+
+    fastify.get('/users/:userId/active-session', {
+        preHandler: [fastify.authorizeUser],
+        schema: {
+            description: 'Get the active focus session for a user',
+            tags: ['Focus Mode'],
+            security: [{ bearerAuth: [] }],
+            params: common.userIdParams
+        }
+    }, habitController.getActiveSession);
+
+    fastify.get('/users/:userId/focus-stats', {
+        preHandler: [fastify.authorizeUser],
+        schema: {
+            description: 'Get focus mode statistics for a user',
+            tags: ['Focus Mode'],
+            security: [{ bearerAuth: [] }],
+            params: common.userIdParams,
+            querystring: {
+                type: 'object',
+                properties: {
+                    period: { type: 'string', enum: ['week', 'month', 'all'], default: 'week' }
+                }
+            }
+        }
+    }, habitController.getFocusStats);
 
     // ==================== SOCIAL GROUPS ====================
     fastify.get('/social-groups', {

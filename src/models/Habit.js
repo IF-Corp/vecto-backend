@@ -16,6 +16,15 @@ const Habit = sequelize.define('Habit', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+    category: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+        defaultValue: 'Geral'
+    },
     context_tags: {
         type: DataTypes.ARRAY(DataTypes.STRING),
         defaultValue: [],
@@ -24,6 +33,11 @@ const Habit = sequelize.define('Habit', {
     ideal_time: {
         type: DataTypes.TIME,
         allowNull: true
+    },
+    time_period: {
+        type: DataTypes.ENUM('morning', 'afternoon', 'evening', 'anytime'),
+        allowNull: true,
+        defaultValue: 'anytime'
     },
     frequency: {
         type: DataTypes.ENUM('DAILY', 'WEEKLY', 'CUSTOM'),
@@ -35,9 +49,24 @@ const Habit = sequelize.define('Habit', {
         defaultValue: [],
         allowNull: true
     },
+    estimated_duration: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        comment: 'Duration in minutes'
+    },
     current_streak: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
+        allowNull: false
+    },
+    best_streak: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        allowNull: false
+    },
+    status: {
+        type: DataTypes.ENUM('active', 'archived'),
+        defaultValue: 'active',
         allowNull: false
     },
     is_frozen: {
@@ -59,12 +88,6 @@ Habit.associate = (models) => {
     Habit.hasMany(models.HabitLog, {
         foreignKey: 'habit_id',
         as: 'logs'
-    });
-    Habit.belongsToMany(models.Routine, {
-        through: models.RoutineItem,
-        foreignKey: 'habit_id',
-        otherKey: 'routine_id',
-        as: 'routines'
     });
 };
 
