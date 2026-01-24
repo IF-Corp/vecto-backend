@@ -2,6 +2,39 @@ const userController = require('../controllers/userController');
 const { user, common } = require('../schemas');
 
 async function userRoutes(fastify, options) {
+    // Check username availability (public endpoint, but requires authentication)
+    fastify.get('/users/check-username/:username', {
+        preHandler: [fastify.authenticate],
+        schema: {
+            description: 'Check if a username is available',
+            tags: ['Users'],
+            security: [{ bearerAuth: [] }],
+            params: {
+                type: 'object',
+                properties: {
+                    username: { type: 'string', minLength: 3, maxLength: 30 }
+                },
+                required: ['username']
+            },
+            response: {
+                200: {
+                    type: 'object',
+                    properties: {
+                        success: { type: 'boolean' },
+                        data: {
+                            type: 'object',
+                            properties: {
+                                username: { type: 'string' },
+                                available: { type: 'boolean' }
+                            }
+                        }
+                    }
+                },
+                400: common.errorResponse
+            }
+        }
+    }, userController.checkUsernameAvailability);
+
     // Get user by ID
     fastify.get('/users/:id', {
         preHandler: [fastify.authenticate],
@@ -209,19 +242,24 @@ async function userRoutes(fastify, options) {
         }
     }, userController.updateMyModuleSettings);
 
-    // Complete onboarding - updates nickname, preferences and modules
+    // Complete onboarding - updates name, username and modules
     fastify.post('/users/me/complete-onboarding', {
         preHandler: [fastify.authenticate],
         schema: {
-            description: 'Complete user onboarding with nickname and preferences',
+            description: 'Complete user onboarding with name, username and module preferences',
             tags: ['Users'],
             security: [{ bearerAuth: [] }],
             body: {
                 type: 'object',
                 properties: {
-                    nickname: { type: 'string', description: 'How the user wants to be called' },
-                    timezone: { type: 'string' },
-                    currency: { type: 'string', enum: ['BRL', 'USD', 'EUR'] },
+                    name: { type: 'string', description: 'Display name (can be edited)' },
+                    username: {
+                        type: 'string',
+                        minLength: 3,
+                        maxLength: 30,
+                        pattern: '^[a-z0-9.]+$',
+                        description: 'Unique username (lowercase, numbers, dots only)'
+                    },
                     modules: {
                         type: 'object',
                         properties: {
@@ -236,7 +274,7 @@ async function userRoutes(fastify, options) {
                         }
                     }
                 },
-                required: ['nickname']
+                required: ['username']
             },
             response: {
                 200: {
@@ -253,6 +291,7 @@ async function userRoutes(fastify, options) {
                                         email: { type: 'string' },
                                         name: { type: 'string' },
                                         nickname: { type: 'string' },
+                                        avatar_url: { type: 'string' },
                                         is_onboarded: { type: 'boolean' }
                                     }
                                 },
@@ -268,7 +307,9 @@ async function userRoutes(fastify, options) {
                         }
                     }
                 },
-                404: common.errorResponse
+                400: common.errorResponse,
+                404: common.errorResponse,
+                409: common.errorResponse
             }
         }
     }, userController.completeOnboarding);
