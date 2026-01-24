@@ -42,6 +42,10 @@ const Task = sequelize.define('Task', {
         type: DataTypes.DATE,
         allowNull: true
     },
+    scheduled_time: {
+        type: DataTypes.TIME,
+        allowNull: true
+    },
     estimated_duration: {
         type: DataTypes.INTEGER,
         allowNull: true

@@ -35,6 +35,21 @@ const Routine = sequelize.define('Routine', {
         defaultValue: 0,
         allowNull: false
     },
+    best_streak: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        allowNull: false
+    },
+    status: {
+        type: DataTypes.ENUM('active', 'archived'),
+        defaultValue: 'active',
+        allowNull: false
+    },
+    average_duration: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        comment: 'Average execution duration in seconds'
+    },
     is_frozen: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
@@ -51,11 +66,13 @@ Routine.associate = (models) => {
         foreignKey: 'user_id',
         as: 'user'
     });
-    Routine.belongsToMany(models.Habit, {
-        through: models.RoutineItem,
+    Routine.hasMany(models.RoutineItem, {
         foreignKey: 'routine_id',
-        otherKey: 'habit_id',
-        as: 'habits'
+        as: 'items'
+    });
+    Routine.hasMany(models.RoutineExecution, {
+        foreignKey: 'routine_id',
+        as: 'executions'
     });
 };
 

@@ -12,14 +12,24 @@ const RoutineItem = sequelize.define('RoutineItem', {
         type: DataTypes.UUID,
         allowNull: false
     },
-    habit_id: {
-        type: DataTypes.UUID,
+    title: {
+        type: DataTypes.STRING(200),
         allowNull: false
     },
-    execution_order: {
+    estimated_duration: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        comment: 'Duration in minutes'
+    },
+    item_order: {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0
+    },
+    // Legacy field for backward compatibility
+    habit_id: {
+        type: DataTypes.UUID,
+        allowNull: true
     }
 }, {
     tableName: 'routine_items',
@@ -31,10 +41,6 @@ RoutineItem.associate = (models) => {
     RoutineItem.belongsTo(models.Routine, {
         foreignKey: 'routine_id',
         as: 'routine'
-    });
-    RoutineItem.belongsTo(models.Habit, {
-        foreignKey: 'habit_id',
-        as: 'habit'
     });
 };
 
