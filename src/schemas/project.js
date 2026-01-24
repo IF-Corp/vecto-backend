@@ -1,8 +1,8 @@
 // Project and Task schemas
 
 const projectStatusEnum = { type: 'string', enum: ['IN_PROGRESS', 'COMPLETED', 'PAUSED'] };
-const taskStatusEnum = { type: 'string', enum: ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'] };
-const taskPriorityEnum = { type: 'string', enum: ['LOW', 'MEDIUM', 'HIGH', 'URGENT'] };
+const taskStatusEnum = { type: 'string', enum: ['BACKLOG', 'TODO', 'DOING', 'DONE'] };
+const taskPriorityEnum = { type: 'string', enum: ['LOW', 'MEDIUM', 'HIGH'] };
 
 // Project schemas
 const createProjectBody = {
@@ -37,7 +37,9 @@ const createTaskBody = {
         project_id: { type: 'string', format: 'uuid', nullable: true },
         status: taskStatusEnum,
         priority: taskPriorityEnum,
-        due_date: { type: 'string', format: 'date-time', nullable: true },
+        scheduled_date: { type: 'string', format: 'date', nullable: true },
+        estimated_duration: { type: 'integer', minimum: 0, nullable: true },
+        category_name: { type: 'string', maxLength: 100, nullable: true },
         tags: { type: 'array', items: { type: 'string' }, default: [] },
         assignees: { type: 'array', items: { type: 'string', format: 'uuid' }, default: [] }
     },
@@ -53,7 +55,9 @@ const updateTaskBody = {
         project_id: { type: 'string', format: 'uuid', nullable: true },
         status: taskStatusEnum,
         priority: taskPriorityEnum,
-        due_date: { type: 'string', format: 'date-time', nullable: true },
+        scheduled_date: { type: 'string', format: 'date', nullable: true },
+        estimated_duration: { type: 'integer', minimum: 0, nullable: true },
+        category_name: { type: 'string', maxLength: 100, nullable: true },
         tags: { type: 'array', items: { type: 'string' } },
         assignees: { type: 'array', items: { type: 'string', format: 'uuid' } }
     },
