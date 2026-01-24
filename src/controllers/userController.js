@@ -2,6 +2,51 @@ const { User, UserPreferences } = require('../models');
 
 class UserController {
     /**
+     * Check if a username is available
+     */
+    async checkUsernameAvailability(request, reply) {
+        try {
+            const { username } = request.params;
+
+            if (!username || username.length < 3) {
+                return reply.status(400).send({
+                    success: false,
+                    error: 'Bad Request',
+                    message: 'Username must be at least 3 characters'
+                });
+            }
+
+            const usernameRegex = /^[a-z0-9.]{3,30}$/;
+            if (!usernameRegex.test(username)) {
+                return reply.status(400).send({
+                    success: false,
+                    error: 'Bad Request',
+                    message: 'Username must contain only lowercase letters, numbers and dots'
+                });
+            }
+
+            const existingUser = await User.findOne({
+                where: { nickname: username }
+            });
+
+            return reply.send({
+                success: true,
+                data: {
+                    username,
+                    available: !existingUser
+                }
+            });
+        } catch (error) {
+            console.error('Check username error:', error);
+            return reply.status(500).send({
+                success: false,
+                error: 'Internal Server Error',
+                message: error.message
+            });
+        }
+    }
+
+    /**
      * Get user by ID
      */
     async getUser(request, reply) {
@@ -277,12 +322,41 @@ class UserController {
     }
 
     /**
-     * Complete onboarding - updates nickname, preferences and modules in one call
+     * Complete onboarding - updates name, username and modules in one call
      */
     async completeOnboarding(request, reply) {
         try {
             const userId = request.user.id;
-            const { nickname, timezone, currency, modules } = request.body;
+            const { name, username, modules } = request.body;
+
+            if (!username) {
+                return reply.status(400).send({
+                    success: false,
+                    error: 'Bad Request',
+                    message: 'Username is required'
+                });
+            }
+
+            const usernameRegex = /^[a-z0-9.]{3,30}$/;
+            if (!usernameRegex.test(username)) {
+                return reply.status(400).send({
+                    success: false,
+                    error: 'Bad Request',
+                    message: 'Username must be 3-30 characters, lowercase letters, numbers and dots only'
+                });
+            }
+
+            const existingUser = await User.findOne({
+                where: { nickname: username }
+            });
+
+            if (existingUser && existingUser.id !== userId) {
+                return reply.status(409).send({
+                    success: false,
+                    error: 'Conflict',
+                    message: 'Username already taken'
+                });
+            }
 
             const user = await User.findByPk(userId);
             if (!user) {
@@ -293,7 +367,8 @@ class UserController {
                 });
             }
 
-            user.nickname = nickname || null;
+            user.name = name || user.name;
+            user.nickname = username;
             user.is_onboarded = true;
             await user.save();
 
@@ -306,8 +381,8 @@ class UserController {
             });
 
             const preferencesData = {
-                timezone: timezone || 'America/Sao_Paulo',
-                default_currency: currency || 'BRL',
+                timezone: 'America/Sao_Paulo',
+                default_currency: 'BRL',
                 enabled_modules: enabledModules
             };
 
@@ -328,6 +403,7 @@ class UserController {
                         email: user.email,
                         name: user.name,
                         nickname: user.nickname,
+                        avatar_url: user.avatar_url,
                         is_onboarded: user.is_onboarded
                     },
                     preferences: {
@@ -338,7 +414,7 @@ class UserController {
                 }
             });
         } catch (error) {
-            console.error(error);
+            console.error('Complete onboarding error:', error);
             return reply.status(500).send({
                 success: false,
                 error: 'Internal Server Error',
