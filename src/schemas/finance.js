@@ -1,6 +1,7 @@
 // Finance schemas
 
 const accountTypeEnum = { type: 'string', enum: ['CREDIT', 'DEBIT', 'CASH', 'INVESTMENT'] };
+const accountBrandEnum = { type: 'string', enum: ['VISA', 'MASTERCARD', 'ELO', 'AMEX', 'HIPERCARD', 'OTHER'] };
 const transactionTypeEnum = { type: 'string', enum: ['INCOME', 'EXPENSE'] };
 const transactionStatusEnum = { type: 'string', enum: ['PENDING', 'CONSOLIDATED'] };
 const recurrenceTypeEnum = { type: 'string', enum: ['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY'] };
@@ -11,6 +12,7 @@ const createAccountBody = {
     properties: {
         name: { type: 'string', minLength: 1, maxLength: 200 },
         type: accountTypeEnum,
+        brand: { ...accountBrandEnum, nullable: true },
         total_limit: { type: 'number', minimum: 0, nullable: true },
         closing_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true },
         due_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true }
@@ -24,6 +26,7 @@ const updateAccountBody = {
     properties: {
         name: { type: 'string', minLength: 1, maxLength: 200 },
         type: accountTypeEnum,
+        brand: { ...accountBrandEnum, nullable: true },
         total_limit: { type: 'number', minimum: 0, nullable: true },
         closing_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true },
         due_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true }
@@ -126,6 +129,7 @@ module.exports = {
     createBudgetBody,
     updateBudgetBody,
     accountTypeEnum,
+    accountBrandEnum,
     transactionTypeEnum,
     transactionStatusEnum,
     recurrenceTypeEnum
