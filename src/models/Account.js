@@ -20,6 +20,10 @@ const Account = sequelize.define('Account', {
         type: DataTypes.ENUM('CREDIT', 'DEBIT', 'CASH', 'INVESTMENT'),
         allowNull: false
     },
+    brand: {
+        type: DataTypes.ENUM('VISA', 'MASTERCARD', 'ELO', 'AMEX', 'HIPERCARD', 'OTHER'),
+        allowNull: true
+    },
     total_limit: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: true
