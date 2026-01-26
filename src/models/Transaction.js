@@ -8,10 +8,27 @@ const Transaction = sequelize.define('Transaction', {
         primaryKey: true,
         allowNull: false
     },
-    account_id: {
+    user_id: {
         type: DataTypes.UUID,
         allowNull: false
     },
+    account_id: {
+        type: DataTypes.UUID,
+        allowNull: true // null for cash/pix transactions
+    },
+    category_id: {
+        type: DataTypes.UUID,
+        allowNull: true
+    },
+    card_id: {
+        type: DataTypes.UUID,
+        allowNull: true
+    },
+    invoice_id: {
+        type: DataTypes.UUID,
+        allowNull: true
+    },
+    // Legacy fields for backward compatibility
     primary_category: {
         type: DataTypes.STRING,
         allowNull: true
@@ -21,11 +38,11 @@ const Transaction = sequelize.define('Transaction', {
         allowNull: true
     },
     description: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(200),
         allowNull: true
     },
     amount: {
-        type: DataTypes.DECIMAL(10, 2),
+        type: DataTypes.DECIMAL(12, 2),
         allowNull: false
     },
     type: {
@@ -36,10 +53,46 @@ const Transaction = sequelize.define('Transaction', {
         type: DataTypes.DATE,
         allowNull: false
     },
-    status: {
-        type: DataTypes.ENUM('PENDING', 'CONSOLIDATED'),
-        defaultValue: 'PENDING',
+    // Installment fields
+    is_installment: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
         allowNull: false
+    },
+    installment_id: {
+        type: DataTypes.UUID,
+        allowNull: true
+    },
+    current_installment: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
+    total_installments: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
+    // Recurring fields
+    is_recurring: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+    },
+    recurring_id: {
+        type: DataTypes.UUID,
+        allowNull: true
+    },
+    status: {
+        type: DataTypes.ENUM('PENDING', 'CONFIRMED', 'CANCELLED'),
+        defaultValue: 'CONFIRMED',
+        allowNull: false
+    },
+    notes: {
+        type: DataTypes.STRING(500),
+        allowNull: true
+    },
+    attachment_url: {
+        type: DataTypes.STRING(500),
+        allowNull: true
     }
 }, {
     tableName: 'transactions',
@@ -48,9 +101,25 @@ const Transaction = sequelize.define('Transaction', {
 });
 
 Transaction.associate = (models) => {
+    Transaction.belongsTo(models.User, {
+        foreignKey: 'user_id',
+        as: 'user'
+    });
     Transaction.belongsTo(models.Account, {
         foreignKey: 'account_id',
         as: 'account'
+    });
+    Transaction.belongsTo(models.FinanceCategory, {
+        foreignKey: 'category_id',
+        as: 'category'
+    });
+    Transaction.belongsTo(models.Card, {
+        foreignKey: 'card_id',
+        as: 'card'
+    });
+    Transaction.belongsTo(models.Invoice, {
+        foreignKey: 'invoice_id',
+        as: 'invoice'
     });
 };
 
