@@ -67,62 +67,6 @@ async function coreRoutes(fastify, options) {
         }
     }, coreController.upsertOnboardingState);
 
-    // ==================== GLOBAL CATEGORIES ====================
-    fastify.get('/users/:userId/categories', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get global categories for a user',
-            tags: ['Core'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams
-        }
-    }, coreController.getCategories);
-
-    fastify.post('/users/:userId/categories', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a global category',
-            tags: ['Core'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
-            body: {
-                type: 'object',
-                properties: {
-                    name: { type: 'string', minLength: 1, maxLength: 100 },
-                    color: { type: 'string', maxLength: 20 },
-                    icon: { type: 'string', maxLength: 50 }
-                },
-                required: ['name']
-            }
-        }
-    }, coreController.createCategory);
-
-    fastify.put('/categories/:id', {
-        schema: {
-            description: 'Update a global category',
-            tags: ['Core'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
-            body: {
-                type: 'object',
-                properties: {
-                    name: { type: 'string', minLength: 1, maxLength: 100 },
-                    color: { type: 'string', maxLength: 20 },
-                    icon: { type: 'string', maxLength: 50 }
-                }
-            }
-        }
-    }, coreController.updateCategory);
-
-    fastify.delete('/categories/:id', {
-        schema: {
-            description: 'Delete a global category',
-            tags: ['Core'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams
-        }
-    }, coreController.deleteCategory);
-
     // ==================== NOTIFICATION CONFIG ====================
     fastify.get('/users/:userId/notifications', {
         preHandler: [fastify.authorizeUser],
