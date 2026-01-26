@@ -5,6 +5,79 @@ async function healthRoutes(fastify, options) {
     // Apply authentication to all routes
     fastify.addHook('preHandler', fastify.authenticate);
 
+    // ==================== HEALTH PROFILE ====================
+    fastify.get('/users/:userId/health-profile', {
+        preHandler: [fastify.authorizeUser],
+        schema: {
+            description: 'Get health profile for a user',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.userIdParams
+        }
+    }, healthController.getHealthProfile);
+
+    fastify.put('/users/:userId/health-profile', {
+        preHandler: [fastify.authorizeUser],
+        schema: {
+            description: 'Update health profile',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.userIdParams,
+            body: health.updateHealthProfileBody
+        }
+    }, healthController.updateHealthProfile);
+
+    // ==================== WEIGHT LOGS ====================
+    fastify.get('/users/:userId/weight', {
+        preHandler: [fastify.authorizeUser],
+        schema: {
+            description: 'Get weight logs for a user',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.userIdParams
+        }
+    }, healthController.getWeightLogs);
+
+    fastify.get('/users/:userId/weight/latest', {
+        preHandler: [fastify.authorizeUser],
+        schema: {
+            description: 'Get latest weight log for a user',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.userIdParams
+        }
+    }, healthController.getLatestWeight);
+
+    fastify.post('/users/:userId/weight', {
+        preHandler: [fastify.authorizeUser],
+        schema: {
+            description: 'Create a weight log',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.userIdParams,
+            body: health.createWeightLogBody
+        }
+    }, healthController.createWeightLog);
+
+    fastify.put('/weight/:id', {
+        schema: {
+            description: 'Update a weight log',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams,
+            body: health.updateWeightLogBody
+        }
+    }, healthController.updateWeightLog);
+
+    fastify.delete('/weight/:id', {
+        schema: {
+            description: 'Delete a weight log',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams
+        }
+    }, healthController.deleteWeightLog);
+
     // ==================== MEAL LOGS ====================
     fastify.get('/users/:userId/meals', {
         preHandler: [fastify.authorizeUser],

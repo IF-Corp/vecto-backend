@@ -1,4 +1,133 @@
-const { MealLog, Workout, WorkoutDetail, Medication, MedicationLog, SleepMetric } = require('../models');
+const { MealLog, Workout, WorkoutDetail, Medication, MedicationLog, SleepMetric, HealthProfile, WeightLog } = require('../models');
+
+// ==================== HEALTH PROFILE ====================
+
+const getHealthProfile = async (request, reply) => {
+    try {
+        const { userId } = request.params;
+        let profile = await HealthProfile.findOne({
+            where: { user_id: userId }
+        });
+
+        // Auto-create profile if doesn't exist
+        if (!profile) {
+            profile = await HealthProfile.create({ user_id: userId });
+        }
+
+        return { success: true, data: profile };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
+const updateHealthProfile = async (request, reply) => {
+    try {
+        const { userId } = request.params;
+        let profile = await HealthProfile.findOne({
+            where: { user_id: userId }
+        });
+
+        if (!profile) {
+            // Create if doesn't exist
+            profile = await HealthProfile.create({
+                ...request.body,
+                user_id: userId
+            });
+            reply.status(201);
+            return { success: true, data: profile, created: true };
+        }
+
+        await profile.update(request.body);
+        return { success: true, data: profile };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
+// ==================== WEIGHT LOGS ====================
+
+const getWeightLogs = async (request, reply) => {
+    try {
+        const { userId } = request.params;
+        const logs = await WeightLog.findAll({
+            where: { user_id: userId },
+            order: [['date', 'DESC']]
+        });
+        return { success: true, data: logs };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
+const createWeightLog = async (request, reply) => {
+    try {
+        const { userId } = request.params;
+        const log = await WeightLog.create({
+            ...request.body,
+            user_id: userId
+        });
+        reply.status(201);
+        return { success: true, data: log, created: true };
+    } catch (error) {
+        // Handle unique constraint violation (one log per day)
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            reply.status(409);
+            return { success: false, error: 'Weight log already exists for this date' };
+        }
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
+const updateWeightLog = async (request, reply) => {
+    try {
+        const { id } = request.params;
+        const [updated] = await WeightLog.update(request.body, {
+            where: { id }
+        });
+        if (!updated) {
+            reply.status(404);
+            return { success: false, error: 'Weight log not found' };
+        }
+        const log = await WeightLog.findByPk(id);
+        return { success: true, data: log };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
+const deleteWeightLog = async (request, reply) => {
+    try {
+        const { id } = request.params;
+        const deleted = await WeightLog.destroy({ where: { id } });
+        if (!deleted) {
+            reply.status(404);
+            return { success: false, error: 'Weight log not found' };
+        }
+        return { success: true, data: { deleted: true } };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
+const getLatestWeight = async (request, reply) => {
+    try {
+        const { userId } = request.params;
+        const log = await WeightLog.findOne({
+            where: { user_id: userId },
+            order: [['date', 'DESC']]
+        });
+        return { success: true, data: log };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
 
 // ==================== MEAL LOGS ====================
 
@@ -343,6 +472,15 @@ const deleteSleepMetric = async (request, reply) => {
 };
 
 module.exports = {
+    // Health Profile
+    getHealthProfile,
+    updateHealthProfile,
+    // Weight Logs
+    getWeightLogs,
+    createWeightLog,
+    updateWeightLog,
+    deleteWeightLog,
+    getLatestWeight,
     // Meal Logs
     getMealLogs,
     createMealLog,

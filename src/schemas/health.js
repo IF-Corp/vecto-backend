@@ -3,6 +3,57 @@
 const mealTypeEnum = { type: 'string', enum: ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'] };
 const workoutTypeEnum = { type: 'string', enum: ['CARDIO', 'STRENGTH', 'FLEXIBILITY', 'SPORTS', 'OTHER'] };
 const sleepQualityEnum = { type: 'string', enum: ['POOR', 'FAIR', 'GOOD', 'EXCELLENT'] };
+const sexEnum = { type: 'string', enum: ['male', 'female', 'other'] };
+const activityLevelEnum = { type: 'string', enum: ['sedentary', 'light', 'moderate', 'active', 'very_active'] };
+
+// Health Profile schemas
+const createHealthProfileBody = {
+    type: 'object',
+    properties: {
+        birth_date: { type: 'string', format: 'date', nullable: true },
+        sex: { ...sexEnum, nullable: true },
+        height_cm: { type: 'number', minimum: 50, maximum: 300, nullable: true },
+        activity_level: { ...activityLevelEnum, nullable: true }
+    },
+    additionalProperties: false
+};
+
+const updateHealthProfileBody = {
+    type: 'object',
+    properties: {
+        birth_date: { type: 'string', format: 'date', nullable: true },
+        sex: { ...sexEnum, nullable: true },
+        height_cm: { type: 'number', minimum: 50, maximum: 300, nullable: true },
+        activity_level: { ...activityLevelEnum, nullable: true }
+    },
+    additionalProperties: false
+};
+
+// Weight Log schemas
+const createWeightLogBody = {
+    type: 'object',
+    properties: {
+        date: { type: 'string', format: 'date' },
+        weight_kg: { type: 'number', minimum: 20, maximum: 500 },
+        body_fat_percentage: { type: 'number', minimum: 1, maximum: 70, nullable: true },
+        muscle_mass_kg: { type: 'number', minimum: 10, maximum: 150, nullable: true },
+        notes: { type: 'string', maxLength: 1000, nullable: true }
+    },
+    required: ['date', 'weight_kg'],
+    additionalProperties: false
+};
+
+const updateWeightLogBody = {
+    type: 'object',
+    properties: {
+        date: { type: 'string', format: 'date' },
+        weight_kg: { type: 'number', minimum: 20, maximum: 500 },
+        body_fat_percentage: { type: 'number', minimum: 1, maximum: 70, nullable: true },
+        muscle_mass_kg: { type: 'number', minimum: 10, maximum: 150, nullable: true },
+        notes: { type: 'string', maxLength: 1000, nullable: true }
+    },
+    additionalProperties: false
+};
 
 // Meal Log schemas
 const createMealLogBody = {
@@ -151,16 +202,29 @@ const updateSleepMetricBody = {
 };
 
 module.exports = {
+    // Health Profile
+    createHealthProfileBody,
+    updateHealthProfileBody,
+    // Weight Logs
+    createWeightLogBody,
+    updateWeightLogBody,
+    // Meal Logs
     createMealLogBody,
     updateMealLogBody,
+    // Workouts
     createWorkoutBody,
     updateWorkoutBody,
     createWorkoutDetailBody,
+    // Medications
     createMedicationBody,
     updateMedicationBody,
     createMedicationLogBody,
+    // Sleep
     createSleepMetricBody,
     updateSleepMetricBody,
+    // Enums
+    sexEnum,
+    activityLevelEnum,
     mealTypeEnum,
     workoutTypeEnum,
     sleepQualityEnum
