@@ -1,4 +1,4 @@
-const { MealLog, Workout, WorkoutDetail, Medication, MedicationLog, SleepMetric, HealthProfile, WeightLog } = require('../models');
+const { MealLog, Workout, WorkoutDetail, Medication, MedicationLog, SleepMetric, HealthProfile, WeightLog, Diet } = require('../models');
 
 // ==================== HEALTH PROFILE ====================
 
@@ -24,6 +24,18 @@ const getHealthProfile = async (request, reply) => {
 const updateHealthProfile = async (request, reply) => {
     try {
         const { userId } = request.params;
+
+        // Clean the data - remove undefined values and convert empty strings to null
+        const cleanData = {};
+        for (const [key, value] of Object.entries(request.body)) {
+            if (value !== undefined && value !== '') {
+                cleanData[key] = value;
+            } else if (value === '') {
+                // Convert empty strings to null for optional fields
+                cleanData[key] = null;
+            }
+        }
+
         let profile = await HealthProfile.findOne({
             where: { user_id: userId }
         });
@@ -31,16 +43,33 @@ const updateHealthProfile = async (request, reply) => {
         if (!profile) {
             // Create if doesn't exist
             profile = await HealthProfile.create({
-                ...request.body,
+                ...cleanData,
                 user_id: userId
             });
             reply.status(201);
             return { success: true, data: profile, created: true };
         }
 
-        await profile.update(request.body);
+        await profile.update(cleanData);
         return { success: true, data: profile };
     } catch (error) {
+        // Enhanced error handling
+        console.error('Health Profile Update Error:', error);
+
+        if (error.name === 'SequelizeValidationError') {
+            reply.status(400);
+            return {
+                success: false,
+                error: 'Validation error',
+                details: error.errors?.map(e => ({ field: e.path, message: e.message }))
+            };
+        }
+
+        if (error.name === 'SequelizeDatabaseError') {
+            reply.status(400);
+            return { success: false, error: 'Database error: ' + error.message };
+        }
+
         reply.status(500);
         return { success: false, error: error.message };
     }
@@ -471,6 +500,102 @@ const deleteSleepMetric = async (request, reply) => {
     }
 };
 
+// ==================== DIETS ====================
+
+const getDiets = async (request, reply) => {
+    try {
+        const { userId } = request.params;
+        const diets = await Diet.findAll({
+            where: { user_id: userId },
+            order: [['created_at', 'DESC']]
+        });
+        return { success: true, data: diets };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
+const getActiveDiet = async (request, reply) => {
+    try {
+        const { userId } = request.params;
+        const diet = await Diet.findOne({
+            where: { user_id: userId, is_active: true },
+            order: [['created_at', 'DESC']]
+        });
+        return { success: true, data: diet };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
+const createDiet = async (request, reply) => {
+    try {
+        const { userId } = request.params;
+
+        // If this diet is active, deactivate other diets
+        if (request.body.is_active !== false) {
+            await Diet.update(
+                { is_active: false },
+                { where: { user_id: userId, is_active: true } }
+            );
+        }
+
+        const diet = await Diet.create({
+            ...request.body,
+            user_id: userId
+        });
+        reply.status(201);
+        return { success: true, data: diet, created: true };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
+const updateDiet = async (request, reply) => {
+    try {
+        const { id } = request.params;
+
+        // Get the diet to find user_id
+        const existingDiet = await Diet.findByPk(id);
+        if (!existingDiet) {
+            reply.status(404);
+            return { success: false, error: 'Diet not found' };
+        }
+
+        // If activating this diet, deactivate others
+        if (request.body.is_active === true) {
+            await Diet.update(
+                { is_active: false },
+                { where: { user_id: existingDiet.user_id, is_active: true, id: { [require('sequelize').Op.ne]: id } } }
+            );
+        }
+
+        await existingDiet.update(request.body);
+        return { success: true, data: existingDiet };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
+const deleteDiet = async (request, reply) => {
+    try {
+        const { id } = request.params;
+        const deleted = await Diet.destroy({ where: { id } });
+        if (!deleted) {
+            reply.status(404);
+            return { success: false, error: 'Diet not found' };
+        }
+        return { success: true, data: { deleted: true } };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
 module.exports = {
     // Health Profile
     getHealthProfile,
@@ -507,5 +632,11 @@ module.exports = {
     getSleepMetrics,
     createSleepMetric,
     updateSleepMetric,
-    deleteSleepMetric
+    deleteSleepMetric,
+    // Diets
+    getDiets,
+    getActiveDiet,
+    createDiet,
+    updateDiet,
+    deleteDiet
 };
