@@ -3,6 +3,7 @@
 const mealTypeEnum = { type: 'string', enum: ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'] };
 const workoutTypeEnum = { type: 'string', enum: ['CARDIO', 'STRENGTH', 'FLEXIBILITY', 'SPORTS', 'OTHER'] };
 const sleepQualityEnum = { type: 'string', enum: ['POOR', 'FAIR', 'GOOD', 'EXCELLENT'] };
+const dietGoalEnum = { type: 'string', enum: ['LOSE_WEIGHT', 'MAINTAIN', 'GAIN_MUSCLE', 'CUSTOM'] };
 const sexEnum = { type: 'string', enum: ['male', 'female', 'other'] };
 const activityLevelEnum = { type: 'string', enum: ['sedentary', 'light', 'moderate', 'active', 'very_active'] };
 
@@ -10,10 +11,10 @@ const activityLevelEnum = { type: 'string', enum: ['sedentary', 'light', 'modera
 const createHealthProfileBody = {
     type: 'object',
     properties: {
-        birth_date: { type: 'string', format: 'date', nullable: true },
-        sex: { ...sexEnum, nullable: true },
-        height_cm: { type: 'number', minimum: 50, maximum: 300, nullable: true },
-        activity_level: { ...activityLevelEnum, nullable: true }
+        birth_date: { type: ['string', 'null'], format: 'date' },
+        sex: { type: ['string', 'null'], enum: ['male', 'female', 'other', null] },
+        height_cm: { type: ['number', 'null'], minimum: 50, maximum: 300 },
+        activity_level: { type: ['string', 'null'], enum: ['sedentary', 'light', 'moderate', 'active', 'very_active', null] }
     },
     additionalProperties: false
 };
@@ -21,10 +22,10 @@ const createHealthProfileBody = {
 const updateHealthProfileBody = {
     type: 'object',
     properties: {
-        birth_date: { type: 'string', format: 'date', nullable: true },
-        sex: { ...sexEnum, nullable: true },
-        height_cm: { type: 'number', minimum: 50, maximum: 300, nullable: true },
-        activity_level: { ...activityLevelEnum, nullable: true }
+        birth_date: { type: ['string', 'null'], format: 'date' },
+        sex: { type: ['string', 'null'], enum: ['male', 'female', 'other', null] },
+        height_cm: { type: ['number', 'null'], minimum: 50, maximum: 300 },
+        activity_level: { type: ['string', 'null'], enum: ['sedentary', 'light', 'moderate', 'active', 'very_active', null] }
     },
     additionalProperties: false
 };
@@ -201,6 +202,42 @@ const updateSleepMetricBody = {
     additionalProperties: false
 };
 
+// Diet schemas
+const createDietBody = {
+    type: 'object',
+    properties: {
+        name: { type: 'string', minLength: 1, maxLength: 200 },
+        goal: dietGoalEnum,
+        daily_calories_target: { type: 'integer', minimum: 500, maximum: 10000 },
+        protein_target: { type: 'number', minimum: 0, nullable: true },
+        carbs_target: { type: 'number', minimum: 0, nullable: true },
+        fat_target: { type: 'number', minimum: 0, nullable: true },
+        description: { type: 'string', maxLength: 2000, nullable: true },
+        start_date: { type: 'string', format: 'date', nullable: true },
+        end_date: { type: 'string', format: 'date', nullable: true },
+        is_active: { type: 'boolean', default: true }
+    },
+    required: ['name', 'goal', 'daily_calories_target'],
+    additionalProperties: false
+};
+
+const updateDietBody = {
+    type: 'object',
+    properties: {
+        name: { type: 'string', minLength: 1, maxLength: 200 },
+        goal: dietGoalEnum,
+        daily_calories_target: { type: 'integer', minimum: 500, maximum: 10000 },
+        protein_target: { type: 'number', minimum: 0, nullable: true },
+        carbs_target: { type: 'number', minimum: 0, nullable: true },
+        fat_target: { type: 'number', minimum: 0, nullable: true },
+        description: { type: 'string', maxLength: 2000, nullable: true },
+        start_date: { type: 'string', format: 'date', nullable: true },
+        end_date: { type: 'string', format: 'date', nullable: true },
+        is_active: { type: 'boolean' }
+    },
+    additionalProperties: false
+};
+
 module.exports = {
     // Health Profile
     createHealthProfileBody,
@@ -222,10 +259,14 @@ module.exports = {
     // Sleep
     createSleepMetricBody,
     updateSleepMetricBody,
+    // Diets
+    createDietBody,
+    updateDietBody,
     // Enums
     sexEnum,
     activityLevelEnum,
     mealTypeEnum,
     workoutTypeEnum,
-    sleepQualityEnum
+    sleepQualityEnum,
+    dietGoalEnum
 };

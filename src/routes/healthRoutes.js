@@ -302,6 +302,57 @@ async function healthRoutes(fastify, options) {
             params: common.idParams
         }
     }, healthController.deleteSleepMetric);
+
+    // ==================== DIETS ====================
+    fastify.get('/users/:userId/diets', {
+        preHandler: [fastify.authorizeUser],
+        schema: {
+            description: 'Get all diets for a user',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.userIdParams
+        }
+    }, healthController.getDiets);
+
+    fastify.get('/users/:userId/diets/active', {
+        preHandler: [fastify.authorizeUser],
+        schema: {
+            description: 'Get active diet for a user',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.userIdParams
+        }
+    }, healthController.getActiveDiet);
+
+    fastify.post('/users/:userId/diets', {
+        preHandler: [fastify.authorizeUser],
+        schema: {
+            description: 'Create a diet',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.userIdParams,
+            body: health.createDietBody
+        }
+    }, healthController.createDiet);
+
+    fastify.put('/diets/:id', {
+        schema: {
+            description: 'Update a diet',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams,
+            body: health.updateDietBody
+        }
+    }, healthController.updateDiet);
+
+    fastify.delete('/diets/:id', {
+        schema: {
+            description: 'Delete a diet',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams
+        }
+    }, healthController.deleteDiet);
 }
 
 module.exports = healthRoutes;
