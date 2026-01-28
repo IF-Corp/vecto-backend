@@ -13,6 +13,7 @@ const okrRoutes = require('./okrRoutes');
 const careerRoutes = require('./careerRoutes');
 const homeRoutes = require('./homeRoutes');
 const homeSpaceRoutes = require('./homeSpaceRoutes');
+const homeMemberRoutes = require('./homeMemberRoutes');
 const freezeModeRoutes = require('./freezeModeRoutes');
 const workModeRoutes = require('./workModeRoutes');
 const dailyStandupRoutes = require('./dailyStandupRoutes');
@@ -47,6 +48,7 @@ async function routes(fastify, options) {
     fastify.register(careerRoutes, { prefix: '/api' });
     fastify.register(homeRoutes, { prefix: '/api' });
     fastify.register(homeSpaceRoutes, { prefix: '/api' });
+    fastify.register(homeMemberRoutes, { prefix: '/api' });
     fastify.register(freezeModeRoutes, { prefix: '/api' });
     fastify.register(workModeRoutes, { prefix: '/api' });
     fastify.register(dailyStandupRoutes, { prefix: '/api' });
