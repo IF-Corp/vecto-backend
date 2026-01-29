@@ -31,6 +31,13 @@ const endOfDayRoutes = require('./endOfDayRoutes');
 const weeklyPlanRoutes = require('./weeklyPlanRoutes');
 const workAnalyticsRoutes = require('./workAnalyticsRoutes');
 const workReportsRoutes = require('./workReportsRoutes');
+const socialSettingsRoutes = require('./socialSettingsRoutes');
+const socialCircleRoutes = require('./socialCircleRoutes');
+const socialContactRoutes = require('./socialContactRoutes');
+const socialInteractionRoutes = require('./socialInteractionRoutes');
+const socialEventRoutes = require('./socialEventRoutes');
+const socialGiftRoutes = require('./socialGiftRoutes');
+const socialDashboardRoutes = require('./socialDashboardRoutes');
 
 async function routes(fastify, options) {
     // Health check endpoint
@@ -76,6 +83,13 @@ async function routes(fastify, options) {
     fastify.register(weeklyPlanRoutes, { prefix: '/api' });
     fastify.register(workAnalyticsRoutes, { prefix: '/api' });
     fastify.register(workReportsRoutes, { prefix: '/api/work' });
+    fastify.register(socialSettingsRoutes, { prefix: '/api' });
+    fastify.register(socialCircleRoutes, { prefix: '/api' });
+    fastify.register(socialContactRoutes, { prefix: '/api' });
+    fastify.register(socialInteractionRoutes, { prefix: '/api' });
+    fastify.register(socialEventRoutes, { prefix: '/api' });
+    fastify.register(socialGiftRoutes, { prefix: '/api' });
+    fastify.register(socialDashboardRoutes, { prefix: '/api' });
 }
 
 module.exports = routes;
