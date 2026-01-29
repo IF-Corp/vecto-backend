@@ -22,6 +22,8 @@ const homeBillRoutes = require('./homeBillRoutes');
 const homePlantRoutes = require('./homePlantRoutes');
 const homePetRoutes = require('./homePetRoutes');
 const homeMealRoutes = require('./homeMealRoutes');
+const homeProjectRoutes = require('./homeProjectRoutes');
+const homeDashboardRoutes = require('./homeDashboardRoutes');
 const freezeModeRoutes = require('./freezeModeRoutes');
 const workModeRoutes = require('./workModeRoutes');
 const dailyStandupRoutes = require('./dailyStandupRoutes');
@@ -65,6 +67,8 @@ async function routes(fastify, options) {
     fastify.register(homePlantRoutes, { prefix: '/api' });
     fastify.register(homePetRoutes, { prefix: '/api' });
     fastify.register(homeMealRoutes, { prefix: '/api' });
+    fastify.register(homeProjectRoutes, { prefix: '/api' });
+    fastify.register(homeDashboardRoutes, { prefix: '/api' });
     fastify.register(freezeModeRoutes, { prefix: '/api' });
     fastify.register(workModeRoutes, { prefix: '/api' });
     fastify.register(dailyStandupRoutes, { prefix: '/api' });
