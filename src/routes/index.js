@@ -38,6 +38,7 @@ const socialInteractionRoutes = require('./socialInteractionRoutes');
 const socialEventRoutes = require('./socialEventRoutes');
 const socialGiftRoutes = require('./socialGiftRoutes');
 const socialDashboardRoutes = require('./socialDashboardRoutes');
+const dashboardRoutes = require('./dashboardRoutes');
 
 async function routes(fastify, options) {
     // Health check endpoint
@@ -90,6 +91,7 @@ async function routes(fastify, options) {
     fastify.register(socialEventRoutes, { prefix: '/api' });
     fastify.register(socialGiftRoutes, { prefix: '/api' });
     fastify.register(socialDashboardRoutes, { prefix: '/api' });
+    fastify.register(dashboardRoutes, { prefix: '/api' });
 }
 
 module.exports = routes;
