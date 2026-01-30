@@ -1,4 +1,5 @@
-const { sequelize, DataTypes } = require('../config/database');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/sequelize');
 
 const DashboardAlertSetting = sequelize.define('DashboardAlertSetting', {
     id: {
