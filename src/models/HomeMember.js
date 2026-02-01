@@ -16,7 +16,7 @@ const HomeMember = sequelize.define('HomeMember', {
         type: DataTypes.STRING(100),
         allowNull: false,
     },
-    profile: {
+    profile_type: {
         type: DataTypes.ENUM('ADULT', 'TEENAGER', 'CHILD', 'ELDERLY', 'NO_PARTICIPATION'),
         allowNull: false,
         defaultValue: 'ADULT',
@@ -25,22 +25,28 @@ const HomeMember = sequelize.define('HomeMember', {
         type: DataTypes.STRING(500),
         allowNull: true,
     },
-    email: {
-        type: DataTypes.STRING(255),
+    linked_user_id: {
+        type: DataTypes.UUID,
         allowNull: true,
     },
-    phone: {
-        type: DataTypes.STRING(20),
-        allowNull: true,
-    },
-    birth_date: {
-        type: DataTypes.DATEONLY,
-        allowNull: true,
-    },
-    is_active: {
+    participates_tasks: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true,
+    },
+    participates_costs: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+    },
+    task_percentage: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+    is_admin: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
     },
 }, {
     tableName: 'home_members',

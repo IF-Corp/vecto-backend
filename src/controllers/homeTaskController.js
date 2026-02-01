@@ -75,7 +75,7 @@ const updateTask = async (request, reply) => {
         }
 
         // If frequency changed, regenerate future occurrences
-        if (request.body.frequency || request.body.frequency_days) {
+        if (request.body.frequency_type || request.body.frequency_days) {
             const task = await HomeTask.findByPk(id);
             await HomeTaskOccurrence.destroy({
                 where: {
@@ -290,7 +290,7 @@ function shouldCreateOccurrence(task, date) {
     const dayOfWeek = date.getDay();
     const dayOfMonth = date.getDate();
 
-    switch (task.frequency) {
+    switch (task.frequency_type) {
         case 'DAILY':
             return true;
         case 'WEEKLY':
