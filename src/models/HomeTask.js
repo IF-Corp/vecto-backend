@@ -20,13 +20,25 @@ const HomeTask = sequelize.define('HomeTask', {
         type: DataTypes.TEXT,
         allowNull: true,
     },
-    frequency: {
+    room: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+    },
+    frequency_type: {
         type: DataTypes.ENUM('DAILY', 'WEEKLY', 'BIWEEKLY', 'MONTHLY', 'CUSTOM'),
         allowNull: false,
         defaultValue: 'WEEKLY',
     },
+    frequency_value: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
     frequency_days: {
         type: DataTypes.ARRAY(DataTypes.INTEGER),
+        allowNull: true,
+    },
+    specific_days: {
+        type: DataTypes.JSONB,
         allowNull: true,
     },
     custom_interval_days: {
@@ -37,6 +49,11 @@ const HomeTask = sequelize.define('HomeTask', {
         type: DataTypes.UUID,
         allowNull: true,
     },
+    is_rotation: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
     rotation_enabled: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
@@ -44,6 +61,10 @@ const HomeTask = sequelize.define('HomeTask', {
     },
     rotation_members: {
         type: DataTypes.ARRAY(DataTypes.UUID),
+        allowNull: true,
+    },
+    preferred_time: {
+        type: DataTypes.STRING(50),
         allowNull: true,
     },
     estimated_minutes: {
@@ -54,6 +75,16 @@ const HomeTask = sequelize.define('HomeTask', {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 1,
+    },
+    current_streak: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+    },
+    best_streak: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
     },
     is_active: {
         type: DataTypes.BOOLEAN,
