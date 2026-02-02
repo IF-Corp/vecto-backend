@@ -10,6 +10,7 @@ const {
     UserTitle
 } = require('../models');
 const { Op } = require('sequelize');
+const storageService = require('../services/storageService');
 
 // ==================== PROFILE ====================
 
@@ -525,11 +526,78 @@ const removeActiveTitle = async (request, reply) => {
     }
 };
 
+// ==================== PHOTO UPLOAD ====================
+
+const uploadPhoto = async (request, reply) => {
+    try {
+        const { userId } = request.params;
+        const { image } = request.body;
+
+        if (!image) {
+            reply.status(400);
+            return { success: false, error: 'No image provided' };
+        }
+
+        // Process and validate the image
+        const { dataUrl, mimeType, size } = storageService.processImage(image);
+
+        // Get or create profile
+        let profile = await UserProfile.findOne({
+            where: { user_id: userId }
+        });
+
+        if (!profile) {
+            profile = await UserProfile.create({
+                user_id: userId,
+                photo_url: dataUrl
+            });
+        } else {
+            await profile.update({ photo_url: dataUrl });
+        }
+
+        return {
+            success: true,
+            data: {
+                photoUrl: dataUrl,
+                mimeType,
+                size
+            }
+        };
+    } catch (error) {
+        reply.status(error.message.includes('Invalid') || error.message.includes('too large') ? 400 : 500);
+        return { success: false, error: error.message };
+    }
+};
+
+const deletePhoto = async (request, reply) => {
+    try {
+        const { userId } = request.params;
+
+        const profile = await UserProfile.findOne({
+            where: { user_id: userId }
+        });
+
+        if (!profile) {
+            reply.status(404);
+            return { success: false, error: 'Profile not found' };
+        }
+
+        await profile.update({ photo_url: null });
+
+        return { success: true, message: 'Photo deleted successfully' };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
 module.exports = {
     // Profile
     getProfile,
     updateProfile,
     getProfileStats,
+    uploadPhoto,
+    deletePhoto,
     // XP & Levels
     getXpProgress,
     addXp,
