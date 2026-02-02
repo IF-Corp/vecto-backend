@@ -49,6 +49,35 @@ async function profileRoutes(fastify, options) {
         }
     }, profileController.getProfileStats);
 
+    // ==================== PHOTO UPLOAD ====================
+
+    fastify.post('/users/:userId/profile/photo', {
+        preHandler: [fastify.authorizeUser],
+        schema: {
+            description: 'Upload profile photo',
+            tags: ['Profile'],
+            security: [{ bearerAuth: [] }],
+            params: common.userIdParams,
+            body: {
+                type: 'object',
+                required: ['image'],
+                properties: {
+                    image: { type: 'string', description: 'Base64 encoded image data' }
+                }
+            }
+        }
+    }, profileController.uploadPhoto);
+
+    fastify.delete('/users/:userId/profile/photo', {
+        preHandler: [fastify.authorizeUser],
+        schema: {
+            description: 'Delete profile photo',
+            tags: ['Profile'],
+            security: [{ bearerAuth: [] }],
+            params: common.userIdParams
+        }
+    }, profileController.deletePhoto);
+
     // ==================== XP & LEVELS ====================
 
     fastify.get('/users/:userId/profile/xp', {
