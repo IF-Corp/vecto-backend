@@ -1,5 +1,6 @@
 const { FreezeModeConfig, FreezePeriod, FreezeModule, FreezeOptions, UserModule } = require('../models');
 const { Op } = require('sequelize');
+const { processScheduledFreezePeriods } = require('../jobs/freezeScheduler');
 
 // ==================== LEGACY CONFIG (backward compatibility) ====================
 
@@ -553,6 +554,38 @@ const getFreezeStatistics = async (request, reply) => {
 
 // ==================== HELPER FUNCTIONS ====================
 
+// ==================== SCHEDULER ENDPOINT ====================
+
+const triggerScheduledProcessing = async (request, reply) => {
+    try {
+        // Optional: Add API key validation for external cron services
+        const apiKey = request.headers['x-api-key'];
+        const expectedKey = process.env.SCHEDULER_API_KEY;
+
+        if (expectedKey && apiKey !== expectedKey) {
+            reply.status(401);
+            return { success: false, error: 'Invalid API key' };
+        }
+
+        const results = await processScheduledFreezePeriods();
+
+        return {
+            success: true,
+            data: {
+                activated: results.activated,
+                completed: results.completed,
+                errors: results.activationErrors.length + results.completionErrors.length,
+                duration_ms: results.duration
+            }
+        };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
+// ==================== HELPER FUNCTIONS ====================
+
 async function syncLegacyConfig(userId, isActive, startDate, endDate, reason) {
     try {
         let config = await FreezeModeConfig.findOne({
@@ -596,5 +629,7 @@ module.exports = {
     cancelFreezePeriod,
     deleteFreezePeriod,
     // Statistics
-    getFreezeStatistics
+    getFreezeStatistics,
+    // Scheduler
+    triggerScheduledProcessing
 };

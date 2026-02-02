@@ -187,6 +187,33 @@ async function freezeModeRoutes(fastify, options) {
             }
         }
     }, freezeModeController.deactivateFreezeMode);
+
+    // ==================== SCHEDULER ENDPOINT ====================
+
+    // Process scheduled freeze periods (for external cron or manual trigger)
+    fastify.post('/freeze-periods/process-scheduled', {
+        schema: {
+            description: 'Process scheduled freeze periods (activate due periods, complete expired ones)',
+            tags: ['Freeze Mode'],
+            response: {
+                200: {
+                    type: 'object',
+                    properties: {
+                        success: { type: 'boolean' },
+                        data: {
+                            type: 'object',
+                            properties: {
+                                activated: { type: 'number' },
+                                completed: { type: 'number' },
+                                errors: { type: 'number' },
+                                duration_ms: { type: 'number' }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }, freezeModeController.triggerScheduledProcessing);
 }
 
 module.exports = freezeModeRoutes;
