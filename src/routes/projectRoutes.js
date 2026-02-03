@@ -112,6 +112,22 @@ async function projectRoutes(fastify, options) {
         }
     }, projectController.updateTaskStatus);
 
+    // ==================== SUBTASKS ====================
+    fastify.patch('/subtasks/:id/toggle', {
+        schema: {
+            description: 'Toggle subtask completion status',
+            tags: ['Tasks'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams,
+            body: {
+                type: 'object',
+                properties: {
+                    completed: { type: 'boolean' }
+                }
+            }
+        }
+    }, projectController.toggleSubtask);
+
     // ==================== MEETINGS ====================
     fastify.get('/projects/:projectId/meetings', {
         schema: {
