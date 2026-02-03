@@ -75,6 +75,11 @@ Task.associate = (models) => {
         foreignKey: 'project_id',
         as: 'project'
     });
+    Task.hasMany(models.Subtask, {
+        foreignKey: 'task_id',
+        as: 'subtasks',
+        onDelete: 'CASCADE'
+    });
 };
 
 module.exports = Task;
