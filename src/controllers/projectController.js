@@ -1,4 +1,4 @@
-const { Project, Task, MeetingHistory } = require('../models');
+const { Project, Task, MeetingHistory, Subtask } = require('../models');
 
 class ProjectController {
     // ==================== PROJECTS ====================
@@ -91,7 +91,10 @@ class ProjectController {
 
             const tasks = await Task.findAll({
                 where,
-                include: [{ model: Project, as: 'project', attributes: ['id', 'name'] }]
+                include: [
+                    { model: Project, as: 'project', attributes: ['id', 'name'] },
+                    { model: Subtask, as: 'subtasks', order: [['order', 'ASC']] }
+                ]
             });
 
             return reply.send({ success: true, data: tasks });
@@ -104,7 +107,7 @@ class ProjectController {
     async createTask(request, reply) {
         try {
             const { userId } = request.params;
-            const data = request.body;
+            const { subtasks, ...data } = request.body;
 
             if (!data.name) {
                 return reply.status(400).send({ success: false, error: 'Name is required' });
@@ -117,7 +120,23 @@ class ProjectController {
                 assignees: data.assignees || []
             });
 
-            return reply.status(201).send({ success: true, data: task });
+            // Create subtasks if provided
+            if (subtasks && Array.isArray(subtasks) && subtasks.length > 0) {
+                const subtaskRecords = subtasks.map((st, index) => ({
+                    task_id: task.id,
+                    title: st.title,
+                    completed: st.completed || false,
+                    order: st.order ?? index
+                }));
+                await Subtask.bulkCreate(subtaskRecords);
+            }
+
+            // Reload with subtasks
+            const taskWithSubtasks = await Task.findByPk(task.id, {
+                include: [{ model: Subtask, as: 'subtasks', order: [['order', 'ASC']] }]
+            });
+
+            return reply.status(201).send({ success: true, data: taskWithSubtasks });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({ success: false, error: error.message });
@@ -127,7 +146,7 @@ class ProjectController {
     async updateTask(request, reply) {
         try {
             const { id } = request.params;
-            const updates = request.body;
+            const { subtasks, ...updates } = request.body;
 
             const task = await Task.findByPk(id);
             if (!task) {
@@ -135,7 +154,50 @@ class ProjectController {
             }
 
             await task.update(updates);
-            return reply.send({ success: true, data: task });
+
+            // Handle subtasks update if provided
+            if (subtasks !== undefined && Array.isArray(subtasks)) {
+                // Get existing subtasks
+                const existingSubtasks = await Subtask.findAll({ where: { task_id: id } });
+                const existingIds = new Set(existingSubtasks.map(s => s.id));
+                const newIds = new Set(subtasks.filter(s => s.id).map(s => s.id));
+
+                // Delete removed subtasks
+                const toDelete = existingSubtasks.filter(s => !newIds.has(s.id));
+                for (const st of toDelete) {
+                    await st.destroy();
+                }
+
+                // Update or create subtasks
+                for (let i = 0; i < subtasks.length; i++) {
+                    const st = subtasks[i];
+                    if (st.id && existingIds.has(st.id)) {
+                        // Update existing
+                        await Subtask.update(
+                            { title: st.title, completed: st.completed ?? false, order: st.order ?? i },
+                            { where: { id: st.id } }
+                        );
+                    } else {
+                        // Create new
+                        await Subtask.create({
+                            task_id: id,
+                            title: st.title,
+                            completed: st.completed || false,
+                            order: st.order ?? i
+                        });
+                    }
+                }
+            }
+
+            // Reload with subtasks
+            const taskWithSubtasks = await Task.findByPk(id, {
+                include: [
+                    { model: Project, as: 'project', attributes: ['id', 'name'] },
+                    { model: Subtask, as: 'subtasks', order: [['order', 'ASC']] }
+                ]
+            });
+
+            return reply.send({ success: true, data: taskWithSubtasks });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({ success: false, error: error.message });
@@ -190,7 +252,10 @@ class ProjectController {
             const { id } = request.params;
 
             const task = await Task.findByPk(id, {
-                include: [{ model: Project, as: 'project', attributes: ['id', 'name'] }]
+                include: [
+                    { model: Project, as: 'project', attributes: ['id', 'name'] },
+                    { model: Subtask, as: 'subtasks', order: [['order', 'ASC']] }
+                ]
             });
 
             if (!task) {
@@ -198,6 +263,26 @@ class ProjectController {
             }
 
             return reply.send({ success: true, data: task });
+        } catch (error) {
+            console.error(error);
+            return reply.status(500).send({ success: false, error: error.message });
+        }
+    }
+
+    // ==================== SUBTASKS ====================
+
+    async toggleSubtask(request, reply) {
+        try {
+            const { id } = request.params;
+            const { completed } = request.body;
+
+            const subtask = await Subtask.findByPk(id);
+            if (!subtask) {
+                return reply.status(404).send({ success: false, error: 'Subtask not found' });
+            }
+
+            await subtask.update({ completed: completed ?? !subtask.completed });
+            return reply.send({ success: true, data: subtask });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({ success: false, error: error.message });
