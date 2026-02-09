@@ -4,6 +4,7 @@ const env = require('@fastify/env');
 const errorHandler = require('./middleware/errorHandler');
 const routes = require('./routes');
 const authPlugin = require('./plugins/auth');
+const freezeGuardPlugin = require('./plugins/freezeGuard');
 const rateLimitPlugin = require('./plugins/rateLimit');
 const swaggerPlugin = require('./plugins/swagger');
 
@@ -56,7 +57,7 @@ async function buildApp(opts = {}) {
 
     // Register CORS
     const allowedOrigins = app.config.NODE_ENV === 'production'
-        ? [app.config.CORS_ORIGIN]
+        ? app.config.CORS_ORIGIN.split(',').map(o => o.trim())
         : ['http://localhost:3001', 'http://localhost:3000', 'http://127.0.0.1:3001'];
 
     await app.register(cors, {
@@ -82,6 +83,9 @@ async function buildApp(opts = {}) {
 
     // Register authentication plugin
     await app.register(authPlugin);
+
+    // Register freeze guard (blocks writes on frozen modules)
+    await app.register(freezeGuardPlugin);
 
     // Set error handler
     app.setErrorHandler(errorHandler);
