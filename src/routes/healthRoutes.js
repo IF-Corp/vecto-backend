@@ -353,6 +353,42 @@ async function healthRoutes(fastify, options) {
             params: common.idParams
         }
     }, healthController.deleteDiet);
+
+    // ==================== DIET MEALS ====================
+    fastify.post('/diets/:dietId/meals', {
+        schema: {
+            description: 'Add meal to diet',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: {
+                type: 'object',
+                properties: {
+                    dietId: { type: 'string', format: 'uuid' }
+                },
+                required: ['dietId']
+            },
+            body: health.createDietMealBody
+        }
+    }, healthController.addDietMeal);
+
+    fastify.put('/diet-meals/:id', {
+        schema: {
+            description: 'Update diet meal',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams,
+            body: health.updateDietMealBody
+        }
+    }, healthController.updateDietMeal);
+
+    fastify.delete('/diet-meals/:id', {
+        schema: {
+            description: 'Delete diet meal',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams
+        }
+    }, healthController.deleteDietMeal);
 }
 
 module.exports = healthRoutes;

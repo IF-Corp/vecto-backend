@@ -1,4 +1,5 @@
 const coreController = require('../controllers/coreController');
+const notificationCountsController = require('../controllers/notificationCountsController');
 const { common } = require('../schemas');
 
 async function coreRoutes(fastify, options) {
@@ -105,6 +106,17 @@ async function coreRoutes(fastify, options) {
             params: common.idParams
         }
     }, coreController.deleteNotificationConfig);
+
+    // ==================== NOTIFICATION COUNTS ====================
+    fastify.get('/users/:userId/notifications/counts', {
+        preHandler: [fastify.authorizeUser],
+        schema: {
+            description: 'Get pending notification counts per module',
+            tags: ['Core'],
+            security: [{ bearerAuth: [] }],
+            params: common.userIdParams
+        }
+    }, notificationCountsController.getNotificationCounts);
 }
 
 module.exports = coreRoutes;

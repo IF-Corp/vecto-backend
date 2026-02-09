@@ -137,7 +137,7 @@ const freezePeriodResponse = {
     type: 'object',
     properties: {
         success: { type: 'boolean' },
-        data: freezePeriodSchema
+        data: { ...freezePeriodSchema, nullable: true }
     }
 };
 
