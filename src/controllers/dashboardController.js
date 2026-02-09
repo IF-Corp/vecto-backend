@@ -82,13 +82,17 @@ const getQuickStats = async (request, reply) => {
             order: [['displayOrder', 'ASC']],
         });
 
-        // Create defaults if none exist
+        // Create defaults if none exist (ignoreDuplicates handles race conditions)
         if (quickStats.length === 0) {
             const statsToCreate = DEFAULT_QUICK_STATS.map((stat) => ({
                 userId,
                 ...stat,
             }));
-            quickStats = await DashboardQuickStat.bulkCreate(statsToCreate);
+            await DashboardQuickStat.bulkCreate(statsToCreate, { ignoreDuplicates: true });
+            quickStats = await DashboardQuickStat.findAll({
+                where: { userId },
+                order: [['displayOrder', 'ASC']],
+            });
         }
 
         return reply.send({ success: true, data: quickStats });
@@ -133,13 +137,17 @@ const getWidgets = async (request, reply) => {
             order: [['displayOrder', 'ASC']],
         });
 
-        // Create defaults if none exist
+        // Create defaults if none exist (ignoreDuplicates handles race conditions)
         if (widgets.length === 0) {
             const widgetsToCreate = DEFAULT_WIDGETS.map((widget) => ({
                 userId,
                 ...widget,
             }));
-            widgets = await DashboardWidget.bulkCreate(widgetsToCreate);
+            await DashboardWidget.bulkCreate(widgetsToCreate, { ignoreDuplicates: true });
+            widgets = await DashboardWidget.findAll({
+                where: { userId },
+                order: [['displayOrder', 'ASC']],
+            });
         }
 
         return reply.send({ success: true, data: widgets });
@@ -184,13 +192,16 @@ const getAlertSettings = async (request, reply) => {
             where: { userId },
         });
 
-        // Create defaults if none exist
+        // Create defaults if none exist (ignoreDuplicates handles race conditions)
         if (alertSettings.length === 0) {
             const settingsToCreate = DEFAULT_ALERT_SETTINGS.map((setting) => ({
                 userId,
                 ...setting,
             }));
-            alertSettings = await DashboardAlertSetting.bulkCreate(settingsToCreate);
+            await DashboardAlertSetting.bulkCreate(settingsToCreate, { ignoreDuplicates: true });
+            alertSettings = await DashboardAlertSetting.findAll({
+                where: { userId },
+            });
         }
 
         return reply.send({ success: true, data: alertSettings });
@@ -316,20 +327,26 @@ const getDashboardOverview = async (request, reply) => {
             DashboardAlertSetting.findAll({ where: { userId } }),
         ]);
 
-        // Create defaults if needed
-        const finalSettings = settings || await DashboardSettings.create({ userId });
+        // Create defaults if needed (ignoreDuplicates handles race conditions with parallel requests)
+        const finalSettings = settings || await DashboardSettings.findOrCreate({ where: { userId }, defaults: { userId } }).then(([s]) => s);
 
-        const finalQuickStats = quickStats.length > 0
-            ? quickStats
-            : await DashboardQuickStat.bulkCreate(DEFAULT_QUICK_STATS.map((s) => ({ userId, ...s })));
+        let finalQuickStats = quickStats;
+        if (quickStats.length === 0) {
+            await DashboardQuickStat.bulkCreate(DEFAULT_QUICK_STATS.map((s) => ({ userId, ...s })), { ignoreDuplicates: true });
+            finalQuickStats = await DashboardQuickStat.findAll({ where: { userId }, order: [['displayOrder', 'ASC']] });
+        }
 
-        const finalWidgets = widgets.length > 0
-            ? widgets
-            : await DashboardWidget.bulkCreate(DEFAULT_WIDGETS.map((w) => ({ userId, ...w })));
+        let finalWidgets = widgets;
+        if (widgets.length === 0) {
+            await DashboardWidget.bulkCreate(DEFAULT_WIDGETS.map((w) => ({ userId, ...w })), { ignoreDuplicates: true });
+            finalWidgets = await DashboardWidget.findAll({ where: { userId }, order: [['displayOrder', 'ASC']] });
+        }
 
-        const finalAlertSettings = alertSettings.length > 0
-            ? alertSettings
-            : await DashboardAlertSetting.bulkCreate(DEFAULT_ALERT_SETTINGS.map((a) => ({ userId, ...a })));
+        let finalAlertSettings = alertSettings;
+        if (alertSettings.length === 0) {
+            await DashboardAlertSetting.bulkCreate(DEFAULT_ALERT_SETTINGS.map((a) => ({ userId, ...a })), { ignoreDuplicates: true });
+            finalAlertSettings = await DashboardAlertSetting.findAll({ where: { userId } });
+        }
 
         // Get greeting data
         const hour = new Date().getHours();
