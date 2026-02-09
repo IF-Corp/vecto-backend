@@ -1,4 +1,4 @@
-const { MealLog, Workout, WorkoutDetail, Medication, MedicationLog, SleepMetric, HealthProfile, WeightLog, Diet } = require('../models');
+const { MealLog, Workout, WorkoutDetail, Medication, MedicationLog, SleepMetric, HealthProfile, WeightLog, Diet, DietMeal } = require('../models');
 
 // ==================== HEALTH PROFILE ====================
 
@@ -507,7 +507,8 @@ const getDiets = async (request, reply) => {
         const { userId } = request.params;
         const diets = await Diet.findAll({
             where: { user_id: userId },
-            order: [['created_at', 'DESC']]
+            include: [{ model: DietMeal, as: 'meals' }],
+            order: [['created_at', 'DESC'], [{ model: DietMeal, as: 'meals' }, 'meal_order', 'ASC']]
         });
         return { success: true, data: diets };
     } catch (error) {
@@ -521,7 +522,8 @@ const getActiveDiet = async (request, reply) => {
         const { userId } = request.params;
         const diet = await Diet.findOne({
             where: { user_id: userId, is_active: true },
-            order: [['created_at', 'DESC']]
+            include: [{ model: DietMeal, as: 'meals' }],
+            order: [['created_at', 'DESC'], [{ model: DietMeal, as: 'meals' }, 'meal_order', 'ASC']]
         });
         return { success: true, data: diet };
     } catch (error) {
@@ -596,6 +598,67 @@ const deleteDiet = async (request, reply) => {
     }
 };
 
+// ==================== DIET MEALS ====================
+
+const addDietMeal = async (request, reply) => {
+    try {
+        const { dietId } = request.params;
+
+        const diet = await Diet.findByPk(dietId);
+        if (!diet) {
+            reply.status(404);
+            return { success: false, error: 'Diet not found' };
+        }
+
+        const body = { ...request.body };
+        if (body.meal_order === undefined) {
+            const maxOrder = await DietMeal.max('meal_order', { where: { diet_id: dietId } });
+            body.meal_order = (maxOrder || 0) + 1;
+        }
+
+        const meal = await DietMeal.create({
+            ...body,
+            diet_id: dietId
+        });
+        reply.status(201);
+        return { success: true, data: meal, created: true };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
+const updateDietMeal = async (request, reply) => {
+    try {
+        const { id } = request.params;
+        const meal = await DietMeal.findByPk(id);
+        if (!meal) {
+            reply.status(404);
+            return { success: false, error: 'Diet meal not found' };
+        }
+        await meal.update(request.body);
+        return { success: true, data: meal };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
+const deleteDietMeal = async (request, reply) => {
+    try {
+        const { id } = request.params;
+        const deleted = await DietMeal.destroy({ where: { id } });
+        if (!deleted) {
+            reply.status(404);
+            return { success: false, error: 'Diet meal not found' };
+        }
+        return { success: true, data: { deleted: true } };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
 module.exports = {
     // Health Profile
     getHealthProfile,
@@ -638,5 +701,9 @@ module.exports = {
     getActiveDiet,
     createDiet,
     updateDiet,
-    deleteDiet
+    deleteDiet,
+    // Diet Meals
+    addDietMeal,
+    updateDietMeal,
+    deleteDietMeal
 };

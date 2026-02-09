@@ -72,6 +72,10 @@ Diet.associate = (models) => {
         foreignKey: 'user_id',
         as: 'user'
     });
+    Diet.hasMany(models.DietMeal, {
+        foreignKey: 'diet_id',
+        as: 'meals'
+    });
 };
 
 module.exports = Diet;

@@ -238,6 +238,38 @@ const updateDietBody = {
     additionalProperties: false
 };
 
+// Diet Meal schemas
+const createDietMealBody = {
+    type: 'object',
+    properties: {
+        name: { type: 'string', minLength: 1, maxLength: 200 },
+        meal_type: { type: 'string', enum: ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'], nullable: true },
+        meal_time: { type: 'string', pattern: '^\\d{2}:\\d{2}$', nullable: true },
+        calories: { type: 'integer', minimum: 0, nullable: true },
+        protein: { type: 'number', minimum: 0, nullable: true },
+        carbs: { type: 'number', minimum: 0, nullable: true },
+        fat: { type: 'number', minimum: 0, nullable: true },
+        meal_order: { type: 'integer', minimum: 0 }
+    },
+    required: ['name'],
+    additionalProperties: false
+};
+
+const updateDietMealBody = {
+    type: 'object',
+    properties: {
+        name: { type: 'string', minLength: 1, maxLength: 200 },
+        meal_type: { type: 'string', enum: ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'], nullable: true },
+        meal_time: { type: 'string', pattern: '^\\d{2}:\\d{2}$', nullable: true },
+        calories: { type: 'integer', minimum: 0, nullable: true },
+        protein: { type: 'number', minimum: 0, nullable: true },
+        carbs: { type: 'number', minimum: 0, nullable: true },
+        fat: { type: 'number', minimum: 0, nullable: true },
+        meal_order: { type: 'integer', minimum: 0 }
+    },
+    additionalProperties: false
+};
+
 module.exports = {
     // Health Profile
     createHealthProfileBody,
@@ -262,6 +294,9 @@ module.exports = {
     // Diets
     createDietBody,
     updateDietBody,
+    // Diet Meals
+    createDietMealBody,
+    updateDietMealBody,
     // Enums
     sexEnum,
     activityLevelEnum,

@@ -1,5 +1,10 @@
 const { Project, Task, MeetingHistory, Subtask } = require('../models');
 
+function getLocalDateString() {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+}
+
 class ProjectController {
     // ==================== PROJECTS ====================
 
@@ -113,12 +118,18 @@ class ProjectController {
                 return reply.status(400).send({ success: false, error: 'Name is required' });
             }
 
-            const task = await Task.create({
+            const taskData = {
                 user_id: userId,
                 ...data,
                 tags: data.tags || [],
                 assignees: data.assignees || []
-            });
+            };
+
+            if (taskData.status === 'DONE') {
+                taskData.completed_at = getLocalDateString();
+            }
+
+            const task = await Task.create(taskData);
 
             // Create subtasks if provided
             if (subtasks && Array.isArray(subtasks) && subtasks.length > 0) {
@@ -151,6 +162,15 @@ class ProjectController {
             const task = await Task.findByPk(id);
             if (!task) {
                 return reply.status(404).send({ success: false, error: 'Task not found' });
+            }
+
+            // Handle completed_at based on status changes
+            if (updates.status) {
+                if (updates.status === 'DONE' && task.status !== 'DONE') {
+                    updates.completed_at = getLocalDateString();
+                } else if (updates.status !== 'DONE' && task.status === 'DONE') {
+                    updates.completed_at = null;
+                }
             }
 
             await task.update(updates);
@@ -239,7 +259,14 @@ class ProjectController {
                 return reply.status(404).send({ success: false, error: 'Task not found' });
             }
 
-            await task.update({ status });
+            const updateData = { status };
+            if (status === 'DONE') {
+                updateData.completed_at = getLocalDateString();
+            } else if (task.status === 'DONE' && status !== 'DONE') {
+                updateData.completed_at = null;
+            }
+
+            await task.update(updateData);
             return reply.send({ success: true, data: task });
         } catch (error) {
             console.error(error);
