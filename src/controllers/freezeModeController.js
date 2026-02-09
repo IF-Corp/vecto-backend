@@ -325,6 +325,9 @@ const activateFreezeMode = async (request, reply) => {
         // Update legacy config
         await syncLegacyConfig(userId, true, today, end_date, reason);
 
+        // Clear freeze guard cache
+        if (request.server.clearFreezeCache) request.server.clearFreezeCache(userId);
+
         const result = await FreezePeriod.findByPk(period.id, {
             include: [
                 { model: FreezeModule, as: 'modules' },
@@ -377,6 +380,9 @@ const activateFreezePeriod = async (request, reply) => {
         // Update legacy config
         await syncLegacyConfig(period.user_id, true, period.start_date, period.end_date, period.reason);
 
+        // Clear freeze guard cache
+        if (request.server.clearFreezeCache) request.server.clearFreezeCache(period.user_id);
+
         const result = await FreezePeriod.findByPk(id, {
             include: [
                 { model: FreezeModule, as: 'modules' },
@@ -414,6 +420,9 @@ const deactivateFreezeMode = async (request, reply) => {
 
         // Update legacy config
         await syncLegacyConfig(userId, false, null, null, null);
+
+        // Clear freeze guard cache
+        if (request.server.clearFreezeCache) request.server.clearFreezeCache(userId);
 
         const result = await FreezePeriod.findByPk(period.id, {
             include: [
@@ -456,6 +465,9 @@ const cancelFreezePeriod = async (request, reply) => {
         if (wasActive) {
             await syncLegacyConfig(period.user_id, false, null, null, null);
         }
+
+        // Clear freeze guard cache
+        if (request.server.clearFreezeCache) request.server.clearFreezeCache(period.user_id);
 
         const result = await FreezePeriod.findByPk(id, {
             include: [
