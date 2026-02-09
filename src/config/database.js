@@ -1,30 +1,35 @@
 require('dotenv').config();
 
+const env = (key, fallback) => {
+    const value = process.env[key];
+    return value ? value.trim() : fallback;
+};
+
 module.exports = {
     development: {
-        username: process.env.DB_USER || 'postgres',
-        password: process.env.DB_PASSWORD || 'postgres',
-        database: process.env.DB_NAME || 'vecto_db',
-        host: process.env.DB_HOST || 'localhost',
-        port: process.env.DB_PORT || 5432,
+        username: env('DB_USER', 'postgres'),
+        password: env('DB_PASSWORD', 'postgres'),
+        database: env('DB_NAME', 'vecto_db'),
+        host: env('DB_HOST', 'localhost'),
+        port: env('DB_PORT', 5432),
         dialect: 'postgres',
         logging: console.log,
     },
     test: {
-        username: process.env.DB_USER || 'postgres',
-        password: process.env.DB_PASSWORD || 'postgres',
-        database: process.env.DB_NAME_TEST || 'vecto_db_test',
-        host: process.env.DB_HOST || 'localhost',
-        port: process.env.DB_PORT || 5432,
+        username: env('DB_USER', 'postgres'),
+        password: env('DB_PASSWORD', 'postgres'),
+        database: env('DB_NAME_TEST', 'vecto_db_test'),
+        host: env('DB_HOST', 'localhost'),
+        port: env('DB_PORT', 5432),
         dialect: 'postgres',
         logging: false,
     },
     production: {
-        username: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-        host: process.env.DB_HOST,
-        port: process.env.DB_PORT || 5432,
+        username: env('DB_USER', undefined),
+        password: env('DB_PASSWORD', undefined),
+        database: env('DB_NAME', undefined),
+        host: env('DB_HOST', undefined),
+        port: env('DB_PORT', 5432),
         dialect: 'postgres',
         logging: false,
         dialectOptions: {
