@@ -6,9 +6,9 @@ const itemTypeEnum = { type: 'string', enum: ['BOOK', 'ARTICLE', 'VIDEO', 'COURS
 const reviewDifficultyEnum = { type: 'string', enum: ['EASY', 'MEDIUM', 'HARD'] };
 const courseStatusEnum = { type: 'string', enum: ['ACTIVE', 'COMPLETED', 'PAUSED', 'DROPPED'] };
 const periodStatusEnum = { type: 'string', enum: ['UPCOMING', 'IN_PROGRESS', 'COMPLETED'] };
-const bookStatusEnum = { type: 'string', enum: ['WANT_TO_READ', 'READING', 'COMPLETED', 'PAUSED', 'DROPPED'] };
-const bookFormatEnum = { type: 'string', enum: ['PHYSICAL', 'EBOOK', 'AUDIOBOOK', 'PDF'] };
-const courseOnlineStatusEnum = { type: 'string', enum: ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'PAUSED', 'DROPPED'] };
+const bookStatusEnum = { type: 'string', enum: ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'PAUSED'] };
+const bookFormatEnum = { type: 'string', enum: ['PHYSICAL', 'KINDLE', 'PDF', 'AUDIOBOOK_ONLY'] };
+const courseOnlineStatusEnum = { type: 'string', enum: ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'PAUSED'] };
 const topicStatusEnum = { type: 'string', enum: ['NOT_STARTED', 'LEARNING', 'REVIEWING', 'MASTERED'] };
 const topicSourceTypeEnum = { type: 'string', enum: ['SUBJECT', 'BOOK', 'COURSE_ONLINE', 'PROJECT', 'STANDALONE'] };
 const evaluationTypeEnum = { type: 'string', enum: ['EXAM', 'ASSIGNMENT', 'PROJECT', 'PRESENTATION', 'QUIZ', 'OTHER'] };
@@ -220,7 +220,7 @@ const createBookBody = {
         author: { type: 'string', maxLength: 200, nullable: true },
         isbn: { type: 'string', maxLength: 20, nullable: true },
         cover_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
-        total_pages: { type: 'integer', minimum: 1, nullable: true },
+        total_pages: { type: 'integer', minimum: 0, nullable: true },
         format: bookFormatEnum,
         status: bookStatusEnum,
         category: { type: 'string', maxLength: 100, nullable: true },
@@ -238,7 +238,7 @@ const updateBookBody = {
         author: { type: 'string', maxLength: 200, nullable: true },
         isbn: { type: 'string', maxLength: 20, nullable: true },
         cover_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
-        total_pages: { type: 'integer', minimum: 1, nullable: true },
+        total_pages: { type: 'integer', minimum: 0, nullable: true },
         current_page: { type: 'integer', minimum: 0 },
         format: bookFormatEnum,
         status: bookStatusEnum,
@@ -252,40 +252,43 @@ const updateBookBody = {
 };
 
 // ==================== ONLINE COURSES ====================
+const courseOnlineCategoryEnum = { type: 'string', enum: ['EXTRACURRICULAR', 'CERTIFICATION', 'EXTENSION', 'FREE'] };
+const courseOnlineModalityEnum = { type: 'string', enum: ['ONLINE', 'IN_PERSON', 'HYBRID'] };
+
 const createCourseOnlineBody = {
     type: 'object',
     properties: {
-        title: { type: 'string', minLength: 1, maxLength: 300 },
+        name: { type: 'string', minLength: 1, maxLength: 500 },
         platform: { type: 'string', maxLength: 100, nullable: true },
         instructor: { type: 'string', maxLength: 200, nullable: true },
         url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
-        thumbnail_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
+        cover_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
+        modality: courseOnlineModalityEnum,
+        category: courseOnlineCategoryEnum,
         total_lessons: { type: 'integer', minimum: 1, nullable: true },
         total_hours: { type: 'number', minimum: 0, nullable: true },
         status: courseOnlineStatusEnum,
-        is_certification: { type: 'boolean', default: false },
-        category: { type: 'string', maxLength: 100, nullable: true },
         notes: { type: 'string', maxLength: 5000, nullable: true }
     },
-    required: ['title'],
+    required: ['name'],
     additionalProperties: false
 };
 
 const updateCourseOnlineBody = {
     type: 'object',
     properties: {
-        title: { type: 'string', minLength: 1, maxLength: 300 },
+        name: { type: 'string', minLength: 1, maxLength: 500 },
         platform: { type: 'string', maxLength: 100, nullable: true },
         instructor: { type: 'string', maxLength: 200, nullable: true },
         url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
-        thumbnail_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
+        cover_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
+        modality: courseOnlineModalityEnum,
+        category: courseOnlineCategoryEnum,
         total_lessons: { type: 'integer', minimum: 1, nullable: true },
-        completed_lessons: { type: 'integer', minimum: 0 },
+        current_lesson: { type: 'integer', minimum: 0 },
         total_hours: { type: 'number', minimum: 0, nullable: true },
         status: courseOnlineStatusEnum,
-        is_certification: { type: 'boolean' },
         certificate_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
-        category: { type: 'string', maxLength: 100, nullable: true },
         rating: { type: 'integer', minimum: 1, maximum: 5, nullable: true },
         notes: { type: 'string', maxLength: 5000, nullable: true },
         started_at: { type: 'string', format: 'date', nullable: true },
