@@ -177,6 +177,92 @@ const updateCalendarEventBody = {
     additionalProperties: false
 };
 
+// Bill schemas
+const billCategoryEnum = {
+    type: 'string',
+    enum: ['RENT', 'CONDO', 'ELECTRICITY', 'WATER', 'GAS', 'INTERNET', 'PHONE', 'STREAMING', 'INSURANCE', 'OTHER']
+};
+
+const createBillBody = {
+    type: 'object',
+    properties: {
+        name: { type: 'string', minLength: 1, maxLength: 255 },
+        category: billCategoryEnum,
+        average_amount: { type: 'number', minimum: 0 },
+        due_day: { type: 'integer', minimum: 1, maximum: 31 },
+        reminder_days_before: { type: 'integer', minimum: 0, nullable: true },
+        is_active: { type: 'boolean' },
+        notes: { type: 'string', nullable: true }
+    },
+    required: ['name', 'due_day'],
+    additionalProperties: false
+};
+
+const updateBillBody = {
+    type: 'object',
+    properties: {
+        name: { type: 'string', minLength: 1, maxLength: 255 },
+        category: billCategoryEnum,
+        average_amount: { type: 'number', minimum: 0 },
+        due_day: { type: 'integer', minimum: 1, maximum: 31 },
+        reminder_days_before: { type: 'integer', minimum: 0, nullable: true },
+        is_active: { type: 'boolean' },
+        notes: { type: 'string', nullable: true }
+    },
+    additionalProperties: false
+};
+
+const payBillBody = {
+    type: 'object',
+    properties: {
+        month: { type: 'integer', minimum: 1, maximum: 12 },
+        year: { type: 'integer', minimum: 2000, maximum: 2100 },
+        amount: { type: 'number', minimum: 0, nullable: true },
+        paidByMemberId: { type: 'string', nullable: true },
+        notes: { type: 'string', nullable: true }
+    },
+    required: ['month', 'year'],
+    additionalProperties: false
+};
+
+const splitTypeEnum = { type: 'string', enum: ['EQUAL', 'CUSTOM'] };
+
+const updateCostSplitBody = {
+    type: 'object',
+    properties: {
+        splitType: splitTypeEnum,
+        memberSplits: {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    memberId: { type: 'string' },
+                    percentage: { type: 'number', minimum: 0, maximum: 100 }
+                },
+                required: ['memberId', 'percentage']
+            },
+            nullable: true
+        }
+    },
+    required: ['splitType'],
+    additionalProperties: false
+};
+
+const monthYearQuery = {
+    type: 'object',
+    properties: {
+        month: { type: 'integer', minimum: 1, maximum: 12 },
+        year: { type: 'integer', minimum: 2000, maximum: 2100 }
+    }
+};
+
+const costHistoryQuery = {
+    type: 'object',
+    properties: {
+        months: { type: 'integer', minimum: 1, maximum: 24, default: 6 }
+    }
+};
+
 module.exports = {
     createShoppingListBody,
     updateShoppingListBody,
@@ -190,5 +276,13 @@ module.exports = {
     updateCalendarEventBody,
     priorityEnum,
     choreFrequencyEnum,
-    eventTypeEnum
+    eventTypeEnum,
+    billCategoryEnum,
+    createBillBody,
+    updateBillBody,
+    payBillBody,
+    splitTypeEnum,
+    updateCostSplitBody,
+    monthYearQuery,
+    costHistoryQuery
 };
