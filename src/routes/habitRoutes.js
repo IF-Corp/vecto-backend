@@ -162,6 +162,47 @@ async function habitRoutes(fastify, options) {
         }
     }, habitController.getRoutineHistory);
 
+    fastify.post('/routines/:id/check', {
+        schema: {
+            description: 'Check/Uncheck a routine execution',
+            tags: ['Routines'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams,
+            body: {
+                type: 'object',
+                properties: {
+                    status: { type: 'string', enum: ['completed', 'in_progress'] },
+                    execution_date: { type: 'string', format: 'date-time' }
+                },
+                required: ['status']
+            }
+        }
+    }, habitController.checkRoutine);
+
+    fastify.post('/routines/:id/items/:itemId/check', {
+        schema: {
+            description: 'Check/Uncheck a routine item',
+            tags: ['Routines'],
+            security: [{ bearerAuth: [] }],
+            params: {
+                type: 'object',
+                properties: {
+                    id: { type: 'string', format: 'uuid' },
+                    itemId: { type: 'string', format: 'uuid' }
+                },
+                required: ['id', 'itemId']
+            },
+            body: {
+                type: 'object',
+                properties: {
+                    status: { type: 'boolean' },
+                    execution_date: { type: 'string', format: 'date-time' }
+                },
+                required: ['status']
+            }
+        }
+    }, habitController.checkRoutineItem);
+
     // ==================== FOCUS MODE ====================
     fastify.post('/routines/:id/executions/start', {
         schema: {

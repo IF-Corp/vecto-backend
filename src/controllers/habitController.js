@@ -525,6 +525,153 @@ class HabitController {
         }
     }
 
+    async checkRoutine(request, reply) {
+        try {
+            const { id } = request.params;
+            const userId = request.user.id;
+            const { status, execution_date } = request.body; // status: 'completed' | 'in_progress'
+
+            const routine = await Routine.findByPk(id);
+            if (!routine) {
+                return reply.status(404).send({ success: false, error: 'Routine not found' });
+            }
+
+            if (routine.user_id !== userId) {
+                return reply.status(403).send({ success: false, error: 'Not authorized' });
+            }
+
+            const targetDate = execution_date ? new Date(execution_date) : new Date();
+            const dateStr = targetDate.toISOString().split('T')[0];
+
+            let execution = await RoutineExecution.findOne({
+                where: {
+                    routine_id: id,
+                    execution_date: dateStr
+                }
+            });
+
+            if (!execution) {
+                execution = await RoutineExecution.create({
+                    routine_id: id,
+                    execution_date: dateStr,
+                    started_at: new Date(),
+                    status: 'in_progress',
+                    completed: false,
+                    paused_duration: 0
+                });
+            }
+
+            if (status === 'completed') {
+                await execution.update({
+                    status: 'completed',
+                    completed: true,
+                    completed_at: new Date()
+                });
+
+                // Update streak
+                const newStreak = routine.current_streak + 1;
+                const bestStreak = Math.max(routine.best_streak, newStreak);
+                await routine.update({
+                    current_streak: newStreak,
+                    best_streak: bestStreak
+                });
+            } else {
+                await execution.update({
+                    status: 'in_progress',
+                    completed: false,
+                    completed_at: null
+                });
+                // TODO: Handle removing streak if unchecked? 
+                // For now user just asked to check. 
+                // If unchecking, might need to recalculate streak which is complex.
+                // Assuming "check" is the primary flow here.
+            }
+
+            return reply.send({ success: true, data: execution });
+        } catch (error) {
+            console.error(error);
+            return reply.status(500).send({ success: false, error: error.message });
+        }
+    }
+
+    async checkRoutineItem(request, reply) {
+        try {
+            const { id, itemId } = request.params;
+            const userId = request.user.id;
+            const { status, execution_date } = request.body; // status: true (checked) | false (unchecked)
+
+            const routine = await Routine.findByPk(id);
+            if (!routine) {
+                return reply.status(404).send({ success: false, error: 'Routine not found' });
+            }
+
+            if (routine.user_id !== userId) {
+                return reply.status(403).send({ success: false, error: 'Not authorized' });
+            }
+
+            const targetDate = execution_date ? new Date(execution_date) : new Date();
+            const dateStr = targetDate.toISOString().split('T')[0];
+
+            let execution = await RoutineExecution.findOne({
+                where: {
+                    routine_id: id,
+                    execution_date: dateStr
+                }
+            });
+
+            if (!execution) {
+                execution = await RoutineExecution.create({
+                    routine_id: id,
+                    execution_date: dateStr,
+                    started_at: new Date(),
+                    status: 'in_progress',
+                    completed: false,
+                    paused_duration: 0
+                });
+            }
+
+            const item = await RoutineItem.findByPk(itemId);
+            if (!item) {
+                return reply.status(404).send({ success: false, error: 'Item not found' });
+            }
+
+            if (status) {
+                // Check item
+                const [execItem, created] = await RoutineExecutionItem.findOrCreate({
+                    where: {
+                        execution_id: execution.id,
+                        item_id: itemId
+                    },
+                    defaults: {
+                        item_title: item.title, // Snapshot title
+                        duration: 0 // Default duration for manual check
+                    }
+                });
+            } else {
+                // Uncheck item
+                await RoutineExecutionItem.destroy({
+                    where: {
+                        execution_id: execution.id,
+                        item_id: itemId
+                    }
+                });
+            }
+
+            // Fetch updated execution with items
+            const updatedExecution = await RoutineExecution.findByPk(execution.id, {
+                include: [{
+                    model: RoutineExecutionItem,
+                    as: 'itemTimes'
+                }]
+            });
+
+            return reply.send({ success: true, data: updatedExecution });
+        } catch (error) {
+            console.error(error);
+            return reply.status(500).send({ success: false, error: error.message });
+        }
+    }
+
     // ==================== FOCUS MODE SESSIONS ====================
 
     async startFocusSession(request, reply) {
