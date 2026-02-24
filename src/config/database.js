@@ -14,6 +14,14 @@ module.exports = {
         port: env('DB_PORT', 5432),
         dialect: 'postgres',
         logging: console.log,
+        ...(env('DB_SSL', 'false') === 'true' && {
+            dialectOptions: {
+                ssl: {
+                    require: true,
+                    rejectUnauthorized: false
+                }
+            }
+        }),
     },
     test: {
         username: env('DB_USER', 'postgres'),
