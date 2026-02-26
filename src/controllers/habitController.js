@@ -9,6 +9,7 @@ const {
     GroupMember
 } = require('../models');
 const { Op } = require('sequelize');
+const { calculateNewStreak } = require('../utils/streakHelper');
 
 class HabitController {
     // ==================== HABITS ====================
@@ -219,17 +220,20 @@ class HabitController {
                 });
             }
 
-            // Update streak
-            if (status === 'DONE') {
-                const newStreak = habit.current_streak + 1;
-                const bestStreak = Math.max(habit.best_streak, newStreak);
-                await habit.update({
-                    current_streak: newStreak,
-                    best_streak: bestStreak
-                });
-            } else if (status === 'FAILED') {
-                await habit.update({ current_streak: 0 });
-            }
+            // Fetch recent history to calculate streak
+            const history = await HabitLog.findAll({
+                where: { habit_id: id },
+                order: [['execution_date', 'DESC']],
+                limit: 10 // Enough to check consecutive days/weeks
+            });
+
+            // Calculate new streak
+            const { newStreak, bestStreak } = calculateNewStreak(habit, logDate, status, history);
+
+            await habit.update({
+                current_streak: newStreak,
+                best_streak: bestStreak
+            });
 
             const updatedHabit = await Habit.findByPk(id, {
                 include: [{ model: HabitLog, as: 'logs', limit: 30, order: [['execution_date', 'DESC']] }]
@@ -463,8 +467,14 @@ class HabitController {
 
             // Update streak if completed
             if (completed) {
-                const newStreak = routine.current_streak + 1;
-                const bestStreak = Math.max(routine.best_streak, newStreak);
+                // Fetch recent history
+                const executionsHistory = await RoutineExecution.findAll({
+                    where: { routine_id: id },
+                    order: [['execution_date', 'DESC']],
+                    limit: 10
+                });
+
+                const { newStreak, bestStreak } = calculateNewStreak(routine, started_at, 'completed', executionsHistory);
 
                 // Calculate new average duration
                 const executions = await RoutineExecution.findAll({
@@ -568,9 +578,16 @@ class HabitController {
                     completed_at: new Date()
                 });
 
+                // Fetch recent history
+                const executionsHistory = await RoutineExecution.findAll({
+                    where: { routine_id: id },
+                    order: [['execution_date', 'DESC']],
+                    limit: 10
+                });
+
                 // Update streak
-                const newStreak = routine.current_streak + 1;
-                const bestStreak = Math.max(routine.best_streak, newStreak);
+                const { newStreak, bestStreak } = calculateNewStreak(routine, targetDate, 'completed', executionsHistory);
+
                 await routine.update({
                     current_streak: newStreak,
                     best_streak: bestStreak
