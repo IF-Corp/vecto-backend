@@ -209,6 +209,8 @@ class HabitController {
                 }
             });
 
+            const previousStatus = existingLog ? existingLog.status : null;
+
             if (existingLog) {
                 await existingLog.update({ status });
             } else {
@@ -219,16 +221,19 @@ class HabitController {
                 });
             }
 
-            // Update streak
-            if (status === 'DONE') {
+            // Update streak only on actual status transitions
+            if (status === 'DONE' && previousStatus !== 'DONE') {
+                // Transitioning TO DONE (new log or from SKIPPED/FAILED)
                 const newStreak = habit.current_streak + 1;
                 const bestStreak = Math.max(habit.best_streak, newStreak);
                 await habit.update({
                     current_streak: newStreak,
                     best_streak: bestStreak
                 });
-            } else if (status === 'FAILED') {
-                await habit.update({ current_streak: 0 });
+            } else if (status !== 'DONE' && previousStatus === 'DONE') {
+                // Transitioning FROM DONE to something else (uncompletion)
+                const newStreak = Math.max(0, habit.current_streak - 1);
+                await habit.update({ current_streak: newStreak });
             }
 
             const updatedHabit = await Habit.findByPk(id, {
@@ -461,27 +466,39 @@ class HabitController {
                 await RoutineExecutionItem.bulkCreate(itemTimeRecords);
             }
 
-            // Update streak if completed
+            // Update streak if completed (only if no other completed execution exists for this date)
             if (completed) {
-                const newStreak = routine.current_streak + 1;
-                const bestStreak = Math.max(routine.best_streak, newStreak);
-
-                // Calculate new average duration
-                const executions = await RoutineExecution.findAll({
-                    where: { routine_id: id, completed: true },
-                    order: [['started_at', 'DESC']],
-                    limit: 7
+                const executionDate = new Date(started_at).toISOString().split('T')[0];
+                const existingCompleted = await RoutineExecution.findOne({
+                    where: {
+                        routine_id: id,
+                        execution_date: executionDate,
+                        completed: true,
+                        id: { [Op.ne]: execution.id }
+                    }
                 });
 
-                const avgDuration = executions.length > 0
-                    ? Math.round(executions.reduce((sum, e) => sum + (e.total_duration || 0), 0) / executions.length)
-                    : total_duration;
+                if (!existingCompleted) {
+                    const newStreak = routine.current_streak + 1;
+                    const bestStreak = Math.max(routine.best_streak, newStreak);
 
-                await routine.update({
-                    current_streak: newStreak,
-                    best_streak: bestStreak,
-                    average_duration: avgDuration
-                });
+                    // Calculate new average duration
+                    const executions = await RoutineExecution.findAll({
+                        where: { routine_id: id, completed: true },
+                        order: [['started_at', 'DESC']],
+                        limit: 7
+                    });
+
+                    const avgDuration = executions.length > 0
+                        ? Math.round(executions.reduce((sum, e) => sum + (e.total_duration || 0), 0) / executions.length)
+                        : total_duration;
+
+                    await routine.update({
+                        current_streak: newStreak,
+                        best_streak: bestStreak,
+                        average_duration: avgDuration
+                    });
+                }
             }
 
             // Fetch complete execution with item times
@@ -561,6 +578,8 @@ class HabitController {
                 });
             }
 
+            const wasCompleted = execution.completed;
+
             if (status === 'completed') {
                 await execution.update({
                     status: 'completed',
@@ -568,23 +587,27 @@ class HabitController {
                     completed_at: new Date()
                 });
 
-                // Update streak
-                const newStreak = routine.current_streak + 1;
-                const bestStreak = Math.max(routine.best_streak, newStreak);
-                await routine.update({
-                    current_streak: newStreak,
-                    best_streak: bestStreak
-                });
+                // Only increment streak if this execution was not already completed
+                if (!wasCompleted) {
+                    const newStreak = routine.current_streak + 1;
+                    const bestStreak = Math.max(routine.best_streak, newStreak);
+                    await routine.update({
+                        current_streak: newStreak,
+                        best_streak: bestStreak
+                    });
+                }
             } else {
                 await execution.update({
                     status: 'in_progress',
                     completed: false,
                     completed_at: null
                 });
-                // TODO: Handle removing streak if unchecked? 
-                // For now user just asked to check. 
-                // If unchecking, might need to recalculate streak which is complex.
-                // Assuming "check" is the primary flow here.
+
+                // Decrement streak if this execution was previously completed
+                if (wasCompleted) {
+                    const newStreak = Math.max(0, routine.current_streak - 1);
+                    await routine.update({ current_streak: newStreak });
+                }
             }
 
             return reply.send({ success: true, data: execution });
@@ -847,9 +870,16 @@ class HabitController {
                 await RoutineExecutionItem.bulkCreate(itemTimeRecords);
             }
 
-            // Update streak and average
-            const newStreak = routine.current_streak + 1;
-            const bestStreak = Math.max(routine.best_streak, newStreak);
+            // Update streak and average (only if no other completed execution exists for this date)
+            const executionDate = execution.execution_date;
+            const existingCompleted = await RoutineExecution.findOne({
+                where: {
+                    routine_id: id,
+                    execution_date: executionDate,
+                    completed: true,
+                    id: { [Op.ne]: executionId }
+                }
+            });
 
             const executions = await RoutineExecution.findAll({
                 where: { routine_id: id, completed: true },
@@ -861,11 +891,17 @@ class HabitController {
                 ? Math.round(executions.reduce((sum, e) => sum + (e.total_duration || 0), 0) / executions.length)
                 : totalSeconds;
 
-            await routine.update({
-                current_streak: newStreak,
-                best_streak: bestStreak,
-                average_duration: avgDuration
-            });
+            if (!existingCompleted) {
+                const newStreak = routine.current_streak + 1;
+                const bestStreak = Math.max(routine.best_streak, newStreak);
+                await routine.update({
+                    current_streak: newStreak,
+                    best_streak: bestStreak,
+                    average_duration: avgDuration
+                });
+            } else {
+                await routine.update({ average_duration: avgDuration });
+            }
 
             const completeExecution = await RoutineExecution.findByPk(executionId, {
                 include: [{ model: RoutineExecutionItem, as: 'itemTimes' }]
