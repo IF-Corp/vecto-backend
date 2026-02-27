@@ -176,7 +176,9 @@ class ProjectController {
             await task.update(updates);
 
             // Handle subtasks update if provided
-            if (subtasks !== undefined && Array.isArray(subtasks)) {
+            // Safe update: only sync if subtasks are provided and the array is NOT empty.
+            // This prevents accidental deletion when the frontend sends [] by default.
+            if (subtasks !== undefined && Array.isArray(subtasks) && subtasks.length > 0) {
                 // Get existing subtasks
                 const existingSubtasks = await Subtask.findAll({ where: { task_id: id } });
                 const existingIds = new Set(existingSubtasks.map(s => s.id));
@@ -267,7 +269,16 @@ class ProjectController {
             }
 
             await task.update(updateData);
-            return reply.send({ success: true, data: task });
+
+            // Reload with subtasks for consistency
+            const taskWithSubtasks = await Task.findByPk(id, {
+                include: [
+                    { model: Project, as: 'project', attributes: ['id', 'name'] },
+                    { model: Subtask, as: 'subtasks', order: [['order', 'ASC']] }
+                ]
+            });
+
+            return reply.send({ success: true, data: taskWithSubtasks });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({ success: false, error: error.message });
@@ -310,6 +321,23 @@ class ProjectController {
 
             await subtask.update({ completed: completed ?? !subtask.completed });
             return reply.send({ success: true, data: subtask });
+        } catch (error) {
+            console.error(error);
+            return reply.status(500).send({ success: false, error: error.message });
+        }
+    }
+
+    async deleteSubtask(request, reply) {
+        try {
+            const { id } = request.params;
+
+            const subtask = await Subtask.findByPk(id);
+            if (!subtask) {
+                return reply.status(404).send({ success: false, error: 'Subtask not found' });
+            }
+
+            await subtask.destroy();
+            return reply.send({ success: true, message: 'Subtask deleted' });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({ success: false, error: error.message });

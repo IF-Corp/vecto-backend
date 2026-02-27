@@ -85,42 +85,70 @@ const updateCardBody = {
     additionalProperties: false
 };
 
+const uuidOrEmpty = { anyOf: [{ type: 'string', format: 'uuid' }, { type: 'string', maxLength: 0 }, { type: 'string', nullable: true }] };
+
 // ==================== TRANSACTION SCHEMAS ====================
 const createTransactionBody = {
     type: 'object',
     properties: {
-        account_id: { type: 'string', format: 'uuid', nullable: true },
-        category_id: { type: 'string', format: 'uuid', nullable: true },
-        card_id: { type: 'string', format: 'uuid', nullable: true },
+        account_id: uuidOrEmpty,
+        accountId: uuidOrEmpty,
+        category_id: uuidOrEmpty,
+        categoryId: uuidOrEmpty,
+        card_id: uuidOrEmpty,
+        cardId: uuidOrEmpty,
         description: { type: 'string', minLength: 1, maxLength: 200 },
         amount: { type: 'number', exclusiveMinimum: 0 },
         type: transactionTypeEnum,
         primary_category: { type: 'string', maxLength: 100, nullable: true },
         secondary_category: { type: 'string', maxLength: 100, nullable: true },
-        transaction_date: { type: 'string', format: 'date-time' },
+        transaction_date: { type: 'string', anyOf: [{ format: 'date-time' }, { format: 'date' }] },
+        date: { type: 'string', anyOf: [{ format: 'date-time' }, { format: 'date' }] },
         is_installment: { type: 'boolean', default: false },
+        isInstallment: { type: 'boolean', default: false },
         total_installments: { type: 'integer', minimum: 2, maximum: 48, nullable: true },
+        totalInstallments: { type: 'integer', minimum: 2, maximum: 48, nullable: true },
         is_recurring: { type: 'boolean', default: false },
+        isRecurring: { type: 'boolean', default: false },
+        recurrence_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true },
+        recurrenceDay: { type: 'integer', minimum: 1, maximum: 31, nullable: true },
+        recurrence_type: recurrenceTypeEnum,
+        recurrenceType: recurrenceTypeEnum,
         status: transactionStatusEnum,
-        notes: { type: 'string', maxLength: 500, nullable: true }
+        notes: { type: 'string', maxLength: 500, nullable: true },
+        paymentMethod: { type: 'string', nullable: true }
     },
-    required: ['description', 'amount', 'type', 'transaction_date'],
+    required: ['description', 'amount', 'type'],
+    anyOf: [
+        { required: ['transaction_date'] },
+        { required: ['date'] }
+    ],
     additionalProperties: false
 };
 
 const updateTransactionBody = {
     type: 'object',
     properties: {
-        category_id: { type: 'string', format: 'uuid', nullable: true },
-        card_id: { type: 'string', format: 'uuid', nullable: true },
+        category_id: uuidOrEmpty,
+        categoryId: uuidOrEmpty,
+        card_id: uuidOrEmpty,
+        cardId: uuidOrEmpty,
         description: { type: 'string', minLength: 1, maxLength: 200 },
         amount: { type: 'number', exclusiveMinimum: 0 },
         type: transactionTypeEnum,
         primary_category: { type: 'string', maxLength: 100, nullable: true },
         secondary_category: { type: 'string', maxLength: 100, nullable: true },
-        transaction_date: { type: 'string', format: 'date-time' },
+        transaction_date: { type: 'string', anyOf: [{ format: 'date-time' }, { format: 'date' }] },
+        date: { type: 'string', anyOf: [{ format: 'date-time' }, { format: 'date' }] },
         status: transactionStatusEnum,
-        notes: { type: 'string', maxLength: 500, nullable: true }
+        notes: { type: 'string', maxLength: 500, nullable: true },
+        is_recurring: { type: 'boolean' },
+        isRecurring: { type: 'boolean' },
+        recurrence_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true },
+        recurrenceDay: { type: 'integer', minimum: 1, maximum: 31, nullable: true },
+        recurrence_type: recurrenceTypeEnum,
+        recurrenceType: recurrenceTypeEnum,
+        paymentMethod: { type: 'string', nullable: true }
     },
     additionalProperties: false
 };

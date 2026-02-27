@@ -229,10 +229,45 @@ const getTransactionsByAccount = async (request, reply) => {
     }
 };
 
+// Helper to normalize transaction data from camelCase to snake_case
+const normalizeTransactionData = (data) => {
+    const normalized = { ...data };
+
+    // Map common fields
+    if (data.date && !data.transaction_date) normalized.transaction_date = data.date;
+    if (data.categoryId !== undefined) normalized.category_id = data.categoryId || null;
+    if (data.cardId !== undefined) normalized.card_id = data.cardId || null;
+    if (data.accountId !== undefined) normalized.account_id = data.accountId || null;
+    if (data.isInstallment !== undefined) normalized.is_installment = data.isInstallment;
+    if (data.totalInstallments !== undefined) normalized.total_installments = data.totalInstallments;
+    if (data.isRecurring !== undefined) normalized.is_recurring = data.isRecurring;
+    if (data.recurrenceDay !== undefined) normalized.recurrence_day = data.recurrenceDay;
+    if (data.recurrenceType !== undefined) normalized.recurrence_type = data.recurrenceType;
+
+    // Remove camelCase versions to avoid duplication if Sequelize doesn't handle them
+    delete normalized.date;
+    delete normalized.categoryId;
+    delete normalized.cardId;
+    delete normalized.accountId;
+    delete normalized.isInstallment;
+    delete normalized.totalInstallments;
+    delete normalized.isRecurring;
+    delete normalized.recurrenceDay;
+    delete normalized.recurrenceType;
+    delete normalized.paymentMethod; // Helper field only
+
+    // Convert empty strings to null for UUID fields
+    if (normalized.category_id === '') normalized.category_id = null;
+    if (normalized.card_id === '') normalized.card_id = null;
+    if (normalized.account_id === '') normalized.account_id = null;
+
+    return normalized;
+};
+
 const createTransaction = async (request, reply) => {
     try {
         const { userId } = request.params;
-        const data = request.body;
+        const data = normalizeTransactionData(request.body);
 
         // Handle installments
         if (data.is_installment && data.total_installments) {
@@ -310,7 +345,9 @@ const createTransactionForAccount = async (request, reply) => {
 const updateTransaction = async (request, reply) => {
     try {
         const { id } = request.params;
-        const [updated] = await Transaction.update(request.body, {
+        const data = normalizeTransactionData(request.body);
+
+        const [updated] = await Transaction.update(data, {
             where: { id }
         });
         if (!updated) {
