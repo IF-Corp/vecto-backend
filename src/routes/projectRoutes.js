@@ -128,6 +128,15 @@ async function projectRoutes(fastify, options) {
         }
     }, projectController.toggleSubtask);
 
+    fastify.delete('/subtasks/:id', {
+        schema: {
+            description: 'Delete a subtask',
+            tags: ['Tasks'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams
+        }
+    }, projectController.deleteSubtask);
+
     // ==================== MEETINGS ====================
     fastify.get('/projects/:projectId/meetings', {
         schema: {

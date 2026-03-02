@@ -3,6 +3,16 @@
 const projectStatusEnum = { type: 'string', enum: ['IN_PROGRESS', 'COMPLETED', 'PAUSED'] };
 const taskStatusEnum = { type: 'string', enum: ['BACKLOG', 'TODO', 'DOING', 'DONE'] };
 const taskPriorityEnum = { type: 'string', enum: ['LOW', 'MEDIUM', 'HIGH'] };
+const subtaskSchema = {
+    type: 'object',
+    properties: {
+        id: { type: 'string', format: 'uuid' },
+        title: { type: 'string', minLength: 1, maxLength: 500 },
+        completed: { type: 'boolean' },
+        order: { type: 'integer' }
+    },
+    required: ['title']
+};
 
 // Project schemas
 const createProjectBody = {
@@ -38,11 +48,12 @@ const createTaskBody = {
         status: taskStatusEnum,
         priority: taskPriorityEnum,
         scheduled_date: { type: 'string', format: 'date', nullable: true },
-        scheduled_time: { type: 'string', pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9]$', nullable: true },
+        scheduled_time: { type: 'string', pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$', nullable: true },
         estimated_duration: { type: 'integer', minimum: 0, nullable: true },
         category_name: { type: 'string', maxLength: 100, nullable: true },
         tags: { type: 'array', items: { type: 'string' }, default: [] },
-        assignees: { type: 'array', items: { type: 'string', format: 'uuid' }, default: [] }
+        assignees: { type: 'array', items: { type: 'string', format: 'uuid' }, default: [] },
+        subtasks: { type: 'array', items: subtaskSchema, default: [] }
     },
     required: ['name'],
     additionalProperties: false
@@ -57,11 +68,12 @@ const updateTaskBody = {
         status: taskStatusEnum,
         priority: taskPriorityEnum,
         scheduled_date: { type: 'string', format: 'date', nullable: true },
-        scheduled_time: { type: 'string', pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9]$', nullable: true },
+        scheduled_time: { type: 'string', pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$', nullable: true },
         estimated_duration: { type: 'integer', minimum: 0, nullable: true },
         category_name: { type: 'string', maxLength: 100, nullable: true },
         tags: { type: 'array', items: { type: 'string' } },
-        assignees: { type: 'array', items: { type: 'string', format: 'uuid' } }
+        assignees: { type: 'array', items: { type: 'string', format: 'uuid' } },
+        subtasks: { type: 'array', items: subtaskSchema }
     },
     additionalProperties: false
 };
