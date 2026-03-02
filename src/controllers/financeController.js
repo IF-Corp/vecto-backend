@@ -675,6 +675,15 @@ const createBudget = async (request, reply) => {
         reply.status(201);
         return { success: true, data: budget, created: true };
     } catch (error) {
+        request.log.error(error, 'Failed to create budget');
+        if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeDatabaseError') {
+            reply.status(400);
+            return { success: false, error: error.message };
+        }
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            reply.status(409);
+            return { success: false, error: 'Budget already exists for this category and month' };
+        }
         reply.status(500);
         return { success: false, error: error.message };
     }
