@@ -201,12 +201,14 @@ const getTransactions = async (request, reply) => {
 
         return {
             success: true,
-            data: rows,
-            pagination: {
-                page: parseInt(page),
-                limit: parseInt(limit),
-                total: count,
-                totalPages: Math.ceil(count / limit)
+            data: {
+                transactions: rows,
+                pagination: {
+                    page: parseInt(page),
+                    limit: parseInt(limit),
+                    total: count,
+                    totalPages: Math.ceil(count / limit)
+                }
             }
         };
     } catch (error) {
@@ -845,12 +847,14 @@ const getInvestments = async (request, reply) => {
 
         return {
             success: true,
-            data: investments,
-            summary: {
-                total_invested: totalInvested,
-                total_current: totalCurrent,
-                total_return: totalReturn,
-                return_percentage: returnPercentage
+            data: {
+                investments,
+                summary: {
+                    total_invested: totalInvested,
+                    total_current: totalCurrent,
+                    total_return: totalReturn,
+                    return_percentage: returnPercentage
+                }
             }
         };
     } catch (error) {
