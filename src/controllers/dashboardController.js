@@ -2,6 +2,8 @@ const DashboardSettings = require('../models/DashboardSettings');
 const DashboardQuickStat = require('../models/DashboardQuickStat');
 const DashboardWidget = require('../models/DashboardWidget');
 const DashboardAlertSetting = require('../models/DashboardAlertSetting');
+const { Op } = require('sequelize');
+const { Transaction, Budget, Habit, HabitLog, Task } = require('../models');
 
 // Default quick stats configuration
 const DEFAULT_QUICK_STATS = [
@@ -281,19 +283,60 @@ const getQuickStatsData = async (request, reply) => {
     try {
         const { userId } = request.params;
 
-        // Get user's quick stats configuration
         const quickStats = await DashboardQuickStat.findAll({
             where: { userId, isActive: true },
             order: [['displayOrder', 'ASC']],
         });
 
-        const statsData = [];
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        const dayOfWeek = today.getDay(); // 0=Sun, 1=Mon, ...
+        const year = today.getFullYear();
+        const month = today.getMonth();
+        const startOfMonth = new Date(year, month, 1);
+        const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59);
 
-        // TODO: Implement actual stat gathering from various modules
-        // For now, returning mock structure
+        // Gather stat types needed to avoid unnecessary queries
+        const neededTypes = new Set(quickStats.map(s => s.statType));
 
-        for (const stat of quickStats) {
-            const statData = {
+        // Parallel data fetching for needed modules
+        const [habits, habitLogs, tasks, transactions, budgets] = await Promise.all([
+            neededTypes.has('HABITS') ? Habit.findAll({ where: { user_id: userId, status: 'active' } }) : [],
+            neededTypes.has('HABITS') ? HabitLog.findAll({ where: { execution_date: todayStr }, include: [{ model: Habit, as: 'habit', where: { user_id: userId }, attributes: ['id'] }] }) : [],
+            neededTypes.has('TASKS') ? Task.findAll({ where: { user_id: userId, status: { [Op.ne]: 'DONE' } } }) : [],
+            neededTypes.has('BALANCE') ? Transaction.findAll({ where: { user_id: userId, transaction_date: { [Op.between]: [startOfMonth, endOfMonth] } } }) : [],
+            neededTypes.has('BALANCE') ? Budget.findAll({ where: { user_id: userId, is_active: true } }) : [],
+        ]);
+
+        // Pre-compute stats
+        let habitsTotal = 0, habitsDone = 0;
+        if (neededTypes.has('HABITS')) {
+            const todayHabits = habits.filter(h => {
+                if (h.frequency === 'DAILY') return true;
+                if (h.frequency === 'WEEKLY' || h.frequency === 'CUSTOM') {
+                    const days = h.frequency_days || [];
+                    return days.includes(dayOfWeek);
+                }
+                return false;
+            });
+            habitsTotal = todayHabits.length;
+            habitsDone = habitLogs.filter(l => l.status === 'DONE').length;
+        }
+
+        let pendingTasks = 0, overdueTasks = 0;
+        if (neededTypes.has('TASKS')) {
+            pendingTasks = tasks.length;
+            overdueTasks = tasks.filter(t => t.scheduled_date && t.scheduled_date < todayStr).length;
+        }
+
+        let totalIncome = 0, totalExpenses = 0;
+        if (neededTypes.has('BALANCE')) {
+            totalIncome = transactions.filter(t => t.type === 'INCOME').reduce((sum, t) => sum + parseFloat(t.amount), 0);
+            totalExpenses = transactions.filter(t => t.type === 'EXPENSE').reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        }
+
+        const statsData = quickStats.map(stat => {
+            const base = {
                 type: stat.statType,
                 label: getStatLabel(stat.statType),
                 value: null,
@@ -302,13 +345,38 @@ const getQuickStatsData = async (request, reply) => {
                 link: getStatLink(stat.statType),
             };
 
-            // Each module would populate its data here
-            statsData.push(statData);
-        }
+            switch (stat.statType) {
+                case 'HABITS': {
+                    const pct = habitsTotal > 0 ? Math.round((habitsDone / habitsTotal) * 100) : 0;
+                    base.value = `${habitsDone}/${habitsTotal}`;
+                    base.subtext = habitsTotal > 0 ? `${pct}% concluído` : 'Nenhum hábito hoje';
+                    base.status = habitsTotal === 0 ? 'neutral' : pct >= 80 ? 'good' : pct >= 50 ? 'warning' : 'bad';
+                    break;
+                }
+                case 'TASKS': {
+                    base.value = pendingTasks.toString();
+                    base.subtext = overdueTasks > 0 ? `${overdueTasks} atrasada${overdueTasks > 1 ? 's' : ''}` : 'Nenhuma atrasada';
+                    base.status = overdueTasks > 0 ? 'bad' : pendingTasks > 0 ? 'warning' : 'good';
+                    break;
+                }
+                case 'BALANCE': {
+                    const balance = totalIncome - totalExpenses;
+                    const fmt = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    base.value = fmt(balance);
+                    base.subtext = `Receitas: ${fmt(totalIncome)}`;
+                    base.status = balance > 0 ? 'good' : balance === 0 ? 'neutral' : 'bad';
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            return base;
+        });
 
         return reply.send({ success: true, data: statsData });
     } catch (error) {
-        console.error('Error getting quick stats data:', error);
+        request.log.error(error, 'Error getting quick stats data');
         return reply.status(500).send({ success: false, error: error.message });
     }
 };
