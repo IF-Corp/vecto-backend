@@ -31,20 +31,30 @@ async function getNotificationCounts(request, reply) {
 
 async function countPendingHabits(userId, today) {
     try {
-        // Count active habits that don't have a log for today
+        // Count active habits scheduled for today that don't have a log
         const activeHabits = await Habit.findAll({
             where: {
                 user_id: userId,
                 status: 'active',
                 is_frozen: false,
             },
-            attributes: ['id'],
+            attributes: ['id', 'frequency', 'frequency_days'],
             raw: true,
         });
 
         if (activeHabits.length === 0) return 0;
 
-        const habitIds = activeHabits.map(h => h.id);
+        // Filter habits scheduled for today
+        const todayDow = new Date().getDay(); // 0=Sunday, 6=Saturday
+        const scheduledHabits = activeHabits.filter(h => {
+            if (h.frequency === 'DAILY') return true;
+            if (!h.frequency_days || h.frequency_days.length === 0) return true;
+            return h.frequency_days.includes(todayDow);
+        });
+
+        if (scheduledHabits.length === 0) return 0;
+
+        const habitIds = scheduledHabits.map(h => h.id);
 
         const completedToday = await HabitLog.count({
             where: {
@@ -54,7 +64,7 @@ async function countPendingHabits(userId, today) {
             },
         });
 
-        return Math.max(0, activeHabits.length - completedToday);
+        return Math.max(0, scheduledHabits.length - completedToday);
     } catch {
         return 0;
     }
