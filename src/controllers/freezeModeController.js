@@ -194,9 +194,10 @@ const createFreezePeriod = async (request, reply) => {
             keep_important_events: options?.keep_important_events ?? true
         });
 
-        // Update legacy config if activated
+        // Update legacy config and clear cache if activated
         if (status === 'ACTIVE') {
             await syncLegacyConfig(userId, true, start_date, end_date, reason);
+            if (request.server.clearFreezeCache) request.server.clearFreezeCache(userId);
         }
 
         // Reload with associations
