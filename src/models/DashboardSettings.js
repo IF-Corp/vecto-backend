@@ -22,6 +22,11 @@ const DashboardSettings = sequelize.define('DashboardSettings', {
         defaultValue: 8,
         field: 'turn_duration_hours',
     },
+    turnStartHour: {
+        type: DataTypes.INTEGER,
+        defaultValue: 7,
+        field: 'turn_start_hour',
+    },
     showWeeklyMetrics: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
