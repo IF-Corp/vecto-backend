@@ -43,6 +43,11 @@ const MealLog = sequelize.define('MealLog', {
     photo_url: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    meal_source: {
+        type: DataTypes.ENUM('diet', 'free'),
+        allowNull: false,
+        defaultValue: 'free'
     }
 }, {
     tableName: 'meal_logs',
