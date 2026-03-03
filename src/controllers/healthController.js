@@ -242,9 +242,11 @@ const getWorkouts = async (request, reply) => {
 const createWorkout = async (request, reply) => {
     try {
         const { userId } = request.params;
+        const { workout_type, ...rest } = request.body;
         const workout = await Workout.create({
-            ...request.body,
-            user_id: userId
+            ...rest,
+            type: workout_type,
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: workout, created: true };
@@ -257,7 +259,10 @@ const createWorkout = async (request, reply) => {
 const updateWorkout = async (request, reply) => {
     try {
         const { id } = request.params;
-        const [updated] = await Workout.update(request.body, {
+        const { workout_type, ...rest } = request.body;
+        const updateData = { ...rest };
+        if (workout_type !== undefined) updateData.type = workout_type;
+        const [updated] = await Workout.update(updateData, {
             where: { id }
         });
         if (!updated) {
@@ -409,9 +414,11 @@ const deleteMedication = async (request, reply) => {
 const logMedication = async (request, reply) => {
     try {
         const { medicationId } = request.params;
+        const { was_taken, ...rest } = request.body;
         const log = await MedicationLog.create({
-            ...request.body,
-            medication_id: medicationId
+            ...rest,
+            medication_id: medicationId,
+            status: was_taken === false ? 'SKIPPED' : 'TAKEN',
         });
         reply.status(201);
         return { success: true, data: log, created: true };
