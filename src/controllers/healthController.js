@@ -1,4 +1,4 @@
-const { MealLog, Workout, WorkoutDetail, Medication, MedicationLog, SleepMetric, HealthProfile, WeightLog, Diet, DietMeal } = require('../models');
+const { MealLog, Workout, WorkoutDetail, WorkoutSchedule, Medication, MedicationLog, SleepMetric, HealthProfile, WeightLog, Diet, DietMeal } = require('../models');
 
 // ==================== HEALTH PROFILE ====================
 
@@ -331,6 +331,70 @@ const deleteWorkoutDetail = async (request, reply) => {
         if (!deleted) {
             reply.status(404);
             return { success: false, error: 'Workout detail not found' };
+        }
+        return { success: true, data: { deleted: true } };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
+// ==================== WORKOUT SCHEDULES ====================
+
+const getWorkoutSchedules = async (request, reply) => {
+    try {
+        const { userId } = request.params;
+        const schedules = await WorkoutSchedule.findAll({
+            where: { user_id: userId },
+            order: [['day_of_week', 'ASC'], ['scheduled_time', 'ASC']]
+        });
+        return { success: true, data: schedules };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
+const createWorkoutSchedule = async (request, reply) => {
+    try {
+        const { userId } = request.params;
+        const schedule = await WorkoutSchedule.create({
+            ...request.body,
+            user_id: userId
+        });
+        reply.status(201);
+        return { success: true, data: schedule, created: true };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
+const updateWorkoutSchedule = async (request, reply) => {
+    try {
+        const { id } = request.params;
+        const [updated] = await WorkoutSchedule.update(request.body, {
+            where: { id }
+        });
+        if (!updated) {
+            reply.status(404);
+            return { success: false, error: 'Workout schedule not found' };
+        }
+        const schedule = await WorkoutSchedule.findByPk(id);
+        return { success: true, data: schedule };
+    } catch (error) {
+        reply.status(500);
+        return { success: false, error: error.message };
+    }
+};
+
+const deleteWorkoutSchedule = async (request, reply) => {
+    try {
+        const { id } = request.params;
+        const deleted = await WorkoutSchedule.destroy({ where: { id } });
+        if (!deleted) {
+            reply.status(404);
+            return { success: false, error: 'Workout schedule not found' };
         }
         return { success: true, data: { deleted: true } };
     } catch (error) {
@@ -683,6 +747,11 @@ module.exports = {
     addWorkoutDetail,
     updateWorkoutDetail,
     deleteWorkoutDetail,
+    // Workout Schedules
+    getWorkoutSchedules,
+    createWorkoutSchedule,
+    updateWorkoutSchedule,
+    deleteWorkoutSchedule,
     // Medications
     getMedications,
     createMedication,

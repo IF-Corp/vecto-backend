@@ -270,6 +270,36 @@ const updateDietMealBody = {
     additionalProperties: false
 };
 
+// Workout Schedule schemas
+const createWorkoutScheduleBody = {
+    type: 'object',
+    properties: {
+        name: { type: 'string', minLength: 1, maxLength: 200 },
+        workout_type: workoutTypeEnum,
+        day_of_week: { type: 'integer', minimum: 0, maximum: 6 },
+        scheduled_time: { type: 'string', pattern: '^\\d{2}:\\d{2}$', nullable: true },
+        duration_minutes: { type: 'integer', minimum: 1, nullable: true },
+        notes: { type: 'string', maxLength: 2000, nullable: true },
+        is_active: { type: 'boolean', default: true }
+    },
+    required: ['name', 'workout_type', 'day_of_week'],
+    additionalProperties: false
+};
+
+const updateWorkoutScheduleBody = {
+    type: 'object',
+    properties: {
+        name: { type: 'string', minLength: 1, maxLength: 200 },
+        workout_type: workoutTypeEnum,
+        day_of_week: { type: 'integer', minimum: 0, maximum: 6 },
+        scheduled_time: { type: 'string', pattern: '^\\d{2}:\\d{2}$', nullable: true },
+        duration_minutes: { type: 'integer', minimum: 1, nullable: true },
+        notes: { type: 'string', maxLength: 2000, nullable: true },
+        is_active: { type: 'boolean' }
+    },
+    additionalProperties: false
+};
+
 module.exports = {
     // Health Profile
     createHealthProfileBody,
@@ -284,6 +314,9 @@ module.exports = {
     createWorkoutBody,
     updateWorkoutBody,
     createWorkoutDetailBody,
+    // Workout Schedules
+    createWorkoutScheduleBody,
+    updateWorkoutScheduleBody,
     // Medications
     createMedicationBody,
     updateMedicationBody,
