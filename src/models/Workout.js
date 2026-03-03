@@ -16,7 +16,7 @@ const Workout = sequelize.define('Workout', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    type: {
+    workout_type: {
         type: DataTypes.ENUM('STRENGTH', 'CARDIO', 'FLEXIBILITY', 'SPORTS', 'OTHER'),
         allowNull: false
     },
