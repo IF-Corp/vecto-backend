@@ -388,23 +388,19 @@ const createFlashcardBody = {
     type: 'object',
     properties: {
         deck_id: { type: 'string', format: 'uuid' },
-        front_content: { type: 'string', minLength: 1, maxLength: 5000 },
-        back_content: { type: 'string', minLength: 1, maxLength: 5000 },
-        front_image_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
-        back_image_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
+        front: { type: 'string', minLength: 1, maxLength: 5000 },
+        back: { type: 'string', minLength: 1, maxLength: 5000 },
         tags: { type: 'array', items: { type: 'string', maxLength: 50 }, default: [] }
     },
-    required: ['deck_id', 'front_content', 'back_content'],
+    required: ['deck_id', 'front', 'back'],
     additionalProperties: false
 };
 
 const updateFlashcardBody = {
     type: 'object',
     properties: {
-        front_content: { type: 'string', minLength: 1, maxLength: 5000 },
-        back_content: { type: 'string', minLength: 1, maxLength: 5000 },
-        front_image_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
-        back_image_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
+        front: { type: 'string', minLength: 1, maxLength: 5000 },
+        back: { type: 'string', minLength: 1, maxLength: 5000 },
         tags: { type: 'array', items: { type: 'string', maxLength: 50 } },
         is_suspended: { type: 'boolean' }
     },

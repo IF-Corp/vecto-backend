@@ -793,11 +793,11 @@ const getFlashcards = async (request, reply) => {
 
 const createFlashcard = async (request, reply) => {
     try {
-        const { deckId } = request.params;
-        const flashcard = await StudyFlashcard.create({ ...request.body, deck_id: deckId });
+        const { deck_id } = request.body;
+        const flashcard = await StudyFlashcard.create(request.body);
 
         // Update deck card count
-        await StudyDeck.increment('cards_count', { where: { id: deckId } });
+        await StudyDeck.increment('cards_count', { where: { id: deck_id } });
 
         reply.status(201);
         return { success: true, data: flashcard, created: true };
@@ -2066,11 +2066,15 @@ const getFlashcard = async (request, reply) => {
 
 const createFlashcardsBulk = async (request, reply) => {
     try {
-        const { deckId } = request.params;
-        const { cards } = request.body;
+        const { deck_id, cards } = request.body;
         const createdCards = await StudyFlashcard.bulkCreate(
-            cards.map(card => ({ ...card, deck_id: deckId }))
+            cards.map(card => ({ ...card, deck_id }))
         );
+
+        // Update deck card count
+        await StudyDeck.increment('cards_count', { by: cards.length, where: { id: deck_id } });
+
+        reply.status(201);
         return { success: true, data: createdCards };
     } catch (error) {
         reply.status(500);
