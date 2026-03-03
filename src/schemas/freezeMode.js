@@ -11,9 +11,9 @@ const moduleTypeEnum = ['HABITS', 'TASKS', 'FINANCE', 'HEALTH', 'STUDIES', 'WORK
 const updateFreezeModeBody = {
     type: 'object',
     properties: {
-        start_date: { type: 'string', format: 'date-time', nullable: true },
-        end_date: { type: 'string', format: 'date-time', nullable: true },
-        reason: { type: 'string', maxLength: 1000, nullable: true },
+        start_date: { anyOf: [{ type: 'string', format: 'date-time' }, { type: 'null' }] },
+        end_date: { anyOf: [{ type: 'string', format: 'date-time' }, { type: 'null' }] },
+        reason: { anyOf: [{ type: 'string', maxLength: 1000 }, { type: 'null' }] },
         pause_habits: { type: 'boolean', default: true },
         pause_tasks: { type: 'boolean', default: true },
         pause_notifications: { type: 'boolean', default: true },
@@ -25,8 +25,8 @@ const updateFreezeModeBody = {
 const activateFreezeModeBody = {
     type: 'object',
     properties: {
-        reason: { type: 'string', enum: freezeReasonEnum, nullable: true },
-        end_date: { type: 'string', format: 'date', nullable: true },
+        reason: { anyOf: [{ type: 'string', enum: freezeReasonEnum }, { type: 'null' }] },
+        end_date: { anyOf: [{ type: 'string', format: 'date' }, { type: 'null' }] },
         pause_habits: { type: 'boolean', default: true },
         pause_tasks: { type: 'boolean', default: true },
         pause_notifications: { type: 'boolean', default: true },
@@ -61,6 +61,7 @@ const freezeModeResponse = {
 
 const freezeOptionsSchema = {
     type: 'object',
+    nullable: true,
     properties: {
         freeze_streaks: { type: 'boolean', default: true },
         hide_non_essential_tasks: { type: 'boolean', default: true },
@@ -77,11 +78,11 @@ const freezePeriodSchema = {
         user_id: { type: 'string', format: 'uuid' },
         start_date: { type: 'string', format: 'date' },
         end_date: { type: 'string', format: 'date' },
-        reason: { type: 'string', enum: freezeReasonEnum, nullable: true },
-        reason_custom: { type: 'string', nullable: true },
+        reason: { anyOf: [{ type: 'string', enum: freezeReasonEnum }, { type: 'null' }] },
+        reason_custom: { anyOf: [{ type: 'string' }, { type: 'null' }] },
         status: { type: 'string', enum: freezeStatusEnum },
-        activated_at: { type: 'string', nullable: true },
-        deactivated_at: { type: 'string', nullable: true },
+        activated_at: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+        deactivated_at: { anyOf: [{ type: 'string' }, { type: 'null' }] },
         modules: {
             type: 'array',
             items: {
@@ -105,8 +106,8 @@ const createFreezePeriodBody = {
     properties: {
         start_date: { type: 'string', format: 'date' },
         end_date: { type: 'string', format: 'date' },
-        reason: { type: 'string', enum: freezeReasonEnum, nullable: true },
-        reason_custom: { type: 'string', maxLength: 500, nullable: true },
+        reason: { anyOf: [{ type: 'string', enum: freezeReasonEnum }, { type: 'null' }] },
+        reason_custom: { anyOf: [{ type: 'string', maxLength: 500 }, { type: 'null' }] },
         modules: {
             type: 'array',
             items: { type: 'string', enum: moduleTypeEnum }
@@ -122,8 +123,8 @@ const updateFreezePeriodBody = {
     properties: {
         start_date: { type: 'string', format: 'date' },
         end_date: { type: 'string', format: 'date' },
-        reason: { type: 'string', enum: freezeReasonEnum, nullable: true },
-        reason_custom: { type: 'string', maxLength: 500, nullable: true },
+        reason: { anyOf: [{ type: 'string', enum: freezeReasonEnum }, { type: 'null' }] },
+        reason_custom: { anyOf: [{ type: 'string', maxLength: 500 }, { type: 'null' }] },
         modules: {
             type: 'array',
             items: { type: 'string', enum: moduleTypeEnum }
