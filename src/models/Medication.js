@@ -16,6 +16,11 @@ const Medication = sequelize.define('Medication', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    type: {
+        type: DataTypes.ENUM('MEDICATION', 'SUPPLEMENT'),
+        allowNull: false,
+        defaultValue: 'MEDICATION'
+    },
     dosage: {
         type: DataTypes.STRING,
         allowNull: true

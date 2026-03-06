@@ -136,6 +136,7 @@ const createMedicationBody = {
     type: 'object',
     properties: {
         name: { type: 'string', minLength: 1, maxLength: 200 },
+        type: { type: 'string', enum: ['MEDICATION', 'SUPPLEMENT'], default: 'MEDICATION' },
         dosage: { type: 'string', maxLength: 100, nullable: true },
         frequency: { type: 'string', maxLength: 100, nullable: true },
         schedule_times: { type: 'array', items: { type: 'string' }, default: [] },
@@ -151,6 +152,7 @@ const updateMedicationBody = {
     type: 'object',
     properties: {
         name: { type: 'string', minLength: 1, maxLength: 200 },
+        type: { type: 'string', enum: ['MEDICATION', 'SUPPLEMENT'] },
         dosage: { type: 'string', maxLength: 100, nullable: true },
         frequency: { type: 'string', maxLength: 100, nullable: true },
         schedule_times: { type: 'array', items: { type: 'string' } },
