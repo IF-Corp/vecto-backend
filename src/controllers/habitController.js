@@ -425,6 +425,28 @@ class HabitController {
         }
     }
 
+    async reactivateRoutine(request, reply) {
+        try {
+            const { id } = request.params;
+            const userId = request.user.id;
+
+            const routine = await Routine.findByPk(id);
+            if (!routine) {
+                return reply.status(404).send({ success: false, error: 'Routine not found' });
+            }
+
+            if (routine.user_id !== userId) {
+                return reply.status(403).send({ success: false, error: 'Not authorized' });
+            }
+
+            await routine.update({ status: 'active' });
+            return reply.send({ success: true, data: routine });
+        } catch (error) {
+            console.error(error);
+            return reply.status(500).send({ success: false, error: error.message });
+        }
+    }
+
     async logRoutineExecution(request, reply) {
         try {
             const { id } = request.params;
