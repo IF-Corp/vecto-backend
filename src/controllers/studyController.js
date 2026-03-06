@@ -1435,28 +1435,35 @@ const cancelFocusSession = async (request, reply) => {
 const getStudyStats = async (request, reply) => {
     try {
         const { userId } = request.params;
-        const { period } = request.query; // week, month, all
+        const { period } = request.query; // day, week, month, year, all
 
         let dateFrom = null;
-        if (period === 'week') {
+        if (period === 'day') {
+            dateFrom = new Date();
+            dateFrom.setHours(0, 0, 0, 0);
+        } else if (period === 'week') {
             dateFrom = new Date();
             dateFrom.setDate(dateFrom.getDate() - 7);
         } else if (period === 'month') {
             dateFrom = new Date();
             dateFrom.setMonth(dateFrom.getMonth() - 1);
+        } else if (period === 'year') {
+            dateFrom = new Date();
+            dateFrom.setFullYear(dateFrom.getFullYear() - 1);
         }
 
         const focusWhere = { user_id: userId, status: 'COMPLETED' };
         const reviewWhere = { user_id: userId, status: 'COMPLETED' };
+        const progressWhere = { user_id: userId };
         if (dateFrom) {
             focusWhere.finished_at = { [Op.gte]: dateFrom };
             reviewWhere.finished_at = { [Op.gte]: dateFrom };
+            progressWhere.created_at = { [Op.gte]: dateFrom };
         }
 
         // Focus stats
         const focusSessions = await StudyFocusSession.findAll({ where: focusWhere });
         const totalFocusMinutes = focusSessions.reduce((sum, s) => sum + (s.total_focus_minutes || 0), 0);
-        const totalFocusSessions = focusSessions.length;
 
         // Review stats
         const reviewSessions = await StudyReviewSession.findAll({ where: reviewWhere });
@@ -1465,15 +1472,29 @@ const getStudyStats = async (request, reply) => {
             ? reviewSessions.reduce((sum, s) => sum + (parseFloat(s.score) || 0), 0) / reviewSessions.length
             : 0;
 
-        // Books/courses progress
-        const booksInProgress = await StudyBook.count({
-            where: { user_id: userId, status: 'IN_PROGRESS' },
+        // Pages read from progress logs (BOOK type)
+        const bookProgressLogs = await StudyProgressLog.findAll({
+            where: { ...progressWhere, resource_type: 'BOOK' },
         });
+        const pagesRead = bookProgressLogs.reduce((sum, log) => {
+            const from = log.progress_from || 0;
+            const to = log.progress_to || 0;
+            return sum + Math.max(0, to - from);
+        }, 0);
+
+        // Lessons completed from progress logs (COURSE_ONLINE type)
+        const courseProgressLogs = await StudyProgressLog.findAll({
+            where: { ...progressWhere, resource_type: 'COURSE_ONLINE' },
+        });
+        const lessonsCompleted = courseProgressLogs.reduce((sum, log) => {
+            const from = log.progress_from || 0;
+            const to = log.progress_to || 0;
+            return sum + Math.max(0, to - from);
+        }, 0);
+
+        // Books/courses completed counts
         const booksCompleted = await StudyBook.count({
             where: { user_id: userId, status: 'COMPLETED' },
-        });
-        const coursesInProgress = await StudyCourseOnline.count({
-            where: { user_id: userId, status: 'IN_PROGRESS' },
         });
         const coursesCompleted = await StudyCourseOnline.count({
             where: { user_id: userId, status: 'COMPLETED' },
@@ -1483,33 +1504,24 @@ const getStudyStats = async (request, reply) => {
         const topicsMastered = await StudyTopic.count({
             where: { user_id: userId, status: 'MASTERED' },
         });
-        const topicsNeedReview = await StudyTopic.count({
-            where: { user_id: userId, status: 'NEEDS_REVIEW' },
-        });
 
         return {
             success: true,
             data: {
-                focus: {
-                    totalMinutes: totalFocusMinutes,
-                    totalSessions: totalFocusSessions,
-                    averageSessionMinutes: totalFocusSessions > 0 ? Math.round(totalFocusMinutes / totalFocusSessions) : 0,
-                },
-                review: {
-                    totalCards: totalCardsReviewed,
-                    totalSessions: reviewSessions.length,
-                    averageScore: Math.round(avgScore * 10) / 10,
-                },
-                resources: {
-                    booksInProgress,
-                    booksCompleted,
-                    coursesInProgress,
-                    coursesCompleted,
-                },
-                topics: {
-                    mastered: topicsMastered,
-                    needReview: topicsNeedReview,
-                },
+                total_study_minutes: totalFocusMinutes,
+                total_focus_minutes: totalFocusMinutes,
+                focus_time_minutes: totalFocusMinutes,
+                total_review_sessions: reviewSessions.length,
+                reviews_completed: reviewSessions.length,
+                cards_reviewed: totalCardsReviewed,
+                pages_read: pagesRead,
+                lessons_completed: lessonsCompleted,
+                books_completed: booksCompleted,
+                courses_completed: coursesCompleted,
+                topics_mastered: topicsMastered,
+                average_retention: Math.round(avgScore * 10) / 10,
+                current_streak: 0,
+                longest_streak: 0,
             },
         };
     } catch (error) {
