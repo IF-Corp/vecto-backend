@@ -57,6 +57,8 @@ const updateWeightLogBody = {
 };
 
 // Meal Log schemas
+const mealSourceEnum = { type: 'string', enum: ['diet', 'free'] };
+
 const createMealLogBody = {
     type: 'object',
     properties: {
@@ -67,7 +69,8 @@ const createMealLogBody = {
         protein: { type: 'number', minimum: 0, nullable: true },
         carbs: { type: 'number', minimum: 0, nullable: true },
         fat: { type: 'number', minimum: 0, nullable: true },
-        photo_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true }
+        photo_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
+        meal_source: mealSourceEnum
     },
     required: ['meal_type', 'meal_date'],
     additionalProperties: false
@@ -83,7 +86,8 @@ const updateMealLogBody = {
         protein: { type: 'number', minimum: 0, nullable: true },
         carbs: { type: 'number', minimum: 0, nullable: true },
         fat: { type: 'number', minimum: 0, nullable: true },
-        photo_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true }
+        photo_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
+        meal_source: mealSourceEnum
     },
     additionalProperties: false
 };
