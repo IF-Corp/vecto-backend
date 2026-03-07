@@ -24,7 +24,7 @@ module.exports = {
                 type: Sequelize.STRING,
                 allowNull: false
             },
-            type: {
+            workout_type: {
                 type: Sequelize.ENUM('STRENGTH', 'CARDIO', 'FLEXIBILITY', 'SPORTS', 'OTHER'),
                 allowNull: false
             },
