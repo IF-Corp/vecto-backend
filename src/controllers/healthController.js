@@ -509,6 +509,47 @@ const deleteMedicationLog = async (request, reply) => {
 
 // ==================== SLEEP METRICS ====================
 
+const QUALITY_STRING_TO_INT = { POOR: 1, FAIR: 2, GOOD: 3, EXCELLENT: 4 };
+const QUALITY_INT_TO_STRING = { 1: 'POOR', 2: 'FAIR', 3: 'GOOD', 4: 'EXCELLENT' };
+
+function calculateDurationMinutes(bedtime, wakeTime) {
+    if (!bedtime || !wakeTime) return null;
+    const bed = new Date(bedtime);
+    const wake = new Date(wakeTime);
+    const diffMs = wake.getTime() - bed.getTime();
+    if (diffMs <= 0) return null;
+    return Math.round(diffMs / 60000);
+}
+
+function prepareSleepData(body) {
+    const { quality, duration_hours, ...rest } = body;
+    const data = { ...rest };
+
+    if (quality && QUALITY_STRING_TO_INT[quality]) {
+        data.quality_rating = QUALITY_STRING_TO_INT[quality];
+    }
+
+    if (duration_hours != null) {
+        data.duration_minutes = Math.round(duration_hours * 60);
+    } else if (rest.bedtime && rest.wake_time) {
+        data.duration_minutes = calculateDurationMinutes(rest.bedtime, rest.wake_time);
+    }
+
+    return data;
+}
+
+function transformSleepMetric(metric) {
+    const json = metric.toJSON();
+    if (json.duration_minutes != null) {
+        json.duration_hours = Math.round((json.duration_minutes / 60) * 10) / 10;
+    } else {
+        const computed = calculateDurationMinutes(json.bedtime, json.wake_time);
+        json.duration_hours = computed ? Math.round((computed / 60) * 10) / 10 : null;
+    }
+    json.quality = QUALITY_INT_TO_STRING[json.quality_rating] || null;
+    return json;
+}
+
 const getSleepMetrics = async (request, reply) => {
     try {
         const { userId } = request.params;
@@ -516,7 +557,7 @@ const getSleepMetrics = async (request, reply) => {
             where: { user_id: userId },
             order: [['sleep_date', 'DESC']]
         });
-        return { success: true, data: metrics };
+        return { success: true, data: metrics.map(transformSleepMetric) };
     } catch (error) {
         reply.status(500);
         return { success: false, error: error.message };
@@ -526,12 +567,13 @@ const getSleepMetrics = async (request, reply) => {
 const createSleepMetric = async (request, reply) => {
     try {
         const { userId } = request.params;
+        const data = prepareSleepData(request.body);
         const metric = await SleepMetric.create({
-            ...request.body,
+            ...data,
             user_id: userId
         });
         reply.status(201);
-        return { success: true, data: metric, created: true };
+        return { success: true, data: transformSleepMetric(metric), created: true };
     } catch (error) {
         reply.status(500);
         return { success: false, error: error.message };
@@ -541,7 +583,8 @@ const createSleepMetric = async (request, reply) => {
 const updateSleepMetric = async (request, reply) => {
     try {
         const { id } = request.params;
-        const [updated] = await SleepMetric.update(request.body, {
+        const data = prepareSleepData(request.body);
+        const [updated] = await SleepMetric.update(data, {
             where: { id }
         });
         if (!updated) {
@@ -549,7 +592,7 @@ const updateSleepMetric = async (request, reply) => {
             return { success: false, error: 'Sleep metric not found' };
         }
         const metric = await SleepMetric.findByPk(id);
-        return { success: true, data: metric };
+        return { success: true, data: transformSleepMetric(metric) };
     } catch (error) {
         reply.status(500);
         return { success: false, error: error.message };
