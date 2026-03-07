@@ -166,15 +166,16 @@ const updateMedicationBody = {
 };
 
 // Medication Log schemas
+const medicationLogStatusEnum = { type: 'string', enum: ['TAKEN', 'SKIPPED', 'MISSED'] };
+
 const createMedicationLogBody = {
     type: 'object',
     properties: {
-        medication_id: { type: 'string', format: 'uuid' },
         taken_at: { type: 'string', format: 'date-time' },
-        was_taken: { type: 'boolean', default: true },
+        status: medicationLogStatusEnum,
         notes: { type: 'string', maxLength: 500, nullable: true }
     },
-    required: ['medication_id', 'taken_at'],
+    required: ['taken_at', 'status'],
     additionalProperties: false
 };
 
