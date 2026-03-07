@@ -137,6 +137,15 @@ async function habitRoutes(fastify, options) {
         }
     }, habitController.archiveRoutine);
 
+    fastify.post('/routines/:id/reactivate', {
+        schema: {
+            description: 'Reactivate an archived routine',
+            tags: ['Routines'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams
+        }
+    }, habitController.reactivateRoutine);
+
     fastify.post('/routines/:id/executions', {
         schema: {
             description: 'Log a routine execution (focus mode)',

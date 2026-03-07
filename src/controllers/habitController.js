@@ -154,7 +154,7 @@ class HabitController {
         try {
             const { id } = request.params;
             const userId = request.user.id;
-            const { frequency, frequency_days } = request.body;
+            const { frequency, frequency_days, reset_streak } = request.body;
 
             const habit = await Habit.findByPk(id);
             if (!habit) {
@@ -165,12 +165,17 @@ class HabitController {
                 return reply.status(403).send({ success: false, error: 'Not authorized' });
             }
 
-            await habit.update({
+            const updateData = {
                 status: 'active',
-                current_streak: 0,
                 frequency: frequency || habit.frequency,
                 frequency_days: frequency_days || habit.frequency_days
-            });
+            };
+
+            if (reset_streak !== false) {
+                updateData.current_streak = 0;
+            }
+
+            await habit.update(updateData);
             return reply.send({ success: true, data: habit });
         } catch (error) {
             console.error(error);
@@ -413,6 +418,28 @@ class HabitController {
             }
 
             await routine.update({ status: 'archived' });
+            return reply.send({ success: true, data: routine });
+        } catch (error) {
+            console.error(error);
+            return reply.status(500).send({ success: false, error: error.message });
+        }
+    }
+
+    async reactivateRoutine(request, reply) {
+        try {
+            const { id } = request.params;
+            const userId = request.user.id;
+
+            const routine = await Routine.findByPk(id);
+            if (!routine) {
+                return reply.status(404).send({ success: false, error: 'Routine not found' });
+            }
+
+            if (routine.user_id !== userId) {
+                return reply.status(403).send({ success: false, error: 'Not authorized' });
+            }
+
+            await routine.update({ status: 'active' });
             return reply.send({ success: true, data: routine });
         } catch (error) {
             console.error(error);
