@@ -3,7 +3,11 @@ const DashboardQuickStat = require('../models/DashboardQuickStat');
 const DashboardWidget = require('../models/DashboardWidget');
 const DashboardAlertSetting = require('../models/DashboardAlertSetting');
 const { Op } = require('sequelize');
-const { Transaction, Budget, Habit, HabitLog, Task } = require('../models');
+const {
+    Transaction, Budget, Habit, HabitLog, Task,
+    WorkTask, SleepMetric, MealLog, StudyFocusSession,
+    HomeTask, HomeTaskOccurrence, HomeSpace, SocialBatteryLog,
+} = require('../models');
 
 // Default quick stats configuration
 const DEFAULT_QUICK_STATS = [
@@ -300,12 +304,22 @@ const getQuickStatsData = async (request, reply) => {
         const neededTypes = new Set(quickStats.map(s => s.statType));
 
         // Parallel data fetching for needed modules
-        const [habits, habitLogs, tasks, transactions, budgets] = await Promise.all([
+        const [
+            habits, habitLogs, tasks, transactions, budgets,
+            workTasks, lastSleep, todayMeals, todayStudySessions,
+            homeSpaces, socialBattery,
+        ] = await Promise.all([
             neededTypes.has('HABITS') ? Habit.findAll({ where: { user_id: userId, status: 'active' } }) : [],
             neededTypes.has('HABITS') ? HabitLog.findAll({ where: { execution_date: todayStr }, include: [{ model: Habit, as: 'habit', where: { user_id: userId }, attributes: ['id'] }] }) : [],
             neededTypes.has('TASKS') ? Task.findAll({ where: { user_id: userId, status: { [Op.ne]: 'DONE' } } }) : [],
             neededTypes.has('BALANCE') ? Transaction.findAll({ where: { user_id: userId, transaction_date: { [Op.between]: [startOfMonth, endOfMonth] } } }) : [],
             neededTypes.has('BALANCE') ? Budget.findAll({ where: { user_id: userId, is_active: true } }) : [],
+            neededTypes.has('WORK') ? WorkTask.findAll({ where: { user_id: userId, completed_at: null } }) : [],
+            neededTypes.has('RECOVERY') ? SleepMetric.findOne({ where: { user_id: userId }, order: [['sleep_date', 'DESC']] }) : null,
+            neededTypes.has('CALORIES') ? MealLog.findAll({ where: { user_id: userId, meal_date: { [Op.between]: [new Date(todayStr), new Date(todayStr + 'T23:59:59')] } } }) : [],
+            neededTypes.has('STUDY_TIME') ? StudyFocusSession.findAll({ where: { user_id: userId, started_at: { [Op.gte]: new Date(todayStr) }, status: { [Op.in]: ['COMPLETED', 'IN_PROGRESS'] } } }) : [],
+            neededTypes.has('HOME_TASKS') ? HomeSpace.findAll({ where: { user_id: userId, is_active: true }, attributes: ['id'] }) : [],
+            neededTypes.has('SOCIAL_BATTERY') ? SocialBatteryLog.findOne({ where: { user_id: userId }, order: [['date', 'DESC']] }) : null,
         ]);
 
         // Pre-compute stats
@@ -333,6 +347,40 @@ const getQuickStatsData = async (request, reply) => {
         if (neededTypes.has('BALANCE')) {
             totalIncome = transactions.filter(t => t.type === 'INCOME').reduce((sum, t) => sum + parseFloat(t.amount), 0);
             totalExpenses = transactions.filter(t => t.type === 'EXPENSE').reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        }
+
+        // Work stats
+        let pendingWorkTasks = 0, urgentWorkTasks = 0;
+        if (neededTypes.has('WORK')) {
+            pendingWorkTasks = workTasks.length;
+            urgentWorkTasks = workTasks.filter(t => t.is_urgent).length;
+        }
+
+        // Calories stats
+        let totalCalories = 0, mealCount = 0;
+        if (neededTypes.has('CALORIES')) {
+            totalCalories = todayMeals.reduce((sum, m) => sum + (parseInt(m.calories) || 0), 0);
+            mealCount = todayMeals.length;
+        }
+
+        // Study time stats
+        let totalStudyMinutes = 0, studySessionCount = 0;
+        if (neededTypes.has('STUDY_TIME')) {
+            totalStudyMinutes = todayStudySessions.reduce((sum, s) => sum + (s.total_focus_minutes || 0), 0);
+            studySessionCount = todayStudySessions.length;
+        }
+
+        // Home tasks stats
+        let pendingHomeTasks = 0, overdueHomeTasks = 0;
+        if (neededTypes.has('HOME_TASKS') && homeSpaces.length > 0) {
+            const spaceIds = homeSpaces.map(s => s.id);
+            const homeTasks = await HomeTask.findAll({ where: { space_id: { [Op.in]: spaceIds }, is_active: true }, attributes: ['id'] });
+            if (homeTasks.length > 0) {
+                const taskIds = homeTasks.map(t => t.id);
+                const pendingOccurrences = await HomeTaskOccurrence.findAll({ where: { task_id: { [Op.in]: taskIds }, status: 'PENDING', due_date: { [Op.lte]: todayStr } } });
+                pendingHomeTasks = pendingOccurrences.length;
+                overdueHomeTasks = pendingOccurrences.filter(o => o.due_date < todayStr).length;
+            }
         }
 
         const statsData = quickStats.map(stat => {
@@ -365,6 +413,73 @@ const getQuickStatsData = async (request, reply) => {
                     base.value = fmt(balance);
                     base.subtext = `Receitas: ${fmt(totalIncome)}`;
                     base.status = balance > 0 ? 'good' : balance === 0 ? 'neutral' : 'bad';
+                    break;
+                }
+                case 'WORK': {
+                    base.value = pendingWorkTasks.toString();
+                    base.subtext = urgentWorkTasks > 0 ? `${urgentWorkTasks} urgente${urgentWorkTasks > 1 ? 's' : ''}` : 'Nenhuma urgente';
+                    base.status = urgentWorkTasks > 0 ? 'bad' : pendingWorkTasks > 5 ? 'warning' : 'good';
+                    break;
+                }
+                case 'RECOVERY': {
+                    if (lastSleep && lastSleep.duration_minutes) {
+                        const hours = Math.floor(lastSleep.duration_minutes / 60);
+                        const mins = lastSleep.duration_minutes % 60;
+                        base.value = mins > 0 ? `${hours}h${mins.toString().padStart(2, '0')}` : `${hours}h`;
+                        const quality = lastSleep.quality_rating;
+                        const qualityLabels = { 1: 'Péssima', 2: 'Ruim', 3: 'Regular', 4: 'Boa', 5: 'Ótima' };
+                        base.subtext = quality ? `Qualidade: ${qualityLabels[quality] || quality}` : lastSleep.sleep_date;
+                        base.status = lastSleep.duration_minutes >= 420 ? 'good' : lastSleep.duration_minutes >= 300 ? 'warning' : 'bad';
+                    } else {
+                        base.value = '—';
+                        base.subtext = 'Nenhum registro de sono';
+                        base.status = 'neutral';
+                    }
+                    break;
+                }
+                case 'CALORIES': {
+                    if (mealCount > 0) {
+                        base.value = `${totalCalories} kcal`;
+                        base.subtext = `${mealCount} refeição${mealCount > 1 ? 'ões' : ''} registrada${mealCount > 1 ? 's' : ''}`;
+                        base.status = mealCount >= 3 ? 'good' : 'warning';
+                    } else {
+                        base.value = '0 kcal';
+                        base.subtext = 'Nenhuma refeição hoje';
+                        base.status = 'neutral';
+                    }
+                    break;
+                }
+                case 'STUDY_TIME': {
+                    if (totalStudyMinutes > 0) {
+                        const h = Math.floor(totalStudyMinutes / 60);
+                        const m = totalStudyMinutes % 60;
+                        base.value = h > 0 ? (m > 0 ? `${h}h${m.toString().padStart(2, '0')}` : `${h}h`) : `${m}min`;
+                        base.subtext = `${studySessionCount} sessão${studySessionCount > 1 ? 'ões' : ''} hoje`;
+                        base.status = totalStudyMinutes >= 60 ? 'good' : 'warning';
+                    } else {
+                        base.value = '0min';
+                        base.subtext = 'Nenhuma sessão hoje';
+                        base.status = 'neutral';
+                    }
+                    break;
+                }
+                case 'HOME_TASKS': {
+                    base.value = pendingHomeTasks.toString();
+                    base.subtext = overdueHomeTasks > 0 ? `${overdueHomeTasks} atrasada${overdueHomeTasks > 1 ? 's' : ''}` : 'Nenhuma atrasada';
+                    base.status = overdueHomeTasks > 0 ? 'bad' : pendingHomeTasks > 0 ? 'warning' : 'good';
+                    break;
+                }
+                case 'SOCIAL_BATTERY': {
+                    if (socialBattery) {
+                        const level = socialBattery.battery_level;
+                        base.value = `${level}%`;
+                        base.subtext = level >= 70 ? 'Energia social alta' : level >= 40 ? 'Energia moderada' : 'Energia baixa';
+                        base.status = level >= 70 ? 'good' : level >= 40 ? 'warning' : 'bad';
+                    } else {
+                        base.value = '—';
+                        base.subtext = 'Nenhum registro';
+                        base.status = 'neutral';
+                    }
                     break;
                 }
                 default:
