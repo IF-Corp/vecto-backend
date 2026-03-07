@@ -1049,7 +1049,7 @@ const getProjects = async (request, reply) => {
                 { model: StudyProjectTemplate, as: 'template' },
                 { model: StudyProjectMilestone, as: 'milestones', order: [['order_index', 'ASC']] },
             ],
-            order: [['deadline', 'ASC NULLS LAST']],
+            order: [['target_date', 'ASC NULLS LAST']],
         });
         return { success: true, data: projects };
     } catch (error) {
@@ -1376,16 +1376,16 @@ const completeFocusBlock = async (request, reply) => {
 
 const pauseFocusSession = async (request, reply) => {
     try {
-        const { sessionId } = request.params;
+        const { id } = request.params;
         const [updated] = await StudyFocusSession.update(
             { status: 'PAUSED' },
-            { where: { id: sessionId } }
+            { where: { id } }
         );
         if (!updated) {
             reply.status(404);
             return { success: false, error: 'Session not found' };
         }
-        const session = await StudyFocusSession.findByPk(sessionId);
+        const session = await StudyFocusSession.findByPk(id);
         return { success: true, data: session };
     } catch (error) {
         reply.status(500);
@@ -1395,16 +1395,16 @@ const pauseFocusSession = async (request, reply) => {
 
 const resumeFocusSession = async (request, reply) => {
     try {
-        const { sessionId } = request.params;
+        const { id } = request.params;
         const [updated] = await StudyFocusSession.update(
             { status: 'IN_PROGRESS' },
-            { where: { id: sessionId } }
+            { where: { id } }
         );
         if (!updated) {
             reply.status(404);
             return { success: false, error: 'Session not found' };
         }
-        const session = await StudyFocusSession.findByPk(sessionId);
+        const session = await StudyFocusSession.findByPk(id);
         return { success: true, data: session };
     } catch (error) {
         reply.status(500);
@@ -1414,10 +1414,10 @@ const resumeFocusSession = async (request, reply) => {
 
 const cancelFocusSession = async (request, reply) => {
     try {
-        const { sessionId } = request.params;
+        const { id } = request.params;
         const [updated] = await StudyFocusSession.update(
             { status: 'CANCELLED', finished_at: new Date() },
-            { where: { id: sessionId } }
+            { where: { id } }
         );
         if (!updated) {
             reply.status(404);
@@ -2230,8 +2230,8 @@ const completeFocusSession = async (request, reply) => {
             return { success: false, error: 'Focus session not found' };
         }
         await session.update({
-            status: 'completed',
-            ended_at: new Date(),
+            status: 'COMPLETED',
+            finished_at: new Date(),
         });
         return { success: true, data: session };
     } catch (error) {

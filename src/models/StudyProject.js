@@ -53,6 +53,15 @@ const StudyProject = sequelize.define('StudyProject', {
         type: DataTypes.DATEONLY,
         allowNull: true,
     },
+    project_type: {
+        type: DataTypes.ENUM('CUSTOM', 'CERTIFICATION', 'SKILL', 'CAREER', 'EXAM'),
+        allowNull: true,
+        defaultValue: 'CUSTOM',
+    },
+    goal: {
+        type: DataTypes.STRING(500),
+        allowNull: true,
+    },
     status: {
         type: DataTypes.ENUM('PLANNING', 'IN_PROGRESS', 'COMPLETED', 'ON_HOLD', 'CANCELLED'),
         allowNull: false,
