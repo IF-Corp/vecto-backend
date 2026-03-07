@@ -132,18 +132,21 @@ const createWorkoutDetailBody = {
 };
 
 // Medication schemas
+const medicationFrequencyEnum = { type: 'string', enum: ['ONCE_DAILY', 'TWICE_DAILY', 'THREE_TIMES_DAILY', 'AS_NEEDED', 'WEEKLY'] };
+
 const createMedicationBody = {
     type: 'object',
     properties: {
         name: { type: 'string', minLength: 1, maxLength: 200 },
         dosage: { type: 'string', maxLength: 100, nullable: true },
-        frequency: { type: 'string', maxLength: 100, nullable: true },
-        schedule_times: { type: 'array', items: { type: 'string' }, default: [] },
-        start_date: { type: 'string', format: 'date', nullable: true },
+        frequency: medicationFrequencyEnum,
+        time_of_day: { type: 'array', items: { type: 'string' }, default: [], nullable: true },
+        start_date: { type: 'string', format: 'date' },
         end_date: { type: 'string', format: 'date', nullable: true },
+        instructions: { type: 'string', nullable: true },
         is_active: { type: 'boolean', default: true }
     },
-    required: ['name'],
+    required: ['name', 'frequency', 'start_date'],
     additionalProperties: false
 };
 
@@ -152,10 +155,11 @@ const updateMedicationBody = {
     properties: {
         name: { type: 'string', minLength: 1, maxLength: 200 },
         dosage: { type: 'string', maxLength: 100, nullable: true },
-        frequency: { type: 'string', maxLength: 100, nullable: true },
-        schedule_times: { type: 'array', items: { type: 'string' } },
+        frequency: medicationFrequencyEnum,
+        time_of_day: { type: 'array', items: { type: 'string' }, nullable: true },
         start_date: { type: 'string', format: 'date', nullable: true },
         end_date: { type: 'string', format: 'date', nullable: true },
+        instructions: { type: 'string', nullable: true },
         is_active: { type: 'boolean' }
     },
     additionalProperties: false
