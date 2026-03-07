@@ -195,6 +195,47 @@ async function healthRoutes(fastify, options) {
         }
     }, healthController.deleteWorkoutDetail);
 
+    // ==================== WORKOUT SCHEDULES ====================
+    fastify.get('/users/:userId/workout-schedules', {
+        preHandler: [fastify.authorizeUser],
+        schema: {
+            description: 'Get workout schedules for a user',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.userIdParams
+        }
+    }, healthController.getWorkoutSchedules);
+
+    fastify.post('/users/:userId/workout-schedules', {
+        preHandler: [fastify.authorizeUser],
+        schema: {
+            description: 'Create a workout schedule',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.userIdParams,
+            body: health.createWorkoutScheduleBody
+        }
+    }, healthController.createWorkoutSchedule);
+
+    fastify.put('/workout-schedules/:id', {
+        schema: {
+            description: 'Update a workout schedule',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams,
+            body: health.updateWorkoutScheduleBody
+        }
+    }, healthController.updateWorkoutSchedule);
+
+    fastify.delete('/workout-schedules/:id', {
+        schema: {
+            description: 'Delete a workout schedule',
+            tags: ['Health'],
+            security: [{ bearerAuth: [] }],
+            params: common.idParams
+        }
+    }, healthController.deleteWorkoutSchedule);
+
     // ==================== MEDICATIONS ====================
     fastify.get('/users/:userId/medications', {
         preHandler: [fastify.authorizeUser],

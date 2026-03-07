@@ -689,11 +689,11 @@ async function studyRoutes(fastify, options) {
                         items: {
                             type: 'object',
                             properties: {
-                                front_content: { type: 'string', minLength: 1, maxLength: 5000 },
-                                back_content: { type: 'string', minLength: 1, maxLength: 5000 },
+                                front: { type: 'string', minLength: 1, maxLength: 5000 },
+                                back: { type: 'string', minLength: 1, maxLength: 5000 },
                                 tags: { type: 'array', items: { type: 'string' }, default: [] }
                             },
-                            required: ['front_content', 'back_content']
+                            required: ['front', 'back']
                         },
                         minItems: 1,
                         maxItems: 100

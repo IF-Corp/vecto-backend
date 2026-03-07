@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/sequelize');
 
-const Workout = sequelize.define('Workout', {
+const WorkoutSchedule = sequelize.define('WorkoutSchedule', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -17,40 +17,42 @@ const Workout = sequelize.define('Workout', {
         allowNull: false
     },
     workout_type: {
-        type: DataTypes.ENUM('STRENGTH', 'CARDIO', 'FLEXIBILITY', 'SPORTS', 'OTHER'),
+        type: DataTypes.ENUM('CARDIO', 'STRENGTH', 'FLEXIBILITY', 'SPORTS', 'OTHER'),
         allowNull: false
+    },
+    day_of_week: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: { min: 0, max: 6 }
+    },
+    scheduled_time: {
+        type: DataTypes.STRING(5),
+        allowNull: true
     },
     duration_minutes: {
         type: DataTypes.INTEGER,
         allowNull: true
     },
-    calories_burned: {
-        type: DataTypes.INTEGER,
-        allowNull: true
-    },
-    workout_date: {
-        type: DataTypes.DATE,
-        allowNull: false
-    },
     notes: {
         type: DataTypes.TEXT,
         allowNull: true
+    },
+    is_active: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+        allowNull: false
     }
 }, {
-    tableName: 'workouts',
+    tableName: 'workout_schedules',
     timestamps: true,
     underscored: true
 });
 
-Workout.associate = (models) => {
-    Workout.belongsTo(models.User, {
+WorkoutSchedule.associate = (models) => {
+    WorkoutSchedule.belongsTo(models.User, {
         foreignKey: 'user_id',
         as: 'user'
     });
-    Workout.hasMany(models.WorkoutDetail, {
-        foreignKey: 'workout_id',
-        as: 'details'
-    });
 };
 
-module.exports = Workout;
+module.exports = WorkoutSchedule;
