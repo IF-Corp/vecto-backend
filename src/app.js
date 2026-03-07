@@ -29,8 +29,7 @@ const schema = {
             default: '*'
         },
         JWT_SECRET: {
-            type: 'string',
-            default: 'development-secret-change-in-production-minimum-32-characters'
+            type: 'string'
         },
         JWT_REFRESH_SECRET: {
             type: 'string',

@@ -3,8 +3,16 @@ const sequelize = require('./config/sequelize');
 const { startScheduler } = require('./jobs/freezeScheduler');
 
 async function startServer() {
+  const required = ['JWT_SECRET', 'FIREBASE_PROJECT_ID'];
+  for (const key of required) {
+    if (!process.env[key]) {
+      console.error(`Missing required env var: ${key}`);
+      process.exit(1);
+    }
+  }
+
   let app;
-  
+
   try {
     // Build Fastify app
     app = await buildApp();

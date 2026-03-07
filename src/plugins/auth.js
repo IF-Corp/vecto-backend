@@ -5,11 +5,11 @@ async function authPlugin(fastify, opts) {
     const jwtSecret = process.env.JWT_SECRET;
 
     if (!jwtSecret || jwtSecret.length < 32) {
-        fastify.log.warn('JWT_SECRET not set or too short. Authentication will fail.');
+        throw new Error('JWT_SECRET must be set and at least 32 characters long');
     }
 
     await fastify.register(jwt, {
-        secret: jwtSecret || 'development-secret-change-in-production-min-32-chars',
+        secret: jwtSecret,
         sign: {
             expiresIn: '15m'
         }
