@@ -446,6 +446,8 @@ const createReviewLogBody = {
 };
 
 // ==================== PROJECTS ====================
+const projectTypeEnum = { type: 'string', enum: ['CUSTOM', 'CERTIFICATION', 'SKILL', 'CAREER', 'EXAM'] };
+
 const createProjectBody = {
     type: 'object',
     properties: {
@@ -453,9 +455,24 @@ const createProjectBody = {
         name: { type: 'string', minLength: 1, maxLength: 200 },
         description: { type: 'string', maxLength: 2000, nullable: true },
         goal: { type: 'string', maxLength: 500, nullable: true },
+        project_type: projectTypeEnum,
         status: projectStatusEnum,
         target_date: { type: 'string', format: 'date', nullable: true },
-        color: { type: 'string', maxLength: 20, nullable: true }
+        color: { type: 'string', maxLength: 20, nullable: true },
+        milestones: {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    name: { type: 'string', minLength: 1, maxLength: 200 },
+                    description: { type: 'string', maxLength: 2000, nullable: true },
+                    target_date: { type: 'string', format: 'date', nullable: true },
+                    order: { type: 'integer', minimum: 0 }
+                },
+                required: ['name']
+            },
+            nullable: true
+        }
     },
     required: ['name'],
     additionalProperties: false
@@ -467,6 +484,7 @@ const updateProjectBody = {
         name: { type: 'string', minLength: 1, maxLength: 200 },
         description: { type: 'string', maxLength: 2000, nullable: true },
         goal: { type: 'string', maxLength: 500, nullable: true },
+        project_type: projectTypeEnum,
         status: projectStatusEnum,
         target_date: { type: 'string', format: 'date', nullable: true },
         completed_at: { type: 'string', format: 'date-time', nullable: true },

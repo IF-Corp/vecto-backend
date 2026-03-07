@@ -31,6 +31,15 @@ const StudyProject = sequelize.define('StudyProject', {
         type: DataTypes.TEXT,
         allowNull: true,
     },
+    project_type: {
+        type: DataTypes.ENUM('CUSTOM', 'CERTIFICATION', 'SKILL', 'CAREER', 'EXAM'),
+        allowNull: false,
+        defaultValue: 'CUSTOM',
+    },
+    goal: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
     color: {
         type: DataTypes.STRING(7),
         allowNull: true,
@@ -40,14 +49,14 @@ const StudyProject = sequelize.define('StudyProject', {
         type: DataTypes.DATEONLY,
         allowNull: true,
     },
-    deadline: {
+    target_date: {
         type: DataTypes.DATEONLY,
         allowNull: true,
     },
     status: {
-        type: DataTypes.ENUM('PLANNED', 'ACTIVE', 'COMPLETED', 'PAUSED', 'CANCELLED'),
+        type: DataTypes.ENUM('PLANNING', 'IN_PROGRESS', 'COMPLETED', 'ON_HOLD', 'CANCELLED'),
         allowNull: false,
-        defaultValue: 'PLANNED',
+        defaultValue: 'PLANNING',
     },
     progress_percentage: {
         type: DataTypes.INTEGER,
