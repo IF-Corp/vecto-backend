@@ -2,26 +2,74 @@ const SocialContact = require('../models/SocialContact');
 const SocialCircle = require('../models/SocialCircle');
 const SocialContactCircle = require('../models/SocialContactCircle');
 const SocialContactReminder = require('../models/SocialContactReminder');
+const SocialInteraction = require('../models/SocialInteraction');
 const SocialEvent = require('../models/SocialEvent');
 const SocialEventGuest = require('../models/SocialEventGuest');
 const SocialBatteryLog = require('../models/SocialBatteryLog');
 const SocialSettings = require('../models/SocialSettings');
 const { Op } = require('sequelize');
+const sequelize = require('../config/sequelize');
 
 async function getSocialHealthScore(request, reply) {
     try {
         const { userId } = request.params;
 
-        // Get all contacts with reminders
+        const now = new Date();
+        const thirtyDaysAgo = new Date(now);
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+
+        // Get all active contacts
         const contacts = await SocialContact.findAll({
             where: { user_id: userId, is_active: true },
         });
+        const totalActiveContacts = contacts.length;
+        const contactIds = contacts.map((c) => c.id);
 
+        if (totalActiveContacts === 0) {
+            return {
+                success: true,
+                data: {
+                    score: 0,
+                    status: 'Sem contatos',
+                    emoji: '👤',
+                    color: '#94A3B8',
+                    healthyRelationships: 0,
+                    needingAttention: 0,
+                    totalTracked: 0,
+                    contactsCoveredLast30d: 0,
+                    interactionsLast30d: 0,
+                    totalActiveContacts: 0,
+                },
+            };
+        }
+
+        // Factor 1: Contact Coverage (40%) — % of contacts interacted with in last 30 days
+        const coveredContacts = await SocialInteraction.count({
+            distinct: true,
+            col: 'contact_id',
+            where: {
+                contact_id: { [Op.in]: contactIds },
+                interaction_date: { [Op.gte]: thirtyDaysAgoStr },
+            },
+        });
+        const coverageScore = (coveredContacts / totalActiveContacts) * 100;
+
+        // Factor 2: Interaction Volume (30%) — interactions vs target
+        const interactionCount = await SocialInteraction.count({
+            where: {
+                contact_id: { [Op.in]: contactIds },
+                interaction_date: { [Op.gte]: thirtyDaysAgoStr },
+            },
+        });
+        const target = Math.max(4, Math.ceil(totalActiveContacts * 0.3));
+        const volumeScore = Math.min(100, (interactionCount / target) * 100);
+
+        // Factor 3: Reminder Health (30%) — % of reminders on schedule
         const reminders = await SocialContactReminder.findAll({
-            where: { contact_id: contacts.map((c) => c.id), is_active: true },
+            where: { contact_id: { [Op.in]: contactIds }, is_active: true },
         });
 
-        const now = new Date();
         let healthyRelationships = 0;
         let needingAttention = 0;
 
@@ -48,15 +96,20 @@ async function getSocialHealthScore(request, reply) {
             }
         }
 
-        const total = reminders.length || 1;
-        const score = Math.round((healthyRelationships / total) * 10 * 10) / 10;
+        // If no reminders, fall back to coverage score for this factor
+        const reminderScore = reminders.length > 0
+            ? (healthyRelationships / reminders.length) * 100
+            : coverageScore;
+
+        // Weighted final score (0-100)
+        const score = Math.round(0.4 * coverageScore + 0.3 * volumeScore + 0.3 * reminderScore);
 
         let status, emoji, color;
-        if (score >= 8) {
+        if (score >= 80) {
             status = 'Excelente';
             emoji = '💪';
             color = '#22C55E';
-        } else if (score >= 5) {
+        } else if (score >= 50) {
             status = 'Moderado';
             emoji = '👍';
             color = '#EAB308';
@@ -76,6 +129,9 @@ async function getSocialHealthScore(request, reply) {
                 healthyRelationships,
                 needingAttention,
                 totalTracked: reminders.length,
+                contactsCoveredLast30d: coveredContacts,
+                interactionsLast30d: interactionCount,
+                totalActiveContacts,
             },
         };
     } catch (error) {
