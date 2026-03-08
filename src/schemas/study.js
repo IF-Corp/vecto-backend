@@ -56,12 +56,27 @@ const retentionLevelEnum = {
 const updateSettingsBody = {
     type: 'object',
     properties: {
+        // Grade settings
+        grade_scale: { type: 'string', enum: ['0-10', '0-100', 'A-F'] },
+        passing_grade: { type: 'number', minimum: 0, maximum: 100 },
+        show_score_colors: { type: 'boolean' },
+        // Study goals
         daily_study_goal_minutes: { type: 'integer', minimum: 1, maximum: 1440 },
         weekly_study_goal_hours: { type: 'number', minimum: 0.5, maximum: 168 },
-        preferred_algorithm: algorithmTypeEnum,
+        // Focus mode
+        default_focus_minutes: { type: 'integer', minimum: 5, maximum: 120 },
+        default_break_minutes: { type: 'integer', minimum: 1, maximum: 30 },
+        // Flashcard settings
+        algorithm_type: { type: 'string', enum: ['LEITNER', 'FSRS_VECTO'] },
+        default_new_cards_per_day: { type: 'integer', minimum: 1, maximum: 200 },
+        default_review_limit: { type: 'integer', minimum: 10, maximum: 9999 },
+        fsrs_desired_retention: { type: 'number', minimum: 0.5, maximum: 0.99 },
+        // Notifications
+        notifications_enabled: { type: 'boolean' },
         show_streak_notifications: { type: 'boolean' },
         auto_schedule_reviews: { type: 'boolean' },
         review_reminder_time: { type: 'string', pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9]$' },
+        // Customization
         theme_color: { type: 'string', maxLength: 20 },
     },
     additionalProperties: false,
