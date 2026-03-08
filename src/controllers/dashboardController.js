@@ -17,7 +17,37 @@ const {
     HomeTaskOccurrence,
     HomeSpace,
     SocialBatteryLog,
+    Medication,
+    MedicationLog,
+    CalendarEvent,
+    WorkMeeting,
+    SocialEvent,
 } = require('../models');
+
+// Turn Calendar type config
+const TURN_CALENDAR_TYPE_CONFIG = {
+    habit: { color: '#8B5CF6', icon: 'Target' },
+    task: { color: '#3B82F6', icon: 'CheckSquare' },
+    meeting: { color: '#6366F1', icon: 'Briefcase' },
+    medication: { color: '#06B6D4', icon: 'Pill' },
+    study_session: { color: '#F59E0B', icon: 'BookOpen' },
+    event: { color: '#10B981', icon: 'Calendar' },
+    home_task: { color: '#F97316', icon: 'Home' },
+    social: { color: '#EC4899', icon: 'Users' },
+};
+
+// Map time period strings to hour values
+function timePeriodToHour(period, turnStartHour) {
+    const map = { morning: 7, afternoon: 13, evening: 19 };
+    return map[period] ?? turnStartHour + 1;
+}
+
+// Build an ISO datetime string from a date string and a TIME value (HH:MM:SS or HH:MM)
+function buildDateTime(dateStr, timeValue) {
+    if (!timeValue) return null;
+    const timePart = String(timeValue).substring(0, 5); // HH:MM
+    return new Date(`${dateStr}T${timePart}:00`);
+}
 
 // Default quick stats configuration
 const DEFAULT_QUICK_STATS = [
@@ -749,6 +779,364 @@ function getStatLink(statType) {
     return links[statType] || '/';
 }
 
+// ==================== TURN CALENDAR ====================
+
+const getTurnCalendar = async (request, reply) => {
+    try {
+        const { userId } = request.params;
+        const hours = parseInt(request.query.hours) || 8;
+
+        // Step 1: Get user settings for turn window config
+        const settings = await DashboardSettings.findOne({ where: { userId } });
+        const turnStartHour = settings?.turnStartHour ?? 7;
+
+        // Step 2: Calculate turn window
+        const now = new Date();
+        const todayStr = now.toISOString().split('T')[0];
+        const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon, ...6=Sat
+        const dayStart = new Date(`${todayStr}T00:00:00`);
+        const dayEnd = new Date(`${todayStr}T23:59:59`);
+        const turnStart = new Date(`${todayStr}T${String(turnStartHour).padStart(2, '0')}:00:00`);
+        const turnEnd = new Date(turnStart.getTime() + hours * 60 * 60 * 1000);
+
+        // Step 3: Parallel queries
+        const [
+            habits,
+            habitLogs,
+            tasks,
+            meetings,
+            medications,
+            medicationLogs,
+            studySessions,
+            calendarEvents,
+            homeOccurrences,
+            socialEvents,
+        ] = await Promise.all([
+            // 1. Active habits scheduled for today
+            Habit.findAll({
+                where: { user_id: userId, status: 'active', is_frozen: false },
+            }),
+            // 2. Today's habit logs
+            HabitLog.findAll({
+                where: { execution_date: todayStr },
+                include: [
+                    {
+                        model: Habit,
+                        as: 'habit',
+                        where: { user_id: userId },
+                        attributes: ['id'],
+                    },
+                ],
+            }),
+            // 3. Tasks scheduled for today
+            Task.findAll({
+                where: { user_id: userId, scheduled_date: todayStr },
+            }),
+            // 4. Work meetings today
+            WorkMeeting.findAll({
+                where: {
+                    user_id: userId,
+                    start_time: { [Op.between]: [dayStart, dayEnd] },
+                },
+            }),
+            // 5. Active medications
+            Medication.findAll({
+                where: {
+                    user_id: userId,
+                    is_active: true,
+                    start_date: { [Op.lte]: todayStr },
+                    [Op.or]: [{ end_date: null }, { end_date: { [Op.gte]: todayStr } }],
+                },
+            }),
+            // 6. Today's medication logs
+            MedicationLog.findAll({
+                where: {
+                    taken_at: { [Op.between]: [dayStart, dayEnd] },
+                },
+                include: [
+                    {
+                        model: Medication,
+                        as: 'medication',
+                        where: { user_id: userId },
+                        attributes: ['id'],
+                    },
+                ],
+            }),
+            // 7. Today's study sessions
+            StudyFocusSession.findAll({
+                where: {
+                    user_id: userId,
+                    started_at: { [Op.gte]: dayStart },
+                    status: { [Op.in]: ['COMPLETED', 'IN_PROGRESS'] },
+                },
+            }),
+            // 8. Today's calendar events (non-all-day)
+            CalendarEvent.findAll({
+                where: {
+                    user_id: userId,
+                    start_date: { [Op.between]: [dayStart, dayEnd] },
+                    is_all_day: false,
+                },
+            }),
+            // 9. Today's home task occurrences
+            HomeTaskOccurrence.findAll({
+                where: { due_date: todayStr },
+                include: [
+                    {
+                        model: HomeTask,
+                        as: 'task',
+                        where: { is_active: true },
+                        include: [
+                            {
+                                model: HomeSpace,
+                                as: 'space',
+                                where: { user_id: userId },
+                                attributes: ['id'],
+                            },
+                        ],
+                    },
+                ],
+            }),
+            // 10. Today's social events
+            SocialEvent.findAll({
+                where: {
+                    user_id: userId,
+                    event_date: todayStr,
+                    status: { [Op.ne]: 'CANCELLED' },
+                },
+            }),
+        ]);
+
+        // Step 4: Map to TurnCalendarItem format
+        const items = [];
+
+        // -- Habits --
+        const habitLogMap = new Set(
+            habitLogs.filter((l) => l.status === 'DONE').map((l) => l.habit_id),
+        );
+        const todayHabits = habits.filter((h) => {
+            if (h.frequency === 'DAILY') return true;
+            if (h.frequency === 'WEEKLY' || h.frequency === 'CUSTOM') {
+                const days = h.frequency_days || [];
+                return days.includes(dayOfWeek);
+            }
+            return false;
+        });
+        for (const h of todayHabits) {
+            let startDate;
+            if (h.ideal_time) {
+                startDate = buildDateTime(todayStr, h.ideal_time);
+            } else {
+                const hour = timePeriodToHour(h.time_period, turnStartHour);
+                startDate = new Date(`${todayStr}T${String(hour).padStart(2, '0')}:00:00`);
+            }
+            const duration = h.estimated_duration || 30;
+            items.push({
+                id: h.id,
+                type: 'habit',
+                title: h.name,
+                startTime: startDate.toISOString(),
+                endTime: new Date(startDate.getTime() + duration * 60 * 1000).toISOString(),
+                durationMinutes: duration,
+                moduleColor: TURN_CALENDAR_TYPE_CONFIG.habit.color,
+                moduleIcon: TURN_CALENDAR_TYPE_CONFIG.habit.icon,
+                isCompleted: habitLogMap.has(h.id),
+                link: `/habits`,
+            });
+        }
+
+        // -- Tasks --
+        for (const t of tasks) {
+            let startDate;
+            if (t.scheduled_time) {
+                startDate = buildDateTime(todayStr, t.scheduled_time);
+            } else {
+                startDate = new Date(`${todayStr}T${String(turnStartHour).padStart(2, '0')}:00:00`);
+            }
+            const duration = t.estimated_duration || 30;
+            items.push({
+                id: t.id,
+                type: 'task',
+                title: t.name,
+                startTime: startDate.toISOString(),
+                endTime: new Date(startDate.getTime() + duration * 60 * 1000).toISOString(),
+                durationMinutes: duration,
+                moduleColor: TURN_CALENDAR_TYPE_CONFIG.task.color,
+                moduleIcon: TURN_CALENDAR_TYPE_CONFIG.task.icon,
+                isCompleted: t.status === 'DONE',
+                link: `/tasks`,
+            });
+        }
+
+        // -- Work Meetings --
+        for (const m of meetings) {
+            const startDate = new Date(m.start_time);
+            const duration = m.duration_minutes || 60;
+            items.push({
+                id: m.id,
+                type: 'meeting',
+                title: m.title,
+                startTime: startDate.toISOString(),
+                endTime: new Date(startDate.getTime() + duration * 60 * 1000).toISOString(),
+                durationMinutes: duration,
+                moduleColor: TURN_CALENDAR_TYPE_CONFIG.meeting.color,
+                moduleIcon: TURN_CALENDAR_TYPE_CONFIG.meeting.icon,
+                isCompleted: false,
+                link: `/work`,
+            });
+        }
+
+        // -- Medications (one item per scheduled time) --
+        const medLogMap = {};
+        for (const log of medicationLogs) {
+            if (log.status === 'TAKEN') {
+                if (!medLogMap[log.medication_id]) medLogMap[log.medication_id] = [];
+                medLogMap[log.medication_id].push(log);
+            }
+        }
+        for (const med of medications) {
+            const times = med.time_of_day || [];
+            for (const time of times) {
+                const startDate = buildDateTime(todayStr, time);
+                if (!startDate) continue;
+                const takenLogs = medLogMap[med.id] || [];
+                const isTaken = takenLogs.length > 0;
+                items.push({
+                    id: `${med.id}-${time}`,
+                    type: 'medication',
+                    title: `${med.name}${med.dosage ? ` (${med.dosage})` : ''}`,
+                    startTime: startDate.toISOString(),
+                    endTime: new Date(startDate.getTime() + 5 * 60 * 1000).toISOString(),
+                    durationMinutes: 5,
+                    moduleColor: TURN_CALENDAR_TYPE_CONFIG.medication.color,
+                    moduleIcon: TURN_CALENDAR_TYPE_CONFIG.medication.icon,
+                    isCompleted: isTaken,
+                    link: `/health`,
+                });
+            }
+        }
+
+        // -- Study Sessions --
+        for (const s of studySessions) {
+            const startDate = new Date(s.started_at);
+            const duration = s.total_focus_minutes + s.total_break_minutes || 30;
+            const endDate = s.finished_at
+                ? new Date(s.finished_at)
+                : new Date(startDate.getTime() + duration * 60 * 1000);
+            items.push({
+                id: s.id,
+                type: 'study_session',
+                title: 'Sessão de Estudo',
+                startTime: startDate.toISOString(),
+                endTime: endDate.toISOString(),
+                durationMinutes: duration,
+                moduleColor: TURN_CALENDAR_TYPE_CONFIG.study_session.color,
+                moduleIcon: TURN_CALENDAR_TYPE_CONFIG.study_session.icon,
+                isCompleted: s.status === 'COMPLETED',
+                link: `/study`,
+            });
+        }
+
+        // -- Calendar Events --
+        for (const e of calendarEvents) {
+            const startDate = new Date(e.start_date);
+            let endDate;
+            let duration;
+            if (e.end_date) {
+                endDate = new Date(e.end_date);
+                duration = Math.round((endDate - startDate) / (60 * 1000));
+            } else {
+                duration = 60;
+                endDate = new Date(startDate.getTime() + duration * 60 * 1000);
+            }
+            items.push({
+                id: e.id,
+                type: 'event',
+                title: e.title,
+                startTime: startDate.toISOString(),
+                endTime: endDate.toISOString(),
+                durationMinutes: duration,
+                moduleColor: e.color || TURN_CALENDAR_TYPE_CONFIG.event.color,
+                moduleIcon: TURN_CALENDAR_TYPE_CONFIG.event.icon,
+                isCompleted: false,
+                link: `/calendar`,
+            });
+        }
+
+        // -- Home Task Occurrences --
+        for (const occ of homeOccurrences) {
+            const homeTask = occ.task;
+            if (!homeTask) continue;
+            let startDate;
+            const preferredTime = homeTask.preferred_time;
+            if (preferredTime) {
+                const hour = timePeriodToHour(preferredTime, turnStartHour);
+                startDate = new Date(`${todayStr}T${String(hour).padStart(2, '0')}:00:00`);
+            } else {
+                startDate = new Date(`${todayStr}T${String(turnStartHour).padStart(2, '0')}:00:00`);
+            }
+            const duration = homeTask.estimated_minutes || 30;
+            items.push({
+                id: occ.id,
+                type: 'home_task',
+                title: homeTask.name,
+                startTime: startDate.toISOString(),
+                endTime: new Date(startDate.getTime() + duration * 60 * 1000).toISOString(),
+                durationMinutes: duration,
+                moduleColor: TURN_CALENDAR_TYPE_CONFIG.home_task.color,
+                moduleIcon: TURN_CALENDAR_TYPE_CONFIG.home_task.icon,
+                isCompleted: occ.status === 'COMPLETED',
+                link: `/home-module`,
+            });
+        }
+
+        // -- Social Events --
+        for (const se of socialEvents) {
+            let startDate;
+            if (se.event_time) {
+                startDate = buildDateTime(todayStr, se.event_time);
+            } else {
+                startDate = new Date(`${todayStr}T19:00:00`);
+            }
+            items.push({
+                id: se.id,
+                type: 'social',
+                title: se.name,
+                startTime: startDate.toISOString(),
+                endTime: new Date(startDate.getTime() + 60 * 60 * 1000).toISOString(),
+                durationMinutes: 60,
+                moduleColor: TURN_CALENDAR_TYPE_CONFIG.social.color,
+                moduleIcon: TURN_CALENDAR_TYPE_CONFIG.social.icon,
+                isCompleted: se.status === 'COMPLETED',
+                link: `/social`,
+            });
+        }
+
+        // Step 5: Filter items within turn window
+        const filteredItems = items.filter((item) => {
+            const itemStart = new Date(item.startTime);
+            const itemEnd = new Date(item.endTime);
+            return itemStart < turnEnd && itemEnd > turnStart;
+        });
+
+        // Sort by start time
+        filteredItems.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+
+        return reply.send({
+            success: true,
+            data: {
+                items: filteredItems,
+                currentTime: now.toISOString(),
+                turnStartTime: turnStart.toISOString(),
+                turnEndTime: turnEnd.toISOString(),
+            },
+        });
+    } catch (error) {
+        console.error('Error fetching turn calendar:', error);
+        return reply.status(500).send({ success: false, error: error.message });
+    }
+};
+
 module.exports = {
     getSettings,
     updateSettings,
@@ -761,4 +1149,5 @@ module.exports = {
     getAlerts,
     getQuickStatsData,
     getDashboardOverview,
+    getTurnCalendar,
 };
