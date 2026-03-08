@@ -8,46 +8,46 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             title_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'titles',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             unlocked_at: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: Sequelize.NOW
+                defaultValue: Sequelize.NOW,
             },
             is_active: {
                 type: Sequelize.BOOLEAN,
                 allowNull: false,
-                defaultValue: false
+                defaultValue: false,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('user_titles', ['user_id']);
@@ -58,11 +58,11 @@ module.exports = {
         await queryInterface.addConstraint('user_titles', {
             fields: ['user_id', 'title_id'],
             type: 'unique',
-            name: 'unique_user_title'
+            name: 'unique_user_title',
         });
     },
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('user_titles');
-    }
+    },
 };

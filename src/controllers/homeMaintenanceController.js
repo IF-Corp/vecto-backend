@@ -43,7 +43,11 @@ const createMaintenance = async (request, reply) => {
 
         // Calculate next_due_at if not provided
         if (!data.next_due_at && data.frequency_type) {
-            data.next_due_at = calculateNextDue(new Date(), data.frequency_type, data.frequency_value);
+            data.next_due_at = calculateNextDue(
+                new Date(),
+                data.frequency_type,
+                data.frequency_value,
+            );
         }
 
         const maintenance = await HomeMaintenance.create(data);
@@ -98,7 +102,11 @@ const completeMaintenance = async (request, reply) => {
         }
 
         const now = new Date();
-        const nextDue = calculateNextDue(now, maintenance.frequency_type, maintenance.frequency_value);
+        const nextDue = calculateNextDue(
+            now,
+            maintenance.frequency_type,
+            maintenance.frequency_value,
+        );
 
         await maintenance.update({
             last_done_at: now,

@@ -8,7 +8,7 @@ async function createTestApp() {
     }
 
     app = await buildApp({
-        logger: false
+        logger: false,
     });
 
     await app.ready();
@@ -29,5 +29,5 @@ function getTestApp() {
 module.exports = {
     createTestApp,
     closeTestApp,
-    getTestApp
+    getTestApp,
 };

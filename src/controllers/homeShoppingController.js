@@ -45,7 +45,10 @@ const getShoppingList = async (request, reply) => {
                     model: HomeShoppingItem,
                     as: 'items',
                     include: [{ model: HomeMember, as: 'addedBy', attributes: ['id', 'name'] }],
-                    order: [['is_purchased', 'ASC'], ['created_at', 'DESC']],
+                    order: [
+                        ['is_purchased', 'ASC'],
+                        ['created_at', 'DESC'],
+                    ],
                 },
             ],
         });
@@ -220,12 +223,14 @@ const getFrequentItems = async (request, reply) => {
                 'unit',
                 [require('sequelize').fn('COUNT', require('sequelize').col('name')), 'frequency'],
             ],
-            include: [{
-                model: HomeShoppingList,
-                as: 'list',
-                where: { space_id: spaceId },
-                attributes: [],
-            }],
+            include: [
+                {
+                    model: HomeShoppingList,
+                    as: 'list',
+                    where: { space_id: spaceId },
+                    attributes: [],
+                },
+            ],
             group: ['name', 'category', 'unit'],
             order: [[require('sequelize').literal('frequency'), 'DESC']],
             limit: 20,

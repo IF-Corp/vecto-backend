@@ -3,8 +3,24 @@
 // ==================== ENUMS ====================
 
 const freezeStatusEnum = ['SCHEDULED', 'ACTIVE', 'COMPLETED', 'CANCELLED'];
-const freezeReasonEnum = ['VACATION', 'TRAVEL', 'ILLNESS', 'INTENSE_PROJECT', 'MENTAL_REST', 'OTHER'];
-const moduleTypeEnum = ['HABITS', 'TASKS', 'FINANCE', 'HEALTH', 'STUDIES', 'WORK', 'SOCIAL', 'HOME'];
+const freezeReasonEnum = [
+    'VACATION',
+    'TRAVEL',
+    'ILLNESS',
+    'INTENSE_PROJECT',
+    'MENTAL_REST',
+    'OTHER',
+];
+const moduleTypeEnum = [
+    'HABITS',
+    'TASKS',
+    'FINANCE',
+    'HEALTH',
+    'STUDIES',
+    'WORK',
+    'SOCIAL',
+    'HOME',
+];
 
 // ==================== LEGACY SCHEMAS ====================
 
@@ -17,9 +33,9 @@ const updateFreezeModeBody = {
         pause_habits: { type: 'boolean', default: true },
         pause_tasks: { type: 'boolean', default: true },
         pause_notifications: { type: 'boolean', default: true },
-        auto_resume: { type: 'boolean', default: false }
+        auto_resume: { type: 'boolean', default: false },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const activateFreezeModeBody = {
@@ -30,9 +46,9 @@ const activateFreezeModeBody = {
         pause_habits: { type: 'boolean', default: true },
         pause_tasks: { type: 'boolean', default: true },
         pause_notifications: { type: 'boolean', default: true },
-        auto_resume: { type: 'boolean', default: false }
+        auto_resume: { type: 'boolean', default: false },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const freezeModeResponse = {
@@ -51,10 +67,10 @@ const freezeModeResponse = {
                 pause_habits: { type: 'boolean' },
                 pause_tasks: { type: 'boolean' },
                 pause_notifications: { type: 'boolean' },
-                auto_resume: { type: 'boolean' }
-            }
-        }
-    }
+                auto_resume: { type: 'boolean' },
+            },
+        },
+    },
 };
 
 // ==================== FREEZE PERIOD SCHEMAS ====================
@@ -67,8 +83,8 @@ const freezeOptionsSchema = {
         hide_non_essential_tasks: { type: 'boolean', default: true },
         pause_general_notifications: { type: 'boolean', default: true },
         pause_goals: { type: 'boolean', default: true },
-        keep_important_events: { type: 'boolean', default: true }
-    }
+        keep_important_events: { type: 'boolean', default: true },
+    },
 };
 
 const freezePeriodSchema = {
@@ -90,14 +106,14 @@ const freezePeriodSchema = {
                 properties: {
                     id: { type: 'string' },
                     freeze_period_id: { type: 'string' },
-                    module_type: { type: 'string', enum: moduleTypeEnum }
-                }
-            }
+                    module_type: { type: 'string', enum: moduleTypeEnum },
+                },
+            },
         },
         options: freezeOptionsSchema,
         created_at: { type: 'string' },
-        updated_at: { type: 'string' }
-    }
+        updated_at: { type: 'string' },
+    },
 };
 
 const createFreezePeriodBody = {
@@ -110,12 +126,12 @@ const createFreezePeriodBody = {
         reason_custom: { anyOf: [{ type: 'string', maxLength: 500 }, { type: 'null' }] },
         modules: {
             type: 'array',
-            items: { type: 'string', enum: moduleTypeEnum }
+            items: { type: 'string', enum: moduleTypeEnum },
         },
         options: freezeOptionsSchema,
-        activate_immediately: { type: 'boolean', default: false }
+        activate_immediately: { type: 'boolean', default: false },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateFreezePeriodBody = {
@@ -127,19 +143,19 @@ const updateFreezePeriodBody = {
         reason_custom: { anyOf: [{ type: 'string', maxLength: 500 }, { type: 'null' }] },
         modules: {
             type: 'array',
-            items: { type: 'string', enum: moduleTypeEnum }
+            items: { type: 'string', enum: moduleTypeEnum },
         },
-        options: freezeOptionsSchema
+        options: freezeOptionsSchema,
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const freezePeriodResponse = {
     type: 'object',
     properties: {
         success: { type: 'boolean' },
-        data: { ...freezePeriodSchema, nullable: true }
-    }
+        data: { ...freezePeriodSchema, nullable: true },
+    },
 };
 
 const freezePeriodsListResponse = {
@@ -148,12 +164,12 @@ const freezePeriodsListResponse = {
         success: { type: 'boolean' },
         data: {
             type: 'array',
-            items: freezePeriodSchema
+            items: freezePeriodSchema,
         },
         total: { type: 'integer' },
         limit: { type: 'integer' },
-        offset: { type: 'integer' }
-    }
+        offset: { type: 'integer' },
+    },
 };
 
 const freezeStatisticsResponse = {
@@ -168,18 +184,18 @@ const freezeStatisticsResponse = {
                 scheduled_periods: { type: 'integer' },
                 total_frozen_days: { type: 'integer' },
                 is_frozen: { type: 'boolean' },
-                active_period: { ...freezePeriodSchema, nullable: true }
-            }
-        }
-    }
+                active_period: { ...freezePeriodSchema, nullable: true },
+            },
+        },
+    },
 };
 
 const freezePeriodIdParams = {
     type: 'object',
     required: ['id'],
     properties: {
-        id: { type: 'string', format: 'uuid' }
-    }
+        id: { type: 'string', format: 'uuid' },
+    },
 };
 
 const freezePeriodsQuerystring = {
@@ -187,8 +203,8 @@ const freezePeriodsQuerystring = {
     properties: {
         status: { type: 'string', enum: freezeStatusEnum },
         limit: { type: 'integer', minimum: 1, maximum: 100, default: 20 },
-        offset: { type: 'integer', minimum: 0, default: 0 }
-    }
+        offset: { type: 'integer', minimum: 0, default: 0 },
+    },
 };
 
 module.exports = {
@@ -207,5 +223,5 @@ module.exports = {
     // Enums for reference
     freezeStatusEnum,
     freezeReasonEnum,
-    moduleTypeEnum
+    moduleTypeEnum,
 };

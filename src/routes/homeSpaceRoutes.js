@@ -8,81 +8,109 @@ async function homeSpaceRoutes(fastify, options) {
 
     // ==================== SPACES ====================
 
-    fastify.get('/users/:userId/home/spaces', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get all home spaces for a user',
-            tags: ['Home - Spaces'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.get(
+        '/users/:userId/home/spaces',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get all home spaces for a user',
+                tags: ['Home - Spaces'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, homeSpaceController.getSpaces);
+        homeSpaceController.getSpaces,
+    );
 
-    fastify.get('/users/:userId/home/spaces/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get a specific home space',
-            tags: ['Home - Spaces'],
-            security: [{ bearerAuth: [] }],
-            params: homeSpaceSchema.spaceIdParams,
+    fastify.get(
+        '/users/:userId/home/spaces/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get a specific home space',
+                tags: ['Home - Spaces'],
+                security: [{ bearerAuth: [] }],
+                params: homeSpaceSchema.spaceIdParams,
+            },
         },
-    }, homeSpaceController.getSpace);
+        homeSpaceController.getSpace,
+    );
 
-    fastify.post('/users/:userId/home/spaces', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a new home space',
-            tags: ['Home - Spaces'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
-            body: homeSpaceSchema.createSpaceBody,
+    fastify.post(
+        '/users/:userId/home/spaces',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a new home space',
+                tags: ['Home - Spaces'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+                body: homeSpaceSchema.createSpaceBody,
+            },
         },
-    }, homeSpaceController.createSpace);
+        homeSpaceController.createSpace,
+    );
 
-    fastify.put('/users/:userId/home/spaces/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Update a home space',
-            tags: ['Home - Spaces'],
-            security: [{ bearerAuth: [] }],
-            params: homeSpaceSchema.spaceIdParams,
-            body: homeSpaceSchema.updateSpaceBody,
+    fastify.put(
+        '/users/:userId/home/spaces/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Update a home space',
+                tags: ['Home - Spaces'],
+                security: [{ bearerAuth: [] }],
+                params: homeSpaceSchema.spaceIdParams,
+                body: homeSpaceSchema.updateSpaceBody,
+            },
         },
-    }, homeSpaceController.updateSpace);
+        homeSpaceController.updateSpace,
+    );
 
-    fastify.delete('/users/:userId/home/spaces/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Delete a home space',
-            tags: ['Home - Spaces'],
-            security: [{ bearerAuth: [] }],
-            params: homeSpaceSchema.spaceIdParams,
+    fastify.delete(
+        '/users/:userId/home/spaces/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Delete a home space',
+                tags: ['Home - Spaces'],
+                security: [{ bearerAuth: [] }],
+                params: homeSpaceSchema.spaceIdParams,
+            },
         },
-    }, homeSpaceController.deleteSpace);
+        homeSpaceController.deleteSpace,
+    );
 
     // ==================== SPACE MODULES ====================
 
-    fastify.put('/users/:userId/home/spaces/:id/modules', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Update all modules for a space',
-            tags: ['Home - Spaces'],
-            security: [{ bearerAuth: [] }],
-            params: homeSpaceSchema.spaceIdParams,
-            body: homeSpaceSchema.updateSpaceModulesBody,
+    fastify.put(
+        '/users/:userId/home/spaces/:id/modules',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Update all modules for a space',
+                tags: ['Home - Spaces'],
+                security: [{ bearerAuth: [] }],
+                params: homeSpaceSchema.spaceIdParams,
+                body: homeSpaceSchema.updateSpaceModulesBody,
+            },
         },
-    }, homeSpaceController.updateSpaceModules);
+        homeSpaceController.updateSpaceModules,
+    );
 
-    fastify.patch('/users/:userId/home/spaces/:id/modules/:moduleType', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Toggle a specific module on/off',
-            tags: ['Home - Spaces'],
-            security: [{ bearerAuth: [] }],
-            params: homeSpaceSchema.spaceModuleParams,
-            body: homeSpaceSchema.toggleModuleBody,
+    fastify.patch(
+        '/users/:userId/home/spaces/:id/modules/:moduleType',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Toggle a specific module on/off',
+                tags: ['Home - Spaces'],
+                security: [{ bearerAuth: [] }],
+                params: homeSpaceSchema.spaceModuleParams,
+                body: homeSpaceSchema.toggleModuleBody,
+            },
         },
-    }, homeSpaceController.toggleSpaceModule);
+        homeSpaceController.toggleSpaceModule,
+    );
 }
 
 module.exports = homeSpaceRoutes;

@@ -2,22 +2,49 @@
 
 // Enums
 const accountTypeEnum = { type: 'string', enum: ['CREDIT', 'DEBIT', 'CASH', 'INVESTMENT'] };
-const accountBrandEnum = { type: 'string', enum: ['VISA', 'MASTERCARD', 'ELO', 'AMEX', 'HIPERCARD', 'OTHER'] };
-const cardBrandEnum = { type: 'string', enum: ['VISA', 'MASTERCARD', 'ELO', 'AMEX', 'HIPERCARD', 'OTHER'] };
+const accountBrandEnum = {
+    type: 'string',
+    enum: ['VISA', 'MASTERCARD', 'ELO', 'AMEX', 'HIPERCARD', 'OTHER'],
+};
+const cardBrandEnum = {
+    type: 'string',
+    enum: ['VISA', 'MASTERCARD', 'ELO', 'AMEX', 'HIPERCARD', 'OTHER'],
+};
 const cardTypeEnum = { type: 'string', enum: ['CREDIT', 'DEBIT', 'BOTH'] };
 const transactionTypeEnum = { type: 'string', enum: ['INCOME', 'EXPENSE'] };
-const transactionStatusEnum = { type: 'string', enum: ['PENDING', 'CONFIRMED', 'CANCELLED', 'CONSOLIDATED'] };
-const invoiceStatusEnum = { type: 'string', enum: ['OPEN', 'CLOSED', 'PAID', 'PARTIAL', 'OVERDUE'] };
+const transactionStatusEnum = {
+    type: 'string',
+    enum: ['PENDING', 'CONFIRMED', 'CANCELLED', 'CONSOLIDATED'],
+};
+const invoiceStatusEnum = {
+    type: 'string',
+    enum: ['OPEN', 'CLOSED', 'PAID', 'PARTIAL', 'OVERDUE'],
+};
 const categoryTypeEnum = { type: 'string', enum: ['EXPENSE', 'INCOME'] };
 const goalPriorityEnum = { type: 'string', enum: ['LOW', 'MEDIUM', 'HIGH'] };
-const goalStatusEnum = { type: 'string', enum: ['IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'PAUSED'] };
+const goalStatusEnum = {
+    type: 'string',
+    enum: ['IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'PAUSED'],
+};
 const investmentTypeEnum = {
     type: 'string',
     enum: [
-        'CDB', 'LCI', 'LCA', 'TESOURO_SELIC', 'TESOURO_IPCA', 'TESOURO_PREFIXADO', 'POUPANCA',
-        'ACAO', 'FII', 'ETF', 'BDR', 'CRIPTO',
-        'FUNDO_INVESTIMENTO', 'PREVIDENCIA', 'OTHER'
-    ]
+        'CDB',
+        'LCI',
+        'LCA',
+        'TESOURO_SELIC',
+        'TESOURO_IPCA',
+        'TESOURO_PREFIXADO',
+        'POUPANCA',
+        'ACAO',
+        'FII',
+        'ETF',
+        'BDR',
+        'CRIPTO',
+        'FUNDO_INVESTIMENTO',
+        'PREVIDENCIA',
+        'OTHER',
+    ],
 };
 const rateTypeEnum = { type: 'string', enum: ['CDI', 'IPCA', 'PREFIXADO', 'SELIC', 'OTHER'] };
 const investorProfileEnum = { type: 'string', enum: ['CONSERVATIVE', 'MODERATE', 'AGGRESSIVE'] };
@@ -33,10 +60,10 @@ const createAccountBody = {
         brand: { ...accountBrandEnum, nullable: true },
         total_limit: { type: 'number', minimum: 0, nullable: true },
         closing_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true },
-        due_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true }
+        due_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true },
     },
     required: ['name', 'type'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateAccountBody = {
@@ -47,9 +74,9 @@ const updateAccountBody = {
         brand: { ...accountBrandEnum, nullable: true },
         total_limit: { type: 'number', minimum: 0, nullable: true },
         closing_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true },
-        due_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true }
+        due_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== CARD SCHEMAS ====================
@@ -63,10 +90,10 @@ const createCardBody = {
         card_limit: { type: 'number', minimum: 0, nullable: true },
         closing_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true },
         due_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true },
-        color: { type: 'string', maxLength: 7, nullable: true }
+        color: { type: 'string', maxLength: 7, nullable: true },
     },
     required: ['name', 'last_digits', 'brand', 'type'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateCardBody = {
@@ -80,12 +107,18 @@ const updateCardBody = {
         closing_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true },
         due_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true },
         color: { type: 'string', maxLength: 7, nullable: true },
-        is_active: { type: 'boolean' }
+        is_active: { type: 'boolean' },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
-const uuidOrEmpty = { anyOf: [{ type: 'string', format: 'uuid' }, { type: 'string', maxLength: 0 }, { type: 'string', nullable: true }] };
+const uuidOrEmpty = {
+    anyOf: [
+        { type: 'string', format: 'uuid' },
+        { type: 'string', maxLength: 0 },
+        { type: 'string', nullable: true },
+    ],
+};
 
 // ==================== TRANSACTION SCHEMAS ====================
 const createTransactionBody = {
@@ -116,14 +149,11 @@ const createTransactionBody = {
         recurrenceType: recurrenceTypeEnum,
         status: transactionStatusEnum,
         notes: { type: 'string', maxLength: 500, nullable: true },
-        paymentMethod: { type: 'string', nullable: true }
+        paymentMethod: { type: 'string', nullable: true },
     },
     required: ['description', 'amount', 'type'],
-    anyOf: [
-        { required: ['transaction_date'] },
-        { required: ['date'] }
-    ],
-    additionalProperties: false
+    anyOf: [{ required: ['transaction_date'] }, { required: ['date'] }],
+    additionalProperties: false,
 };
 
 const updateTransactionBody = {
@@ -148,9 +178,9 @@ const updateTransactionBody = {
         recurrenceDay: { type: 'integer', minimum: 1, maximum: 31, nullable: true },
         recurrence_type: recurrenceTypeEnum,
         recurrenceType: recurrenceTypeEnum,
-        paymentMethod: { type: 'string', nullable: true }
+        paymentMethod: { type: 'string', nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== INVOICE SCHEMAS ====================
@@ -160,10 +190,10 @@ const createInvoiceBody = {
         card_id: { type: 'string', format: 'uuid' },
         reference_month: { type: 'string', format: 'date' },
         closing_date: { type: 'string', format: 'date' },
-        due_date: { type: 'string', format: 'date' }
+        due_date: { type: 'string', format: 'date' },
     },
     required: ['card_id', 'reference_month', 'closing_date', 'due_date'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateInvoiceBody = {
@@ -171,9 +201,9 @@ const updateInvoiceBody = {
     properties: {
         status: invoiceStatusEnum,
         paid_amount: { type: 'number', minimum: 0, nullable: true },
-        paid_at: { type: 'string', format: 'date-time', nullable: true }
+        paid_at: { type: 'string', format: 'date-time', nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== CATEGORY SCHEMAS ====================
@@ -183,10 +213,10 @@ const createCategoryBody = {
         name: { type: 'string', minLength: 1, maxLength: 100 },
         type: categoryTypeEnum,
         icon: { type: 'string', maxLength: 50, nullable: true },
-        color: { type: 'string', maxLength: 7, nullable: true }
+        color: { type: 'string', maxLength: 7, nullable: true },
     },
     required: ['name', 'type'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateCategoryBody = {
@@ -195,9 +225,9 @@ const updateCategoryBody = {
         name: { type: 'string', minLength: 1, maxLength: 100 },
         icon: { type: 'string', maxLength: 50, nullable: true },
         color: { type: 'string', maxLength: 7, nullable: true },
-        is_active: { type: 'boolean' }
+        is_active: { type: 'boolean' },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== BUDGET SCHEMAS ====================
@@ -211,10 +241,10 @@ const createBudgetBody = {
         month: { type: 'string', format: 'date', nullable: true },
         start_date: { type: 'string', format: 'date', nullable: true },
         end_date: { type: 'string', format: 'date', nullable: true },
-        alert_threshold: { type: 'integer', minimum: 0, maximum: 100, default: 80 }
+        alert_threshold: { type: 'integer', minimum: 0, maximum: 100, default: 80 },
     },
     required: ['limit_amount', 'period'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateBudgetBody = {
@@ -228,9 +258,9 @@ const updateBudgetBody = {
         start_date: { type: 'string', format: 'date', nullable: true },
         end_date: { type: 'string', format: 'date', nullable: true },
         alert_threshold: { type: 'integer', minimum: 0, maximum: 100 },
-        is_active: { type: 'boolean' }
+        is_active: { type: 'boolean' },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== RECURRING EXPENSE SCHEMAS ====================
@@ -242,10 +272,10 @@ const createRecurringExpenseBody = {
         recurrence_type: recurrenceTypeEnum,
         recurrence_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true },
         category: { type: 'string', maxLength: 100, nullable: true },
-        is_active: { type: 'boolean', default: true }
+        is_active: { type: 'boolean', default: true },
     },
     required: ['name', 'amount', 'recurrence_type'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateRecurringExpenseBody = {
@@ -256,9 +286,9 @@ const updateRecurringExpenseBody = {
         recurrence_type: recurrenceTypeEnum,
         recurrence_day: { type: 'integer', minimum: 1, maximum: 31, nullable: true },
         category: { type: 'string', maxLength: 100, nullable: true },
-        is_active: { type: 'boolean' }
+        is_active: { type: 'boolean' },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== GOAL SCHEMAS ====================
@@ -271,10 +301,10 @@ const createGoalBody = {
         color: { type: 'string', maxLength: 7, nullable: true },
         target_amount: { type: 'number', exclusiveMinimum: 0 },
         deadline: { type: 'string', format: 'date', nullable: true },
-        priority: goalPriorityEnum
+        priority: goalPriorityEnum,
     },
     required: ['name', 'target_amount'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateGoalBody = {
@@ -287,9 +317,9 @@ const updateGoalBody = {
         target_amount: { type: 'number', exclusiveMinimum: 0 },
         deadline: { type: 'string', format: 'date', nullable: true },
         priority: goalPriorityEnum,
-        status: goalStatusEnum
+        status: goalStatusEnum,
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const createGoalContributionBody = {
@@ -297,10 +327,10 @@ const createGoalContributionBody = {
     properties: {
         amount: { type: 'number', exclusiveMinimum: 0 },
         date: { type: 'string', format: 'date', nullable: true },
-        notes: { type: 'string', maxLength: 200, nullable: true }
+        notes: { type: 'string', maxLength: 200, nullable: true },
     },
     required: ['amount'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== INVESTMENT SCHEMAS ====================
@@ -319,10 +349,10 @@ const createInvestmentBody = {
         quantity: { type: 'number', minimum: 0, nullable: true },
         average_price: { type: 'number', minimum: 0, nullable: true },
         start_date: { type: 'string', format: 'date' },
-        notes: { type: 'string', maxLength: 500, nullable: true }
+        notes: { type: 'string', maxLength: 500, nullable: true },
     },
     required: ['name', 'type', 'initial_amount', 'current_amount', 'start_date'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateInvestmentBody = {
@@ -339,9 +369,9 @@ const updateInvestmentBody = {
         quantity: { type: 'number', minimum: 0, nullable: true },
         average_price: { type: 'number', minimum: 0, nullable: true },
         notes: { type: 'string', maxLength: 500, nullable: true },
-        is_active: { type: 'boolean' }
+        is_active: { type: 'boolean' },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== FINANCE PROFILE SCHEMAS ====================
@@ -354,9 +384,9 @@ const createFinanceProfileBody = {
         budget_invest_percent: { type: 'integer', minimum: 0, maximum: 100 },
         monthly_income: { type: 'number', minimum: 0, nullable: true },
         alerts_enabled: { type: 'boolean' },
-        weekly_report_enabled: { type: 'boolean' }
+        weekly_report_enabled: { type: 'boolean' },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateFinanceProfileBody = createFinanceProfileBody;
@@ -408,5 +438,5 @@ module.exports = {
     rateTypeEnum,
     investorProfileEnum,
     recurrenceTypeEnum,
-    periodEnum
+    periodEnum,
 };

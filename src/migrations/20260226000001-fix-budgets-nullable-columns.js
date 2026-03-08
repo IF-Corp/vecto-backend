@@ -8,24 +8,24 @@ module.exports = {
         // since budgets now use month + category_id instead of start_date + category
         await queryInterface.changeColumn('budgets', 'start_date', {
             type: Sequelize.DATEONLY,
-            allowNull: true
+            allowNull: true,
         });
 
         await queryInterface.changeColumn('budgets', 'category', {
             type: Sequelize.STRING,
-            allowNull: true
+            allowNull: true,
         });
     },
 
     async down(queryInterface, Sequelize) {
         await queryInterface.changeColumn('budgets', 'start_date', {
             type: Sequelize.DATEONLY,
-            allowNull: false
+            allowNull: false,
         });
 
         await queryInterface.changeColumn('budgets', 'category', {
             type: Sequelize.STRING,
-            allowNull: false
+            allowNull: false,
         });
-    }
+    },
 };

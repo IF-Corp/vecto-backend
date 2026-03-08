@@ -25,7 +25,7 @@ module.exports = {
     async up(queryInterface, Sequelize) {
         const now = new Date();
 
-        const records = levels.map(level => ({
+        const records = levels.map((level) => ({
             id: uuidv4(),
             level: level.level,
             name: level.name,
@@ -41,5 +41,5 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.bulkDelete('xp_levels', null, {});
-    }
+    },
 };

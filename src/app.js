@@ -14,50 +14,51 @@ const schema = {
     properties: {
         PORT: {
             type: 'string',
-            default: '3000'
+            default: '3000',
         },
         HOST: {
             type: 'string',
-            default: '0.0.0.0'
+            default: '0.0.0.0',
         },
         NODE_ENV: {
             type: 'string',
-            default: 'development'
+            default: 'development',
         },
         CORS_ORIGIN: {
             type: 'string',
-            default: '*'
+            default: '*',
         },
         JWT_SECRET: {
-            type: 'string'
+            type: 'string',
         },
         JWT_REFRESH_SECRET: {
             type: 'string',
-            default: ''
+            default: '',
         },
         FIREBASE_PROJECT_ID: {
             type: 'string',
-            default: ''
-        }
-    }
+            default: '',
+        },
+    },
 };
 
 async function buildApp(opts = {}) {
     const app = fastify({
         logger: false, // Using console.log instead
-        ...opts
+        ...opts,
     });
 
     // Register environment plugin
     await app.register(env, {
         schema,
-        dotenv: true
+        dotenv: true,
     });
 
     // Register CORS
-    const allowedOrigins = app.config.NODE_ENV === 'production'
-        ? app.config.CORS_ORIGIN.split(',').map(o => o.trim())
-        : ['http://localhost:3001', 'http://localhost:3000', 'http://127.0.0.1:3001'];
+    const allowedOrigins =
+        app.config.NODE_ENV === 'production'
+            ? app.config.CORS_ORIGIN.split(',').map((o) => o.trim())
+            : ['http://localhost:3001', 'http://localhost:3000', 'http://127.0.0.1:3001'];
 
     await app.register(cors, {
         origin: (origin, callback) => {
@@ -69,7 +70,7 @@ async function buildApp(opts = {}) {
         },
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization']
+        allowedHeaders: ['Content-Type', 'Authorization'],
     });
 
     // Register Swagger documentation (before routes to collect schemas)

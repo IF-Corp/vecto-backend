@@ -6,7 +6,7 @@ const {
     RoutineExecution,
     RoutineExecutionItem,
     SocialGroup,
-    GroupMember
+    GroupMember,
 } = require('../models');
 const { Op } = require('sequelize');
 const { calculateNewStreak } = require('../utils/streakHelper');
@@ -26,13 +26,15 @@ class HabitController {
 
             const habits = await Habit.findAll({
                 where: whereClause,
-                include: [{
-                    model: HabitLog,
-                    as: 'logs',
-                    limit: 30,
-                    order: [['execution_date', 'DESC']]
-                }],
-                order: [['created_at', 'DESC']]
+                include: [
+                    {
+                        model: HabitLog,
+                        as: 'logs',
+                        limit: 30,
+                        order: [['execution_date', 'DESC']],
+                    },
+                ],
+                order: [['created_at', 'DESC']],
             });
 
             return reply.send({ success: true, data: habits });
@@ -54,7 +56,7 @@ class HabitController {
                 time_period,
                 frequency,
                 frequency_days,
-                estimated_duration
+                estimated_duration,
             } = request.body;
 
             if (!name) {
@@ -71,7 +73,7 @@ class HabitController {
                 time_period: time_period || 'anytime',
                 frequency: frequency || 'DAILY',
                 frequency_days: frequency_days || [],
-                estimated_duration
+                estimated_duration,
             });
 
             return reply.status(201).send({ success: true, data: habit });
@@ -168,7 +170,7 @@ class HabitController {
             const updateData = {
                 status: 'active',
                 frequency: frequency || habit.frequency,
-                frequency_days: frequency_days || habit.frequency_days
+                frequency_days: frequency_days || habit.frequency_days,
             };
 
             if (reset_streak !== false) {
@@ -210,9 +212,9 @@ class HabitController {
                     habit_id: id,
                     execution_date: {
                         [Op.gte]: new Date(logDate.setHours(0, 0, 0, 0)),
-                        [Op.lt]: new Date(logDate.setHours(23, 59, 59, 999))
-                    }
-                }
+                        [Op.lt]: new Date(logDate.setHours(23, 59, 59, 999)),
+                    },
+                },
             });
 
             if (existingLog) {
@@ -221,7 +223,7 @@ class HabitController {
                 await HabitLog.create({
                     habit_id: id,
                     status,
-                    execution_date: execution_date || new Date()
+                    execution_date: execution_date || new Date(),
                 });
             }
 
@@ -229,7 +231,7 @@ class HabitController {
             const history = await HabitLog.findAll({
                 where: { habit_id: id },
                 order: [['execution_date', 'DESC']],
-                limit: 10 // Enough to check consecutive days/weeks
+                limit: 10, // Enough to check consecutive days/weeks
             });
 
             // Calculate new streak
@@ -237,11 +239,13 @@ class HabitController {
 
             await habit.update({
                 current_streak: newStreak,
-                best_streak: bestStreak
+                best_streak: bestStreak,
             });
 
             const updatedHabit = await Habit.findByPk(id, {
-                include: [{ model: HabitLog, as: 'logs', limit: 30, order: [['execution_date', 'DESC']] }]
+                include: [
+                    { model: HabitLog, as: 'logs', limit: 30, order: [['execution_date', 'DESC']] },
+                ],
             });
 
             return reply.status(201).send({ success: true, data: updatedHabit });
@@ -269,20 +273,22 @@ class HabitController {
                     {
                         model: RoutineItem,
                         as: 'items',
-                        order: [['item_order', 'ASC']]
+                        order: [['item_order', 'ASC']],
                     },
                     {
                         model: RoutineExecution,
                         as: 'executions',
                         limit: 10,
                         order: [['started_at', 'DESC']],
-                        include: [{
-                            model: RoutineExecutionItem,
-                            as: 'itemTimes'
-                        }]
-                    }
+                        include: [
+                            {
+                                model: RoutineExecutionItem,
+                                as: 'itemTimes',
+                            },
+                        ],
+                    },
                 ],
-                order: [['created_at', 'DESC']]
+                order: [['created_at', 'DESC']],
             });
 
             return reply.send({ success: true, data: routines });
@@ -306,7 +312,7 @@ class HabitController {
                 name,
                 start_time,
                 frequency: frequency || 'DAILY',
-                frequency_days: frequency_days || []
+                frequency_days: frequency_days || [],
             });
 
             // Create items if provided
@@ -315,18 +321,20 @@ class HabitController {
                     routine_id: routine.id,
                     title: item.title,
                     estimated_duration: item.duration || item.estimated_duration,
-                    item_order: index
+                    item_order: index,
                 }));
                 await RoutineItem.bulkCreate(routineItems);
             }
 
             // Fetch the complete routine with items
             const completeRoutine = await Routine.findByPk(routine.id, {
-                include: [{
-                    model: RoutineItem,
-                    as: 'items',
-                    order: [['item_order', 'ASC']]
-                }]
+                include: [
+                    {
+                        model: RoutineItem,
+                        as: 'items',
+                        order: [['item_order', 'ASC']],
+                    },
+                ],
             });
 
             return reply.status(201).send({ success: true, data: completeRoutine });
@@ -360,18 +368,20 @@ class HabitController {
                     routine_id: id,
                     title: item.title,
                     estimated_duration: item.duration || item.estimated_duration,
-                    item_order: index
+                    item_order: index,
                 }));
                 await RoutineItem.bulkCreate(routineItems);
             }
 
             // Fetch the complete routine with items
             const completeRoutine = await Routine.findByPk(id, {
-                include: [{
-                    model: RoutineItem,
-                    as: 'items',
-                    order: [['item_order', 'ASC']]
-                }]
+                include: [
+                    {
+                        model: RoutineItem,
+                        as: 'items',
+                        order: [['item_order', 'ASC']],
+                    },
+                ],
             });
 
             return reply.send({ success: true, data: completeRoutine });
@@ -451,16 +461,11 @@ class HabitController {
         try {
             const { id } = request.params;
             const userId = request.user.id;
-            const {
-                started_at,
-                completed_at,
-                total_duration,
-                completed,
-                item_times
-            } = request.body;
+            const { started_at, completed_at, total_duration, completed, item_times } =
+                request.body;
 
             const routine = await Routine.findByPk(id, {
-                include: [{ model: RoutineItem, as: 'items' }]
+                include: [{ model: RoutineItem, as: 'items' }],
             });
 
             if (!routine) {
@@ -478,16 +483,16 @@ class HabitController {
                 started_at,
                 completed_at,
                 total_duration,
-                completed: completed || false
+                completed: completed || false,
             });
 
             // Create item time records
             if (item_times && item_times.length > 0) {
-                const itemTimeRecords = item_times.map(it => ({
+                const itemTimeRecords = item_times.map((it) => ({
                     execution_id: execution.id,
                     item_id: it.item_id,
                     item_title: it.item_title,
-                    duration: it.duration
+                    duration: it.duration,
                 }));
                 await RoutineExecutionItem.bulkCreate(itemTimeRecords);
             }
@@ -498,32 +503,41 @@ class HabitController {
                 const executionsHistory = await RoutineExecution.findAll({
                     where: { routine_id: id },
                     order: [['execution_date', 'DESC']],
-                    limit: 10
+                    limit: 10,
                 });
 
-                const { newStreak, bestStreak } = calculateNewStreak(routine, started_at, 'completed', executionsHistory);
+                const { newStreak, bestStreak } = calculateNewStreak(
+                    routine,
+                    started_at,
+                    'completed',
+                    executionsHistory,
+                );
 
                 // Calculate new average duration
                 const executions = await RoutineExecution.findAll({
                     where: { routine_id: id, completed: true },
                     order: [['started_at', 'DESC']],
-                    limit: 7
+                    limit: 7,
                 });
 
-                const avgDuration = executions.length > 0
-                    ? Math.round(executions.reduce((sum, e) => sum + (e.total_duration || 0), 0) / executions.length)
-                    : total_duration;
+                const avgDuration =
+                    executions.length > 0
+                        ? Math.round(
+                              executions.reduce((sum, e) => sum + (e.total_duration || 0), 0) /
+                                  executions.length,
+                          )
+                        : total_duration;
 
                 await routine.update({
                     current_streak: newStreak,
                     best_streak: bestStreak,
-                    average_duration: avgDuration
+                    average_duration: avgDuration,
                 });
             }
 
             // Fetch complete execution with item times
             const completeExecution = await RoutineExecution.findByPk(execution.id, {
-                include: [{ model: RoutineExecutionItem, as: 'itemTimes' }]
+                include: [{ model: RoutineExecutionItem, as: 'itemTimes' }],
             });
 
             return reply.status(201).send({ success: true, data: completeExecution });
@@ -552,7 +566,7 @@ class HabitController {
                 where: { routine_id: id },
                 include: [{ model: RoutineExecutionItem, as: 'itemTimes' }],
                 order: [['started_at', 'DESC']],
-                limit: parseInt(limit)
+                limit: parseInt(limit),
             });
 
             return reply.send({ success: true, data: executions });
@@ -583,8 +597,8 @@ class HabitController {
             let execution = await RoutineExecution.findOne({
                 where: {
                     routine_id: id,
-                    execution_date: dateStr
-                }
+                    execution_date: dateStr,
+                },
             });
 
             if (!execution) {
@@ -594,7 +608,7 @@ class HabitController {
                     started_at: new Date(),
                     status: 'in_progress',
                     completed: false,
-                    paused_duration: 0
+                    paused_duration: 0,
                 });
             }
 
@@ -602,31 +616,36 @@ class HabitController {
                 await execution.update({
                     status: 'completed',
                     completed: true,
-                    completed_at: new Date()
+                    completed_at: new Date(),
                 });
 
                 // Fetch recent history
                 const executionsHistory = await RoutineExecution.findAll({
                     where: { routine_id: id },
                     order: [['execution_date', 'DESC']],
-                    limit: 10
+                    limit: 10,
                 });
 
                 // Update streak
-                const { newStreak, bestStreak } = calculateNewStreak(routine, targetDate, 'completed', executionsHistory);
+                const { newStreak, bestStreak } = calculateNewStreak(
+                    routine,
+                    targetDate,
+                    'completed',
+                    executionsHistory,
+                );
 
                 await routine.update({
                     current_streak: newStreak,
-                    best_streak: bestStreak
+                    best_streak: bestStreak,
                 });
             } else {
                 await execution.update({
                     status: 'in_progress',
                     completed: false,
-                    completed_at: null
+                    completed_at: null,
                 });
-                // TODO: Handle removing streak if unchecked? 
-                // For now user just asked to check. 
+                // TODO: Handle removing streak if unchecked?
+                // For now user just asked to check.
                 // If unchecking, might need to recalculate streak which is complex.
                 // Assuming "check" is the primary flow here.
             }
@@ -659,8 +678,8 @@ class HabitController {
             let execution = await RoutineExecution.findOne({
                 where: {
                     routine_id: id,
-                    execution_date: dateStr
-                }
+                    execution_date: dateStr,
+                },
             });
 
             if (!execution) {
@@ -670,7 +689,7 @@ class HabitController {
                     started_at: new Date(),
                     status: 'in_progress',
                     completed: false,
-                    paused_duration: 0
+                    paused_duration: 0,
                 });
             }
 
@@ -684,29 +703,31 @@ class HabitController {
                 const [execItem, created] = await RoutineExecutionItem.findOrCreate({
                     where: {
                         execution_id: execution.id,
-                        item_id: itemId
+                        item_id: itemId,
                     },
                     defaults: {
                         item_title: item.title, // Snapshot title
-                        duration: 0 // Default duration for manual check
-                    }
+                        duration: 0, // Default duration for manual check
+                    },
                 });
             } else {
                 // Uncheck item
                 await RoutineExecutionItem.destroy({
                     where: {
                         execution_id: execution.id,
-                        item_id: itemId
-                    }
+                        item_id: itemId,
+                    },
                 });
             }
 
             // Fetch updated execution with items
             const updatedExecution = await RoutineExecution.findByPk(execution.id, {
-                include: [{
-                    model: RoutineExecutionItem,
-                    as: 'itemTimes'
-                }]
+                include: [
+                    {
+                        model: RoutineExecutionItem,
+                        as: 'itemTimes',
+                    },
+                ],
             });
 
             return reply.send({ success: true, data: updatedExecution });
@@ -724,7 +745,7 @@ class HabitController {
             const userId = request.user.id;
 
             const routine = await Routine.findByPk(id, {
-                include: [{ model: RoutineItem, as: 'items' }]
+                include: [{ model: RoutineItem, as: 'items' }],
             });
 
             if (!routine) {
@@ -738,20 +759,22 @@ class HabitController {
             // Check for existing active session for this user
             const existingSession = await RoutineExecution.findOne({
                 where: {
-                    status: { [Op.in]: ['in_progress', 'paused'] }
+                    status: { [Op.in]: ['in_progress', 'paused'] },
                 },
-                include: [{
-                    model: Routine,
-                    as: 'routine',
-                    where: { user_id: userId }
-                }]
+                include: [
+                    {
+                        model: Routine,
+                        as: 'routine',
+                        where: { user_id: userId },
+                    },
+                ],
             });
 
             if (existingSession) {
                 return reply.status(409).send({
                     success: false,
                     error: 'Active session exists',
-                    activeSession: existingSession
+                    activeSession: existingSession,
                 });
             }
 
@@ -762,11 +785,11 @@ class HabitController {
                 started_at: now,
                 status: 'in_progress',
                 completed: false,
-                paused_duration: 0
+                paused_duration: 0,
             });
 
             const completeExecution = await RoutineExecution.findByPk(execution.id, {
-                include: [{ model: RoutineExecutionItem, as: 'itemTimes' }]
+                include: [{ model: RoutineExecutionItem, as: 'itemTimes' }],
             });
 
             return reply.status(201).send({ success: true, data: completeExecution });
@@ -782,7 +805,7 @@ class HabitController {
             const userId = request.user.id;
 
             const execution = await RoutineExecution.findByPk(executionId, {
-                include: [{ model: Routine, as: 'routine' }]
+                include: [{ model: Routine, as: 'routine' }],
             });
 
             if (!execution) {
@@ -794,12 +817,14 @@ class HabitController {
             }
 
             if (execution.status !== 'in_progress') {
-                return reply.status(400).send({ success: false, error: 'Session is not in progress' });
+                return reply
+                    .status(400)
+                    .send({ success: false, error: 'Session is not in progress' });
             }
 
             await execution.update({
                 status: 'paused',
-                paused_at: new Date()
+                paused_at: new Date(),
             });
 
             return reply.send({ success: true, data: execution });
@@ -815,7 +840,7 @@ class HabitController {
             const userId = request.user.id;
 
             const execution = await RoutineExecution.findByPk(executionId, {
-                include: [{ model: Routine, as: 'routine' }]
+                include: [{ model: Routine, as: 'routine' }],
             });
 
             if (!execution) {
@@ -838,7 +863,7 @@ class HabitController {
             await execution.update({
                 status: 'in_progress',
                 paused_duration: execution.paused_duration + pausedSeconds,
-                paused_at: null
+                paused_at: null,
             });
 
             return reply.send({ success: true, data: execution });
@@ -855,7 +880,7 @@ class HabitController {
             const { item_times } = request.body;
 
             const execution = await RoutineExecution.findByPk(executionId, {
-                include: [{ model: Routine, as: 'routine' }]
+                include: [{ model: Routine, as: 'routine' }],
             });
 
             if (!execution) {
@@ -876,17 +901,17 @@ class HabitController {
                 completed: true,
                 completed_at: now,
                 total_duration: totalSeconds,
-                paused_at: null
+                paused_at: null,
             });
 
             // Create item time records
             if (item_times && item_times.length > 0) {
                 await RoutineExecutionItem.destroy({ where: { execution_id: executionId } });
-                const itemTimeRecords = item_times.map(it => ({
+                const itemTimeRecords = item_times.map((it) => ({
                     execution_id: executionId,
                     item_id: it.item_id,
                     item_title: it.item_title,
-                    duration: it.duration
+                    duration: it.duration,
                 }));
                 await RoutineExecutionItem.bulkCreate(itemTimeRecords);
             }
@@ -898,21 +923,25 @@ class HabitController {
             const executions = await RoutineExecution.findAll({
                 where: { routine_id: id, completed: true },
                 order: [['started_at', 'DESC']],
-                limit: 7
+                limit: 7,
             });
 
-            const avgDuration = executions.length > 0
-                ? Math.round(executions.reduce((sum, e) => sum + (e.total_duration || 0), 0) / executions.length)
-                : totalSeconds;
+            const avgDuration =
+                executions.length > 0
+                    ? Math.round(
+                          executions.reduce((sum, e) => sum + (e.total_duration || 0), 0) /
+                              executions.length,
+                      )
+                    : totalSeconds;
 
             await routine.update({
                 current_streak: newStreak,
                 best_streak: bestStreak,
-                average_duration: avgDuration
+                average_duration: avgDuration,
             });
 
             const completeExecution = await RoutineExecution.findByPk(executionId, {
-                include: [{ model: RoutineExecutionItem, as: 'itemTimes' }]
+                include: [{ model: RoutineExecutionItem, as: 'itemTimes' }],
             });
 
             return reply.send({ success: true, data: completeExecution });
@@ -929,7 +958,7 @@ class HabitController {
             const { item_times } = request.body;
 
             const execution = await RoutineExecution.findByPk(executionId, {
-                include: [{ model: Routine, as: 'routine' }]
+                include: [{ model: Routine, as: 'routine' }],
             });
 
             if (!execution) {
@@ -955,17 +984,17 @@ class HabitController {
                 completed: false,
                 completed_at: now,
                 total_duration: totalSeconds,
-                paused_at: null
+                paused_at: null,
             });
 
             // Save partial item times if provided
             if (item_times && item_times.length > 0) {
                 await RoutineExecutionItem.destroy({ where: { execution_id: executionId } });
-                const itemTimeRecords = item_times.map(it => ({
+                const itemTimeRecords = item_times.map((it) => ({
                     execution_id: executionId,
                     item_id: it.item_id,
                     item_title: it.item_title,
-                    duration: it.duration
+                    duration: it.duration,
                 }));
                 await RoutineExecutionItem.bulkCreate(itemTimeRecords);
             }
@@ -983,17 +1012,17 @@ class HabitController {
 
             const activeSession = await RoutineExecution.findOne({
                 where: {
-                    status: { [Op.in]: ['in_progress', 'paused'] }
+                    status: { [Op.in]: ['in_progress', 'paused'] },
                 },
                 include: [
                     {
                         model: Routine,
                         as: 'routine',
                         where: { user_id: userId },
-                        include: [{ model: RoutineItem, as: 'items' }]
+                        include: [{ model: RoutineItem, as: 'items' }],
                     },
-                    { model: RoutineExecutionItem, as: 'itemTimes' }
-                ]
+                    { model: RoutineExecutionItem, as: 'itemTimes' },
+                ],
             });
 
             return reply.send({ success: true, data: activeSession });
@@ -1011,17 +1040,22 @@ class HabitController {
             const executions = await RoutineExecution.findAll({
                 where: {
                     status: 'completed',
-                    completed: true
+                    completed: true,
                 },
-                include: [{
-                    model: Routine,
-                    as: 'routine',
-                    where: { user_id: userId }
-                }]
+                include: [
+                    {
+                        model: Routine,
+                        as: 'routine',
+                        where: { user_id: userId },
+                    },
+                ],
             });
 
             // Calculate stats
-            const totalTimeAllTime = executions.reduce((sum, e) => sum + (e.total_duration || 0), 0);
+            const totalTimeAllTime = executions.reduce(
+                (sum, e) => sum + (e.total_duration || 0),
+                0,
+            );
             const completedSessionsCount = executions.length;
 
             // This week's stats
@@ -1029,14 +1063,18 @@ class HabitController {
             startOfWeek.setHours(0, 0, 0, 0);
             startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
 
-            const thisWeekExecutions = executions.filter(e =>
-                new Date(e.started_at) >= startOfWeek
+            const thisWeekExecutions = executions.filter(
+                (e) => new Date(e.started_at) >= startOfWeek,
             );
-            const totalTimeThisWeek = thisWeekExecutions.reduce((sum, e) => sum + (e.total_duration || 0), 0);
+            const totalTimeThisWeek = thisWeekExecutions.reduce(
+                (sum, e) => sum + (e.total_duration || 0),
+                0,
+            );
 
-            const avgDuration = completedSessionsCount > 0
-                ? Math.round(totalTimeAllTime / completedSessionsCount)
-                : 0;
+            const avgDuration =
+                completedSessionsCount > 0
+                    ? Math.round(totalTimeAllTime / completedSessionsCount)
+                    : 0;
 
             return reply.send({
                 success: true,
@@ -1044,8 +1082,8 @@ class HabitController {
                     total_time_all_time: totalTimeAllTime,
                     total_time_this_week: totalTimeThisWeek,
                     completed_sessions_count: completedSessionsCount,
-                    average_duration: avgDuration
-                }
+                    average_duration: avgDuration,
+                },
             });
         } catch (error) {
             console.error(error);
@@ -1058,11 +1096,13 @@ class HabitController {
     async getSocialGroups(request, reply) {
         try {
             const groups = await SocialGroup.findAll({
-                include: [{
-                    model: GroupMember,
-                    as: 'members',
-                    attributes: ['user_id', 'current_score']
-                }]
+                include: [
+                    {
+                        model: GroupMember,
+                        as: 'members',
+                        attributes: ['user_id', 'current_score'],
+                    },
+                ],
             });
 
             return reply.send({ success: true, data: groups });
@@ -1082,7 +1122,7 @@ class HabitController {
 
             const group = await SocialGroup.create({
                 name,
-                ranking_logic: ranking_logic || 'POINTS'
+                ranking_logic: ranking_logic || 'POINTS',
             });
 
             return reply.status(201).send({ success: true, data: group });
@@ -1103,13 +1143,13 @@ class HabitController {
 
             const [member, created] = await GroupMember.findOrCreate({
                 where: { group_id: id, user_id },
-                defaults: { group_id: id, user_id, current_score: 0 }
+                defaults: { group_id: id, user_id, current_score: 0 },
             });
 
             return reply.status(created ? 201 : 200).send({
                 success: true,
                 data: member,
-                created
+                created,
             });
         } catch (error) {
             console.error(error);
@@ -1123,7 +1163,7 @@ class HabitController {
             const { user_id } = request.body;
 
             const member = await GroupMember.findOne({
-                where: { group_id: id, user_id }
+                where: { group_id: id, user_id },
             });
 
             if (!member) {
@@ -1145,7 +1185,13 @@ class HabitController {
             const members = await GroupMember.findAll({
                 where: { group_id: id },
                 order: [['current_score', 'DESC']],
-                include: [{ model: require('../models').User, as: 'user', attributes: ['id', 'name', 'avatar_url'] }]
+                include: [
+                    {
+                        model: require('../models').User,
+                        as: 'user',
+                        attributes: ['id', 'name', 'avatar_url'],
+                    },
+                ],
             });
 
             return reply.send({ success: true, data: members });

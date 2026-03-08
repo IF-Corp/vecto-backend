@@ -46,7 +46,7 @@ async function countPendingHabits(userId, today) {
 
         // Filter habits scheduled for today
         const todayDow = new Date().getDay(); // 0=Sunday, 6=Saturday
-        const scheduledHabits = activeHabits.filter(h => {
+        const scheduledHabits = activeHabits.filter((h) => {
             if (h.frequency === 'DAILY') return true;
             if (!h.frequency_days || h.frequency_days.length === 0) return true;
             return h.frequency_days.includes(todayDow);
@@ -54,7 +54,7 @@ async function countPendingHabits(userId, today) {
 
         if (scheduledHabits.length === 0) return 0;
 
-        const habitIds = scheduledHabits.map(h => h.id);
+        const habitIds = scheduledHabits.map((h) => h.id);
 
         const completedToday = await HabitLog.count({
             where: {
@@ -109,7 +109,7 @@ async function countPendingHome(userId, today) {
 
         if (spaces.length === 0) return 0;
 
-        const spaceIds = spaces.map(s => s.id);
+        const spaceIds = spaces.map((s) => s.id);
 
         const [pendingTasks, overdueMaintenance] = await Promise.all([
             // Pending task occurrences
@@ -118,15 +118,17 @@ async function countPendingHome(userId, today) {
                     status: 'PENDING',
                     due_date: { [Op.lte]: today },
                 },
-                include: [{
-                    model: HomeTask,
-                    as: 'task',
-                    where: {
-                        space_id: { [Op.in]: spaceIds },
-                        is_active: true,
+                include: [
+                    {
+                        model: HomeTask,
+                        as: 'task',
+                        where: {
+                            space_id: { [Op.in]: spaceIds },
+                            is_active: true,
+                        },
+                        attributes: [],
                     },
-                    attributes: [],
-                }],
+                ],
             }),
             // Overdue maintenance
             HomeMaintenance.count({

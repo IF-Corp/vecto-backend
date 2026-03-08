@@ -8,67 +8,67 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             sleep_date: {
                 type: Sequelize.DATEONLY,
-                allowNull: false
+                allowNull: false,
             },
             bedtime: {
                 type: Sequelize.DATE,
-                allowNull: true
+                allowNull: true,
             },
             wake_time: {
                 type: Sequelize.DATE,
-                allowNull: true
+                allowNull: true,
             },
             duration_minutes: {
                 type: Sequelize.INTEGER,
-                allowNull: true
+                allowNull: true,
             },
             quality_rating: {
                 type: Sequelize.INTEGER,
                 allowNull: true,
                 validate: {
                     min: 1,
-                    max: 5
-                }
+                    max: 5,
+                },
             },
             deep_sleep_minutes: {
                 type: Sequelize.INTEGER,
-                allowNull: true
+                allowNull: true,
             },
             rem_sleep_minutes: {
                 type: Sequelize.INTEGER,
-                allowNull: true
+                allowNull: true,
             },
             interruptions: {
                 type: Sequelize.INTEGER,
                 defaultValue: 0,
-                allowNull: false
+                allowNull: false,
             },
             notes: {
                 type: Sequelize.TEXT,
-                allowNull: true
+                allowNull: true,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('sleep_metrics', ['user_id']);
@@ -77,5 +77,5 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('sleep_metrics');
-    }
+    },
 };

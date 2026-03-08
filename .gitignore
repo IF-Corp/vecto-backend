@@ -30,8 +30,6 @@ Thumbs.db
 dist/
 build/
 
-package-lock.json
-
 .claude
 
 # Database

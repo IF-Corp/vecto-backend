@@ -7,7 +7,7 @@ async function errorHandler(error, request, reply) {
         return reply.status(400).send({
             error: 'Validation Error',
             message: 'Request validation failed',
-            details: error.validation
+            details: error.validation,
         });
     }
 
@@ -16,10 +16,10 @@ async function errorHandler(error, request, reply) {
         return reply.status(400).send({
             error: 'Validation Error',
             message: error.message,
-            details: error.errors.map(e => ({
+            details: error.errors.map((e) => ({
                 field: e.path,
-                message: e.message
-            }))
+                message: e.message,
+            })),
         });
     }
 
@@ -27,10 +27,10 @@ async function errorHandler(error, request, reply) {
         return reply.status(409).send({
             error: 'Conflict',
             message: 'Resource already exists',
-            details: error.errors.map(e => ({
+            details: error.errors.map((e) => ({
                 field: e.path,
-                message: e.message
-            }))
+                message: e.message,
+            })),
         });
     }
 
@@ -40,7 +40,7 @@ async function errorHandler(error, request, reply) {
     reply.status(statusCode).send({
         error: error.name || 'Internal Server Error',
         message: error.message || 'An unexpected error occurred',
-        ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
+        ...(process.env.NODE_ENV === 'development' && { stack: error.stack }),
     });
 }
 

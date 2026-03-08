@@ -8,7 +8,10 @@ async function getCircles(request, reply) {
 
         const circles = await SocialCircle.findAll({
             where: { user_id: userId },
-            order: [['sort_order', 'ASC'], ['name', 'ASC']],
+            order: [
+                ['sort_order', 'ASC'],
+                ['name', 'ASC'],
+            ],
         });
 
         // Get contact counts for each circle
@@ -18,7 +21,7 @@ async function getCircles(request, reply) {
                     where: { circle_id: circle.id },
                 });
                 return { ...circle.toJSON(), contact_count: count };
-            })
+            }),
         );
 
         return { success: true, data: circlesWithCounts };
@@ -103,7 +106,9 @@ async function deleteCircle(request, reply) {
         }
 
         if (circle.is_default) {
-            return reply.status(400).send({ success: false, error: 'Cannot delete default circle' });
+            return reply
+                .status(400)
+                .send({ success: false, error: 'Cannot delete default circle' });
         }
 
         await SocialContactCircle.destroy({ where: { circle_id: id } });
@@ -124,7 +129,7 @@ async function reorderCircles(request, reply) {
         for (let i = 0; i < circleIds.length; i++) {
             await SocialCircle.update(
                 { sort_order: i + 1 },
-                { where: { id: circleIds[i], user_id: userId } }
+                { where: { id: circleIds[i], user_id: userId } },
             );
         }
 

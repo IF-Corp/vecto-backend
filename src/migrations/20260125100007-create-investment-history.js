@@ -7,47 +7,47 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             investment_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'investments',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             date: {
                 type: Sequelize.DATEONLY,
-                allowNull: false
+                allowNull: false,
             },
             value: {
                 type: Sequelize.DECIMAL(12, 2),
-                allowNull: false
+                allowNull: false,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('investment_history', ['investment_id'], {
-            name: 'investment_history_investment_id_idx'
+            name: 'investment_history_investment_id_idx',
         });
 
         await queryInterface.addIndex('investment_history', ['investment_id', 'date'], {
             name: 'investment_history_investment_date_idx',
-            unique: true
+            unique: true,
         });
     },
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('investment_history');
-    }
+    },
 };

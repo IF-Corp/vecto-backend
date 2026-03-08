@@ -21,5 +21,5 @@ module.exports = {
     health,
     study,
     home,
-    freezeMode
+    freezeMode,
 };

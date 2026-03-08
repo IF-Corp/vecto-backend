@@ -7,7 +7,7 @@ module.exports = {
         await queryInterface.addConstraint('users', {
             fields: ['nickname'],
             type: 'unique',
-            name: 'users_nickname_unique'
+            name: 'users_nickname_unique',
         });
 
         // Create index for faster username lookups
@@ -15,14 +15,14 @@ module.exports = {
             name: 'users_nickname_idx',
             where: {
                 nickname: {
-                    [Sequelize.Op.ne]: null
-                }
-            }
+                    [Sequelize.Op.ne]: null,
+                },
+            },
         });
     },
 
     async down(queryInterface, Sequelize) {
         await queryInterface.removeIndex('users', 'users_nickname_idx');
         await queryInterface.removeConstraint('users', 'users_nickname_unique');
-    }
+    },
 };

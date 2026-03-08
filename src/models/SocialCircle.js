@@ -48,7 +48,7 @@ const SocialCircle = sequelize.define(
         tableName: 'social_circles',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = SocialCircle;

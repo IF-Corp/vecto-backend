@@ -7,46 +7,46 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             goal_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'finance_goals',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             amount: {
                 type: Sequelize.DECIMAL(12, 2),
-                allowNull: false
+                allowNull: false,
             },
             date: {
                 type: Sequelize.DATEONLY,
-                allowNull: false
+                allowNull: false,
             },
             notes: {
                 type: Sequelize.STRING(200),
-                allowNull: true
+                allowNull: true,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('goal_contributions', ['goal_id'], {
-            name: 'goal_contributions_goal_id_idx'
+            name: 'goal_contributions_goal_id_idx',
         });
     },
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('goal_contributions');
-    }
+    },
 };

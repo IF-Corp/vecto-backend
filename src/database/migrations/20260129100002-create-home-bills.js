@@ -33,7 +33,7 @@ module.exports = {
                     'PHONE',
                     'STREAMING',
                     'INSURANCE',
-                    'OTHER'
+                    'OTHER',
                 ),
                 allowNull: false,
                 defaultValue: 'OTHER',

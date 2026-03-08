@@ -25,42 +25,42 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             xp_amount: {
                 type: Sequelize.INTEGER,
-                allowNull: false
+                allowNull: false,
             },
             source: {
                 type: 'xp_source',
-                allowNull: false
+                allowNull: false,
             },
             source_id: {
                 type: Sequelize.UUID,
-                allowNull: true
+                allowNull: true,
             },
             description: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('xp_logs', ['user_id']);
@@ -71,5 +71,5 @@ module.exports = {
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('xp_logs');
         await queryInterface.sequelize.query('DROP TYPE IF EXISTS xp_source;');
-    }
+    },
 };

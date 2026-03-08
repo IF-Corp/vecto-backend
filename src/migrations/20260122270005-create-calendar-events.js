@@ -8,69 +8,69 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             title: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: false,
             },
             description: {
                 type: Sequelize.TEXT,
-                allowNull: true
+                allowNull: true,
             },
             start_date: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             end_date: {
                 type: Sequelize.DATE,
-                allowNull: true
+                allowNull: true,
             },
             is_all_day: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false,
-                allowNull: false
+                allowNull: false,
             },
             location: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             category: {
                 type: Sequelize.ENUM('PERSONAL', 'WORK', 'FAMILY', 'SOCIAL', 'HEALTH', 'OTHER'),
                 defaultValue: 'PERSONAL',
-                allowNull: false
+                allowNull: false,
             },
             recurrence: {
                 type: Sequelize.ENUM('NONE', 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY'),
                 defaultValue: 'NONE',
-                allowNull: false
+                allowNull: false,
             },
             reminder_minutes: {
                 type: Sequelize.INTEGER,
-                allowNull: true
+                allowNull: true,
             },
             color: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('calendar_events', ['user_id']);
@@ -79,5 +79,5 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('calendar_events');
-    }
+    },
 };

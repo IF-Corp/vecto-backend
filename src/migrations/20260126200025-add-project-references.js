@@ -34,7 +34,8 @@ module.exports = {
             {
                 id: 'b0000000-0000-0000-0000-000000000001',
                 name: 'Preparação para Certificação',
-                description: 'Template para estudar e se preparar para uma certificação profissional',
+                description:
+                    'Template para estudar e se preparar para uma certificação profissional',
                 default_milestones: JSON.stringify([
                     { name: 'Fundamentos', order: 1 },
                     { name: 'Conceitos Intermediários', order: 2 },
@@ -97,7 +98,10 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.removeConstraint('study_books', 'study_books_project_id_fkey');
-        await queryInterface.removeConstraint('study_courses_online', 'study_courses_online_project_id_fkey');
+        await queryInterface.removeConstraint(
+            'study_courses_online',
+            'study_courses_online_project_id_fkey',
+        );
         await queryInterface.bulkDelete('study_project_templates', {
             id: {
                 [Sequelize.Op.in]: [

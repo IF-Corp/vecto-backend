@@ -49,7 +49,13 @@ module.exports = {
                 defaultValue: false,
             },
             status: {
-                type: Sequelize.ENUM('completed', 'in_progress', 'not_started', 'blocked', 'deferred'),
+                type: Sequelize.ENUM(
+                    'completed',
+                    'in_progress',
+                    'not_started',
+                    'blocked',
+                    'deferred',
+                ),
                 allowNull: false,
                 defaultValue: 'not_started',
             },

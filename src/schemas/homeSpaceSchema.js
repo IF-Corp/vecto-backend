@@ -1,7 +1,16 @@
 const { uuidPattern } = require('./common');
 
 const spaceTypeEnum = ['HOUSE', 'APARTMENT', 'STUDIO', 'ROOM', 'OTHER'];
-const moduleTypeEnum = ['ROUTINE', 'MAINTENANCE', 'SHOPPING', 'STOCK', 'PLANTS', 'PETS', 'MEALS', 'PROJECTS'];
+const moduleTypeEnum = [
+    'ROUTINE',
+    'MAINTENANCE',
+    'SHOPPING',
+    'STOCK',
+    'PLANTS',
+    'PETS',
+    'MEALS',
+    'PROJECTS',
+];
 
 const spaceIdParams = {
     type: 'object',

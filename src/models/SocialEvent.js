@@ -18,7 +18,16 @@ const SocialEvent = sequelize.define(
             allowNull: false,
         },
         event_type: {
-            type: DataTypes.ENUM('PARTY', 'BBQ', 'MEETUP', 'DINNER', 'TRIP', 'BIRTHDAY', 'WEDDING', 'OTHER'),
+            type: DataTypes.ENUM(
+                'PARTY',
+                'BBQ',
+                'MEETUP',
+                'DINNER',
+                'TRIP',
+                'BIRTHDAY',
+                'WEDDING',
+                'OTHER',
+            ),
             allowNull: false,
             defaultValue: 'MEETUP',
         },
@@ -69,7 +78,7 @@ const SocialEvent = sequelize.define(
         tableName: 'social_events',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = SocialEvent;

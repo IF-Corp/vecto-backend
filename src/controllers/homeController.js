@@ -1,4 +1,10 @@
-const { ShoppingList, HouseholdInventory, HouseholdChore, Contact, CalendarEvent } = require('../models');
+const {
+    ShoppingList,
+    HouseholdInventory,
+    HouseholdChore,
+    Contact,
+    CalendarEvent,
+} = require('../models');
 
 // ==================== SHOPPING LISTS ====================
 
@@ -7,7 +13,11 @@ const getShoppingList = async (request, reply) => {
         const { userId } = request.params;
         const items = await ShoppingList.findAll({
             where: { user_id: userId },
-            order: [['is_purchased', 'ASC'], ['priority', 'DESC'], ['created_at', 'DESC']]
+            order: [
+                ['is_purchased', 'ASC'],
+                ['priority', 'DESC'],
+                ['created_at', 'DESC'],
+            ],
         });
         return { success: true, data: items };
     } catch (error) {
@@ -21,7 +31,7 @@ const createShoppingItem = async (request, reply) => {
         const { userId } = request.params;
         const item = await ShoppingList.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: item, created: true };
@@ -69,7 +79,10 @@ const getInventory = async (request, reply) => {
         const { userId } = request.params;
         const items = await HouseholdInventory.findAll({
             where: { user_id: userId },
-            order: [['category', 'ASC'], ['name', 'ASC']]
+            order: [
+                ['category', 'ASC'],
+                ['name', 'ASC'],
+            ],
         });
         return { success: true, data: items };
     } catch (error) {
@@ -83,7 +96,7 @@ const createInventoryItem = async (request, reply) => {
         const { userId } = request.params;
         const item = await HouseholdInventory.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: item, created: true };
@@ -131,7 +144,7 @@ const getChores = async (request, reply) => {
         const { userId } = request.params;
         const chores = await HouseholdChore.findAll({
             where: { user_id: userId },
-            order: [['next_due', 'ASC']]
+            order: [['next_due', 'ASC']],
         });
         return { success: true, data: chores };
     } catch (error) {
@@ -145,7 +158,7 @@ const createChore = async (request, reply) => {
         const { userId } = request.params;
         const chore = await HouseholdChore.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: chore, created: true };
@@ -193,7 +206,10 @@ const getContacts = async (request, reply) => {
         const { userId } = request.params;
         const contacts = await Contact.findAll({
             where: { user_id: userId },
-            order: [['is_favorite', 'DESC'], ['name', 'ASC']]
+            order: [
+                ['is_favorite', 'DESC'],
+                ['name', 'ASC'],
+            ],
         });
         return { success: true, data: contacts };
     } catch (error) {
@@ -207,7 +223,7 @@ const createContact = async (request, reply) => {
         const { userId } = request.params;
         const contact = await Contact.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: contact, created: true };
@@ -255,7 +271,7 @@ const getCalendarEvents = async (request, reply) => {
         const { userId } = request.params;
         const events = await CalendarEvent.findAll({
             where: { user_id: userId },
-            order: [['start_date', 'ASC']]
+            order: [['start_date', 'ASC']],
         });
         return { success: true, data: events };
     } catch (error) {
@@ -269,7 +285,7 @@ const createCalendarEvent = async (request, reply) => {
         const { userId } = request.params;
         const event = await CalendarEvent.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: event, created: true };
@@ -335,5 +351,5 @@ module.exports = {
     getCalendarEvents,
     createCalendarEvent,
     updateCalendarEvent,
-    deleteCalendarEvent
+    deleteCalendarEvent,
 };

@@ -14,7 +14,9 @@ class FirebaseAuthService {
 
         if (!projectId || !clientEmail || !privateKey) {
             console.warn('Firebase credentials not fully configured');
-            console.warn('Required: FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY');
+            console.warn(
+                'Required: FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY',
+            );
             return;
         }
 

@@ -8,59 +8,65 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             name: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: false,
             },
             dosage: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             frequency: {
-                type: Sequelize.ENUM('ONCE_DAILY', 'TWICE_DAILY', 'THREE_TIMES_DAILY', 'AS_NEEDED', 'WEEKLY'),
-                allowNull: false
+                type: Sequelize.ENUM(
+                    'ONCE_DAILY',
+                    'TWICE_DAILY',
+                    'THREE_TIMES_DAILY',
+                    'AS_NEEDED',
+                    'WEEKLY',
+                ),
+                allowNull: false,
             },
             time_of_day: {
                 type: Sequelize.ARRAY(Sequelize.TIME),
-                allowNull: true
+                allowNull: true,
             },
             start_date: {
                 type: Sequelize.DATEONLY,
-                allowNull: false
+                allowNull: false,
             },
             end_date: {
                 type: Sequelize.DATEONLY,
-                allowNull: true
+                allowNull: true,
             },
             instructions: {
                 type: Sequelize.TEXT,
-                allowNull: true
+                allowNull: true,
             },
             is_active: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: true,
-                allowNull: false
+                allowNull: false,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('medications', ['user_id']);
@@ -69,5 +75,5 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('medications');
-    }
+    },
 };

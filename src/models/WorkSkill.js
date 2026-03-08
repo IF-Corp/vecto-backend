@@ -1,48 +1,52 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/sequelize');
 
-const WorkSkill = sequelize.define('WorkSkill', {
-    id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
-        allowNull: false,
+const WorkSkill = sequelize.define(
+    'WorkSkill',
+    {
+        id: {
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
+            primaryKey: true,
+            allowNull: false,
+        },
+        user_id: {
+            type: DataTypes.UUID,
+            allowNull: false,
+        },
+        name: {
+            type: DataTypes.STRING(100),
+            allowNull: false,
+        },
+        category: {
+            type: DataTypes.STRING(100),
+            allowNull: true,
+        },
+        current_level: {
+            type: DataTypes.ENUM('BEGINNER', 'BASIC', 'INTERMEDIATE', 'ADVANCED', 'EXPERT'),
+            allowNull: false,
+            defaultValue: 'BEGINNER',
+        },
+        target_level: {
+            type: DataTypes.ENUM('BEGINNER', 'BASIC', 'INTERMEDIATE', 'ADVANCED', 'EXPERT'),
+            allowNull: false,
+            defaultValue: 'INTERMEDIATE',
+        },
+        icon: {
+            type: DataTypes.STRING(50),
+            allowNull: true,
+        },
+        color: {
+            type: DataTypes.STRING(7),
+            allowNull: true,
+        },
     },
-    user_id: {
-        type: DataTypes.UUID,
-        allowNull: false,
+    {
+        tableName: 'work_skills',
+        timestamps: true,
+        underscored: true,
     },
-    name: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-    },
-    category: {
-        type: DataTypes.STRING(100),
-        allowNull: true,
-    },
-    current_level: {
-        type: DataTypes.ENUM('BEGINNER', 'BASIC', 'INTERMEDIATE', 'ADVANCED', 'EXPERT'),
-        allowNull: false,
-        defaultValue: 'BEGINNER',
-    },
-    target_level: {
-        type: DataTypes.ENUM('BEGINNER', 'BASIC', 'INTERMEDIATE', 'ADVANCED', 'EXPERT'),
-        allowNull: false,
-        defaultValue: 'INTERMEDIATE',
-    },
-    icon: {
-        type: DataTypes.STRING(50),
-        allowNull: true,
-    },
-    color: {
-        type: DataTypes.STRING(7),
-        allowNull: true,
-    },
-}, {
-    tableName: 'work_skills',
-    timestamps: true,
-    underscored: true,
-});
+);
 
 WorkSkill.associate = (models) => {
     WorkSkill.belongsTo(models.User, {
@@ -68,7 +72,7 @@ WorkSkill.LEVEL_VALUES = {
     EXPERT: 5,
 };
 
-WorkSkill.calculateProgress = function(currentLevel, targetLevel) {
+WorkSkill.calculateProgress = function (currentLevel, targetLevel) {
     const currentValue = WorkSkill.LEVEL_VALUES[currentLevel] || 1;
     const targetValue = WorkSkill.LEVEL_VALUES[targetLevel] || 5;
 

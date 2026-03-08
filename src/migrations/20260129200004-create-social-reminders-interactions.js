@@ -22,7 +22,14 @@ module.exports = {
                 defaultValue: true,
             },
             frequency_type: {
-                type: Sequelize.ENUM('WEEKLY', 'BIWEEKLY', 'MONTHLY', 'QUARTERLY', 'YEARLY', 'CUSTOM'),
+                type: Sequelize.ENUM(
+                    'WEEKLY',
+                    'BIWEEKLY',
+                    'MONTHLY',
+                    'QUARTERLY',
+                    'YEARLY',
+                    'CUSTOM',
+                ),
                 allowNull: false,
                 defaultValue: 'MONTHLY',
             },

@@ -14,7 +14,7 @@ class ProjectController {
 
             const projects = await Project.findAll({
                 where: { user_id: userId },
-                include: [{ model: Task, as: 'tasks' }]
+                include: [{ model: Task, as: 'tasks' }],
             });
 
             return reply.send({ success: true, data: projects });
@@ -38,7 +38,7 @@ class ProjectController {
                 name,
                 deadline,
                 status: status || 'IN_PROGRESS',
-                life_area
+                life_area,
             });
 
             return reply.status(201).send({ success: true, data: project });
@@ -98,8 +98,8 @@ class ProjectController {
                 where,
                 include: [
                     { model: Project, as: 'project', attributes: ['id', 'name'] },
-                    { model: Subtask, as: 'subtasks', order: [['order', 'ASC']] }
-                ]
+                    { model: Subtask, as: 'subtasks', order: [['order', 'ASC']] },
+                ],
             });
 
             return reply.send({ success: true, data: tasks });
@@ -122,7 +122,7 @@ class ProjectController {
                 user_id: userId,
                 ...data,
                 tags: data.tags || [],
-                assignees: data.assignees || []
+                assignees: data.assignees || [],
             };
 
             if (taskData.status === 'DONE') {
@@ -137,14 +137,14 @@ class ProjectController {
                     task_id: task.id,
                     title: st.title,
                     completed: st.completed || false,
-                    order: st.order ?? index
+                    order: st.order ?? index,
                 }));
                 await Subtask.bulkCreate(subtaskRecords);
             }
 
             // Reload with subtasks
             const taskWithSubtasks = await Task.findByPk(task.id, {
-                include: [{ model: Subtask, as: 'subtasks', order: [['order', 'ASC']] }]
+                include: [{ model: Subtask, as: 'subtasks', order: [['order', 'ASC']] }],
             });
 
             return reply.status(201).send({ success: true, data: taskWithSubtasks });
@@ -181,11 +181,11 @@ class ProjectController {
             if (subtasks !== undefined && Array.isArray(subtasks) && subtasks.length > 0) {
                 // Get existing subtasks
                 const existingSubtasks = await Subtask.findAll({ where: { task_id: id } });
-                const existingIds = new Set(existingSubtasks.map(s => s.id));
-                const newIds = new Set(subtasks.filter(s => s.id).map(s => s.id));
+                const existingIds = new Set(existingSubtasks.map((s) => s.id));
+                const newIds = new Set(subtasks.filter((s) => s.id).map((s) => s.id));
 
                 // Delete removed subtasks
-                const toDelete = existingSubtasks.filter(s => !newIds.has(s.id));
+                const toDelete = existingSubtasks.filter((s) => !newIds.has(s.id));
                 for (const st of toDelete) {
                     await st.destroy();
                 }
@@ -196,8 +196,12 @@ class ProjectController {
                     if (st.id && existingIds.has(st.id)) {
                         // Update existing
                         await Subtask.update(
-                            { title: st.title, completed: st.completed ?? false, order: st.order ?? i },
-                            { where: { id: st.id } }
+                            {
+                                title: st.title,
+                                completed: st.completed ?? false,
+                                order: st.order ?? i,
+                            },
+                            { where: { id: st.id } },
                         );
                     } else {
                         // Create new
@@ -205,7 +209,7 @@ class ProjectController {
                             task_id: id,
                             title: st.title,
                             completed: st.completed || false,
-                            order: st.order ?? i
+                            order: st.order ?? i,
                         });
                     }
                 }
@@ -215,8 +219,8 @@ class ProjectController {
             const taskWithSubtasks = await Task.findByPk(id, {
                 include: [
                     { model: Project, as: 'project', attributes: ['id', 'name'] },
-                    { model: Subtask, as: 'subtasks', order: [['order', 'ASC']] }
-                ]
+                    { model: Subtask, as: 'subtasks', order: [['order', 'ASC']] },
+                ],
             });
 
             return reply.send({ success: true, data: taskWithSubtasks });
@@ -252,7 +256,7 @@ class ProjectController {
             if (!validStatuses.includes(status)) {
                 return reply.status(400).send({
                     success: false,
-                    error: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
+                    error: `Invalid status. Must be one of: ${validStatuses.join(', ')}`,
                 });
             }
 
@@ -274,8 +278,8 @@ class ProjectController {
             const taskWithSubtasks = await Task.findByPk(id, {
                 include: [
                     { model: Project, as: 'project', attributes: ['id', 'name'] },
-                    { model: Subtask, as: 'subtasks', order: [['order', 'ASC']] }
-                ]
+                    { model: Subtask, as: 'subtasks', order: [['order', 'ASC']] },
+                ],
             });
 
             return reply.send({ success: true, data: taskWithSubtasks });
@@ -292,8 +296,8 @@ class ProjectController {
             const task = await Task.findByPk(id, {
                 include: [
                     { model: Project, as: 'project', attributes: ['id', 'name'] },
-                    { model: Subtask, as: 'subtasks', order: [['order', 'ASC']] }
-                ]
+                    { model: Subtask, as: 'subtasks', order: [['order', 'ASC']] },
+                ],
             });
 
             if (!task) {
@@ -352,7 +356,7 @@ class ProjectController {
 
             const meetings = await MeetingHistory.findAll({
                 where: { project_id: projectId },
-                order: [['start_date', 'DESC']]
+                order: [['start_date', 'DESC']],
             });
 
             return reply.send({ success: true, data: meetings });
@@ -365,10 +369,13 @@ class ProjectController {
     async createMeeting(request, reply) {
         try {
             const { projectId } = request.params;
-            const { title, start_date, actual_duration, agenda_description, documentation_link } = request.body;
+            const { title, start_date, actual_duration, agenda_description, documentation_link } =
+                request.body;
 
             if (!title || !start_date) {
-                return reply.status(400).send({ success: false, error: 'Title and start_date are required' });
+                return reply
+                    .status(400)
+                    .send({ success: false, error: 'Title and start_date are required' });
             }
 
             const meeting = await MeetingHistory.create({
@@ -377,7 +384,7 @@ class ProjectController {
                 start_date,
                 actual_duration,
                 agenda_description,
-                documentation_link
+                documentation_link,
             });
 
             return reply.status(201).send({ success: true, data: meeting });

@@ -8,62 +8,68 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             subject: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: false,
             },
             topic: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             start_time: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             end_time: {
                 type: Sequelize.DATE,
-                allowNull: true
+                allowNull: true,
             },
             duration_minutes: {
                 type: Sequelize.INTEGER,
-                allowNull: true
+                allowNull: true,
             },
             technique: {
-                type: Sequelize.ENUM('POMODORO', 'DEEP_WORK', 'ACTIVE_RECALL', 'FREE_STUDY', 'OTHER'),
-                allowNull: true
+                type: Sequelize.ENUM(
+                    'POMODORO',
+                    'DEEP_WORK',
+                    'ACTIVE_RECALL',
+                    'FREE_STUDY',
+                    'OTHER',
+                ),
+                allowNull: true,
             },
             productivity_rating: {
                 type: Sequelize.INTEGER,
                 allowNull: true,
                 validate: {
                     min: 1,
-                    max: 5
-                }
+                    max: 5,
+                },
             },
             notes: {
                 type: Sequelize.TEXT,
-                allowNull: true
+                allowNull: true,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('study_sessions', ['user_id']);
@@ -72,5 +78,5 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('study_sessions');
-    }
+    },
 };

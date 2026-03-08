@@ -47,7 +47,7 @@ const HomePet = sequelize.define(
         tableName: 'home_pets',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = HomePet;

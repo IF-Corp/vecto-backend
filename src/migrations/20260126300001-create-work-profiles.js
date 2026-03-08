@@ -4,13 +4,21 @@
 module.exports = {
     async up(queryInterface, Sequelize) {
         // Create ENUM types first
-        await queryInterface.sequelize.query(`
+        await queryInterface.sequelize
+            .query(
+                `
             CREATE TYPE work_type AS ENUM ('CLT', 'PJ', 'FREELANCER', 'ENTREPRENEUR', 'HYBRID');
-        `).catch(() => {}); // Ignore if already exists
+        `,
+            )
+            .catch(() => {}); // Ignore if already exists
 
-        await queryInterface.sequelize.query(`
+        await queryInterface.sequelize
+            .query(
+                `
             CREATE TYPE work_model AS ENUM ('IN_PERSON', 'REMOTE', 'HYBRID');
-        `).catch(() => {}); // Ignore if already exists
+        `,
+            )
+            .catch(() => {}); // Ignore if already exists
 
         await queryInterface.createTable('work_profiles', {
             id: {

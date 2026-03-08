@@ -1,6 +1,19 @@
-const { WorkWeeklyPlan, WorkWeeklyPlanItem, WorkTask, WorkMeeting, sequelize } = require('../models');
+const {
+    WorkWeeklyPlan,
+    WorkWeeklyPlanItem,
+    WorkTask,
+    WorkMeeting,
+    sequelize,
+} = require('../models');
 const { Op } = require('sequelize');
-const { format, startOfWeek, endOfWeek, addDays, eachDayOfInterval, differenceInMinutes } = require('date-fns');
+const {
+    format,
+    startOfWeek,
+    endOfWeek,
+    addDays,
+    eachDayOfInterval,
+    differenceInMinutes,
+} = require('date-fns');
 
 // Get weekly meetings
 const getWeeklyMeetings = async (request, reply) => {
@@ -8,7 +21,9 @@ const getWeeklyMeetings = async (request, reply) => {
         const { userId } = request.params;
         const { weekStart } = request.query;
 
-        const start = weekStart ? new Date(weekStart) : startOfWeek(new Date(), { weekStartsOn: 1 });
+        const start = weekStart
+            ? new Date(weekStart)
+            : startOfWeek(new Date(), { weekStartsOn: 1 });
         const end = endOfWeek(start, { weekStartsOn: 1 });
 
         const meetings = await WorkMeeting.findAll({
@@ -24,12 +39,12 @@ const getWeeklyMeetings = async (request, reply) => {
         // Group by day
         const byDay = {};
         const days = eachDayOfInterval({ start, end });
-        days.forEach(day => {
+        days.forEach((day) => {
             const dateKey = format(day, 'yyyy-MM-dd');
             byDay[dateKey] = [];
         });
 
-        meetings.forEach(meeting => {
+        meetings.forEach((meeting) => {
             const dateKey = format(new Date(meeting.scheduledAt), 'yyyy-MM-dd');
             if (byDay[dateKey]) {
                 byDay[dateKey].push(meeting);
@@ -38,7 +53,7 @@ const getWeeklyMeetings = async (request, reply) => {
 
         // Calculate total meeting hours
         let totalMinutes = 0;
-        meetings.forEach(meeting => {
+        meetings.forEach((meeting) => {
             totalMinutes += meeting.duration || 60;
         });
 
@@ -59,7 +74,9 @@ const getWeeklyDeadlines = async (request, reply) => {
         const { userId } = request.params;
         const { weekStart } = request.query;
 
-        const start = weekStart ? new Date(weekStart) : startOfWeek(new Date(), { weekStartsOn: 1 });
+        const start = weekStart
+            ? new Date(weekStart)
+            : startOfWeek(new Date(), { weekStartsOn: 1 });
         const end = endOfWeek(start, { weekStartsOn: 1 });
 
         const tasks = await WorkTask.findAll({
@@ -70,12 +87,15 @@ const getWeeklyDeadlines = async (request, reply) => {
                     [Op.between]: [start, end],
                 },
             },
-            order: [['deadline', 'ASC'], ['priorityQuadrant', 'ASC']],
+            order: [
+                ['deadline', 'ASC'],
+                ['priorityQuadrant', 'ASC'],
+            ],
         });
 
         // Calculate total estimated hours
         let totalMinutes = 0;
-        tasks.forEach(task => {
+        tasks.forEach((task) => {
             totalMinutes += task.estimatedDuration || 60;
         });
 
@@ -96,7 +116,9 @@ const calculateAvailableHours = async (request, reply) => {
         const { userId } = request.params;
         const { weekStart, workHoursPerDay = 8 } = request.query;
 
-        const start = weekStart ? new Date(weekStart) : startOfWeek(new Date(), { weekStartsOn: 1 });
+        const start = weekStart
+            ? new Date(weekStart)
+            : startOfWeek(new Date(), { weekStartsOn: 1 });
         const end = endOfWeek(start, { weekStartsOn: 1 });
 
         // Get meetings
@@ -111,7 +133,7 @@ const calculateAvailableHours = async (request, reply) => {
 
         // Calculate total meeting minutes
         let meetingMinutes = 0;
-        meetings.forEach(meeting => {
+        meetings.forEach((meeting) => {
             meetingMinutes += meeting.duration || 60;
         });
 
@@ -168,7 +190,7 @@ const getWeeklyPlan = async (request, reply) => {
             });
 
             let meetingMinutes = 0;
-            meetings.forEach(m => {
+            meetings.forEach((m) => {
                 meetingMinutes += m.duration || 60;
             });
 
@@ -231,7 +253,7 @@ const saveWeeklyPlan = async (request, reply) => {
         });
 
         let meetingMinutes = 0;
-        meetings.forEach(m => {
+        meetings.forEach((m) => {
             meetingMinutes += m.duration || 60;
         });
 
@@ -241,20 +263,23 @@ const saveWeeklyPlan = async (request, reply) => {
         // Calculate estimated hours from items
         let estimatedHours = 0;
         if (items && items.length > 0) {
-            items.forEach(item => {
+            items.forEach((item) => {
                 estimatedHours += parseFloat(item.estimatedHours || 0);
             });
         }
 
         if (plan) {
-            await plan.update({
-                availableHours: availableHours || 40,
-                meetingHours: Math.round(meetingHours * 100) / 100,
-                workHours: Math.round(workHours * 100) / 100,
-                estimatedHours: Math.round(estimatedHours * 100) / 100,
-                notes,
-                status: status || plan.status,
-            }, { transaction });
+            await plan.update(
+                {
+                    availableHours: availableHours || 40,
+                    meetingHours: Math.round(meetingHours * 100) / 100,
+                    workHours: Math.round(workHours * 100) / 100,
+                    estimatedHours: Math.round(estimatedHours * 100) / 100,
+                    notes,
+                    status: status || plan.status,
+                },
+                { transaction },
+            );
 
             // Delete existing items
             await WorkWeeklyPlanItem.destroy({
@@ -262,17 +287,20 @@ const saveWeeklyPlan = async (request, reply) => {
                 transaction,
             });
         } else {
-            plan = await WorkWeeklyPlan.create({
-                userId,
-                weekStart: start,
-                weekEnd: end,
-                availableHours: availableHours || 40,
-                meetingHours: Math.round(meetingHours * 100) / 100,
-                workHours: Math.round(workHours * 100) / 100,
-                estimatedHours: Math.round(estimatedHours * 100) / 100,
-                notes,
-                status: status || 'draft',
-            }, { transaction });
+            plan = await WorkWeeklyPlan.create(
+                {
+                    userId,
+                    weekStart: start,
+                    weekEnd: end,
+                    availableHours: availableHours || 40,
+                    meetingHours: Math.round(meetingHours * 100) / 100,
+                    workHours: Math.round(workHours * 100) / 100,
+                    estimatedHours: Math.round(estimatedHours * 100) / 100,
+                    notes,
+                    status: status || 'draft',
+                },
+                { transaction },
+            );
         }
 
         // Create items
@@ -328,7 +356,7 @@ const updateItemOrder = async (request, reply) => {
                     priorityOrder: item.priorityOrder,
                     targetDay: item.targetDay,
                 },
-                { where: { id: item.id, planId } }
+                { where: { id: item.id, planId } },
             );
         }
 
@@ -371,7 +399,7 @@ const generatePlanSuggestions = async (request, reply) => {
 
             // Find lowest priority items that could be moved
             const lowPriorityItems = plan.items
-                .filter(item => item.task && !item.task.deadline)
+                .filter((item) => item.task && !item.task.deadline)
                 .slice(-2);
 
             if (lowPriorityItems.length > 0) {
@@ -388,7 +416,7 @@ const generatePlanSuggestions = async (request, reply) => {
         }
 
         // Check for tasks without estimated time
-        const noEstimate = plan.items.filter(item => !item.estimatedHours);
+        const noEstimate = plan.items.filter((item) => !item.estimatedHours);
         if (noEstimate.length > 0) {
             suggestions.push({
                 type: 'info',
@@ -397,7 +425,8 @@ const generatePlanSuggestions = async (request, reply) => {
         }
 
         // Check for high meeting days
-        const meetingPercentage = (parseFloat(plan.meetingHours) / parseFloat(plan.availableHours)) * 100;
+        const meetingPercentage =
+            (parseFloat(plan.meetingHours) / parseFloat(plan.availableHours)) * 100;
         if (meetingPercentage > 40) {
             suggestions.push({
                 type: 'warning',

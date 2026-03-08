@@ -34,7 +34,13 @@ const formatHours = (hours) => {
 // ==================== WEEKLY REPORT ====================
 
 const calculateWeeklyMetrics = async (userId, weekStart) => {
-    const { WorkTimesheet, WorkTask, WorkMeeting, WorkModeSession, WorkProject } = require('../models');
+    const {
+        WorkTimesheet,
+        WorkTask,
+        WorkMeeting,
+        WorkModeSession,
+        WorkProject,
+    } = require('../models');
     const weekEnd = getEndOfWeek(weekStart);
 
     // Get all timesheet entries for the week
@@ -156,7 +162,9 @@ const calculateWeeklyMetrics = async (userId, weekStart) => {
     // Context switches (count unique project/task transitions)
     let contextSwitches = 0;
     let prevProjectId = null;
-    for (const entry of timesheetEntries.sort((a, b) => new Date(a.startedAt) - new Date(b.startedAt))) {
+    for (const entry of timesheetEntries.sort(
+        (a, b) => new Date(a.startedAt) - new Date(b.startedAt),
+    )) {
         if (prevProjectId !== null && entry.projectId !== prevProjectId) {
             contextSwitches++;
         }
@@ -183,12 +191,13 @@ const calculateWeeklyMetrics = async (userId, weekStart) => {
         deliveries: {
             tasksCompleted,
             tasksPlanned: Math.max(tasksPlanned, tasksCompleted),
-            completionRate: tasksPlanned > 0 ? Math.round((tasksCompleted / tasksPlanned) * 100) : 100,
+            completionRate:
+                tasksPlanned > 0 ? Math.round((tasksCompleted / tasksPlanned) * 100) : 100,
             onTime,
             late,
         },
         projects: Object.values(hoursByProject)
-            .map(p => ({
+            .map((p) => ({
                 ...p,
                 hours: Math.round(p.hours * 10) / 10,
                 percentage: totalHours > 0 ? Math.round((p.hours / totalHours) * 100) : 0,
@@ -196,7 +205,7 @@ const calculateWeeklyMetrics = async (userId, weekStart) => {
             .sort((a, b) => b.hours - a.hours),
         focus: {
             contextSwitches,
-            avgContextSwitchesPerDay: Math.round(contextSwitches / 5 * 10) / 10,
+            avgContextSwitchesPerDay: Math.round((contextSwitches / 5) * 10) / 10,
         },
     };
 };
@@ -211,7 +220,8 @@ const compareWithPreviousWeek = async (userId, weekStart) => {
     ]);
 
     const hoursDiff = currentMetrics.time.totalHours - previousMetrics.time.totalHours;
-    const tasksDiff = currentMetrics.deliveries.tasksCompleted - previousMetrics.deliveries.tasksCompleted;
+    const tasksDiff =
+        currentMetrics.deliveries.tasksCompleted - previousMetrics.deliveries.tasksCompleted;
     const deepWorkDiff = currentMetrics.time.deepWorkHours - previousMetrics.time.deepWorkHours;
 
     return {
@@ -236,7 +246,14 @@ const compareWithPreviousWeek = async (userId, weekStart) => {
     };
 };
 
-const generateWeeklyInsights = async (userId, weekStart, metrics, comparison, strainData, balanceData) => {
+const generateWeeklyInsights = async (
+    userId,
+    weekStart,
+    metrics,
+    comparison,
+    strainData,
+    balanceData,
+) => {
     const insights = [];
 
     // Overtime insight
@@ -306,30 +323,47 @@ const generateWeeklyInsights = async (userId, weekStart, metrics, comparison, st
 };
 
 const generateWeeklyReport = async (userId, weekStart) => {
-    const { calculateWorkStrain, getStrainHistory, calculateWorkLifeBalance } = require('./workAnalyticsController');
+    const {
+        calculateWorkStrain,
+        getStrainHistory,
+        calculateWorkLifeBalance,
+    } = require('./workAnalyticsController');
 
     const metrics = await calculateWeeklyMetrics(userId, weekStart);
     const comparison = await compareWithPreviousWeek(userId, weekStart);
 
     // Get strain and balance averages for the week
     const strainHistory = await getStrainHistory(userId, 7);
-    const avgStrain = strainHistory.length > 0
-        ? Math.round((strainHistory.reduce((sum, h) => sum + h.score, 0) / strainHistory.length) * 10) / 10
-        : null;
+    const avgStrain =
+        strainHistory.length > 0
+            ? Math.round(
+                  (strainHistory.reduce((sum, h) => sum + h.score, 0) / strainHistory.length) * 10,
+              ) / 10
+            : null;
 
     const balanceData = await calculateWorkLifeBalance(userId);
 
-    const insights = await generateWeeklyInsights(userId, weekStart, metrics, comparison, { score: avgStrain }, balanceData);
+    const insights = await generateWeeklyInsights(
+        userId,
+        weekStart,
+        metrics,
+        comparison,
+        { score: avgStrain },
+        balanceData,
+    );
 
     // Calculate overall score (weighted average)
     const completionScore = metrics.deliveries.completionRate / 10;
     const balanceScore = balanceData?.score || 5;
-    const strainScore = avgStrain ? (10 - avgStrain) : 5; // Inverse strain
-    const focusScore = metrics.time.deepWorkPercentage >= 40 ? 8 : metrics.time.deepWorkPercentage >= 25 ? 6 : 4;
+    const strainScore = avgStrain ? 10 - avgStrain : 5; // Inverse strain
+    const focusScore =
+        metrics.time.deepWorkPercentage >= 40 ? 8 : metrics.time.deepWorkPercentage >= 25 ? 6 : 4;
 
-    const overallScore = Math.round(
-        (completionScore * 0.3 + balanceScore * 0.25 + strainScore * 0.25 + focusScore * 0.2) * 10
-    ) / 10;
+    const overallScore =
+        Math.round(
+            (completionScore * 0.3 + balanceScore * 0.25 + strainScore * 0.25 + focusScore * 0.2) *
+                10,
+        ) / 10;
 
     return {
         period: {
@@ -344,10 +378,12 @@ const generateWeeklyReport = async (userId, weekStart) => {
             average: avgStrain,
             history: strainHistory,
         },
-        balance: balanceData ? {
-            score: balanceData.score,
-            color: balanceData.color,
-        } : null,
+        balance: balanceData
+            ? {
+                  score: balanceData.score,
+                  color: balanceData.color,
+              }
+            : null,
         insights,
     };
 };
@@ -358,7 +394,13 @@ const calculateMonthlyMetrics = async (userId, month, year) => {
     const monthStart = getStartOfMonth(year, month);
     const monthEnd = getEndOfMonth(year, month);
 
-    const { WorkTimesheet, WorkTask, WorkMeeting, WorkProject, WorkObjective } = require('../models');
+    const {
+        WorkTimesheet,
+        WorkTask,
+        WorkMeeting,
+        WorkProject,
+        WorkObjective,
+    } = require('../models');
 
     // Get all timesheet entries for the month
     const timesheetEntries = await WorkTimesheet.findAll({
@@ -418,11 +460,11 @@ const calculateMonthlyMetrics = async (userId, month, year) => {
     // Count weekend days worked
     const weekendDaysWorked = new Set(
         timesheetEntries
-            .filter(e => {
+            .filter((e) => {
                 const day = new Date(e.startedAt).getDay();
                 return day === 0 || day === 6;
             })
-            .map(e => new Date(e.startedAt).toISOString().split('T')[0])
+            .map((e) => new Date(e.startedAt).toISOString().split('T')[0]),
     ).size;
 
     // Tasks completed
@@ -441,7 +483,7 @@ const calculateMonthlyMetrics = async (userId, month, year) => {
         },
     });
 
-    const okrProgress = objectives.map(o => ({
+    const okrProgress = objectives.map((o) => ({
         id: o.id,
         title: o.title,
         progress: o.progress,
@@ -468,7 +510,7 @@ const calculateMonthlyMetrics = async (userId, month, year) => {
             tasksCompleted,
         },
         projects: Object.values(hoursByProject)
-            .map(p => ({
+            .map((p) => ({
                 ...p,
                 hours: Math.round(p.hours * 10) / 10,
                 percentage: totalHours > 0 ? Math.round((p.hours / totalHours) * 100) : 0,
@@ -516,7 +558,12 @@ const getWeeklyTrends = async (userId, month, year) => {
         return {
             weeks: trends,
             trend: scoreDiff > 0 ? 'up' : scoreDiff < 0 ? 'down' : 'stable',
-            message: scoreDiff > 0 ? 'Tendencia positiva' : scoreDiff < 0 ? 'Tendencia de queda' : 'Estavel',
+            message:
+                scoreDiff > 0
+                    ? 'Tendencia positiva'
+                    : scoreDiff < 0
+                      ? 'Tendencia de queda'
+                      : 'Estavel',
         };
     }
 
@@ -528,15 +575,19 @@ const generateMonthlyReport = async (userId, month, year) => {
     const weeklyTrends = await getWeeklyTrends(userId, month, year);
 
     // Calculate overall score
-    const avgWeeklyScore = weeklyTrends.weeks.length > 0
-        ? weeklyTrends.weeks.reduce((sum, w) => sum + w.score, 0) / weeklyTrends.weeks.length
-        : 5;
+    const avgWeeklyScore =
+        weeklyTrends.weeks.length > 0
+            ? weeklyTrends.weeks.reduce((sum, w) => sum + w.score, 0) / weeklyTrends.weeks.length
+            : 5;
 
     return {
         period: {
             month,
             year,
-            label: new Date(year, month - 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }),
+            label: new Date(year, month - 1).toLocaleDateString('pt-BR', {
+                month: 'long',
+                year: 'numeric',
+            }),
         },
         score: Math.round(avgWeeklyScore * 10) / 10,
         scoreEmoji: avgWeeklyScore >= 7.5 ? '👍' : avgWeeklyScore >= 5 ? '👌' : '⚠️',
@@ -628,7 +679,7 @@ const generateBillingReport = async (userId, month, year) => {
 
     // Client ranking
     const clientRanking = Object.values(hoursByClient)
-        .map(c => ({
+        .map((c) => ({
             ...c,
             hours: Math.round(c.hours * 10) / 10,
             value: Math.round(c.value * 100) / 100,
@@ -640,7 +691,10 @@ const generateBillingReport = async (userId, month, year) => {
         period: {
             month,
             year,
-            label: new Date(year, month - 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }),
+            label: new Date(year, month - 1).toLocaleDateString('pt-BR', {
+                month: 'long',
+                year: 'numeric',
+            }),
         },
         summary: {
             billableHours: Math.round(totalBillableHours * 10) / 10,
@@ -746,9 +800,14 @@ const getBillingReport = async (request, reply) => {
 
         const comparison = {
             valueDiff: report.summary.totalValue - prevReport.summary.totalValue,
-            valueDiffPercentage: prevReport.summary.totalValue > 0
-                ? Math.round(((report.summary.totalValue - prevReport.summary.totalValue) / prevReport.summary.totalValue) * 100)
-                : 0,
+            valueDiffPercentage:
+                prevReport.summary.totalValue > 0
+                    ? Math.round(
+                          ((report.summary.totalValue - prevReport.summary.totalValue) /
+                              prevReport.summary.totalValue) *
+                              100,
+                      )
+                    : 0,
             direction: report.summary.totalValue > prevReport.summary.totalValue ? 'up' : 'down',
         };
 

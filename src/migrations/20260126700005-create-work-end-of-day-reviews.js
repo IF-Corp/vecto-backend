@@ -68,7 +68,9 @@ module.exports = {
             },
         });
 
-        await queryInterface.addIndex('work_end_of_day_reviews', ['user_id', 'date'], { unique: true });
+        await queryInterface.addIndex('work_end_of_day_reviews', ['user_id', 'date'], {
+            unique: true,
+        });
         await queryInterface.addIndex('work_end_of_day_reviews', ['date']);
     },
 

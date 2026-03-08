@@ -7,73 +7,73 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             name: {
                 type: Sequelize.STRING(100),
-                allowNull: false
+                allowNull: false,
             },
             description: {
                 type: Sequelize.STRING(500),
-                allowNull: true
+                allowNull: true,
             },
             icon: {
                 type: Sequelize.STRING(50),
-                allowNull: true
+                allowNull: true,
             },
             color: {
                 type: Sequelize.STRING(7),
-                allowNull: true
+                allowNull: true,
             },
             target_amount: {
                 type: Sequelize.DECIMAL(12, 2),
-                allowNull: false
+                allowNull: false,
             },
             current_amount: {
                 type: Sequelize.DECIMAL(12, 2),
                 defaultValue: 0,
-                allowNull: false
+                allowNull: false,
             },
             deadline: {
                 type: Sequelize.DATEONLY,
-                allowNull: true
+                allowNull: true,
             },
             priority: {
                 type: Sequelize.ENUM('LOW', 'MEDIUM', 'HIGH'),
                 defaultValue: 'MEDIUM',
-                allowNull: false
+                allowNull: false,
             },
             status: {
                 type: Sequelize.ENUM('IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'PAUSED'),
                 defaultValue: 'IN_PROGRESS',
-                allowNull: false
+                allowNull: false,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('finance_goals', ['user_id'], {
-            name: 'finance_goals_user_id_idx'
+            name: 'finance_goals_user_id_idx',
         });
     },
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('finance_goals');
-    }
+    },
 };

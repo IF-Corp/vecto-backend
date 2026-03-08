@@ -76,15 +76,28 @@ async function getSocialHealthScore(request, reply) {
         for (const reminder of reminders) {
             let frequencyDays;
             switch (reminder.frequency_type) {
-                case 'WEEKLY': frequencyDays = 7; break;
-                case 'BIWEEKLY': frequencyDays = 14; break;
-                case 'MONTHLY': frequencyDays = 30; break;
-                case 'QUARTERLY': frequencyDays = 90; break;
-                case 'YEARLY': frequencyDays = 365; break;
-                default: frequencyDays = reminder.frequency_days || 30;
+                case 'WEEKLY':
+                    frequencyDays = 7;
+                    break;
+                case 'BIWEEKLY':
+                    frequencyDays = 14;
+                    break;
+                case 'MONTHLY':
+                    frequencyDays = 30;
+                    break;
+                case 'QUARTERLY':
+                    frequencyDays = 90;
+                    break;
+                case 'YEARLY':
+                    frequencyDays = 365;
+                    break;
+                default:
+                    frequencyDays = reminder.frequency_days || 30;
             }
 
-            const lastInteraction = reminder.last_interaction_at ? new Date(reminder.last_interaction_at) : null;
+            const lastInteraction = reminder.last_interaction_at
+                ? new Date(reminder.last_interaction_at)
+                : null;
             const daysSince = lastInteraction
                 ? Math.floor((now - lastInteraction) / (1000 * 60 * 60 * 24))
                 : 999;
@@ -97,9 +110,8 @@ async function getSocialHealthScore(request, reply) {
         }
 
         // If no reminders, fall back to coverage score for this factor
-        const reminderScore = reminders.length > 0
-            ? (healthyRelationships / reminders.length) * 100
-            : coverageScore;
+        const reminderScore =
+            reminders.length > 0 ? (healthyRelationships / reminders.length) * 100 : coverageScore;
 
         // Weighted final score (0-100)
         const score = Math.round(0.4 * coverageScore + 0.3 * volumeScore + 0.3 * reminderScore);
@@ -155,7 +167,12 @@ async function getDashboard(request, reply) {
         const upcomingEvents = await SocialEvent.findAll({
             where: {
                 user_id: userId,
-                event_date: { [Op.between]: [today.toISOString().split('T')[0], nextWeek.toISOString().split('T')[0]] },
+                event_date: {
+                    [Op.between]: [
+                        today.toISOString().split('T')[0],
+                        nextWeek.toISOString().split('T')[0],
+                    ],
+                },
                 status: { [Op.in]: ['PLANNING', 'CONFIRMED'] },
             },
             order: [['event_date', 'ASC']],
@@ -170,7 +187,11 @@ async function getDashboard(request, reply) {
         const upcomingBirthdays = contacts
             .map((contact) => {
                 const birthday = new Date(contact.birthday);
-                const thisYearBirthday = new Date(today.getFullYear(), birthday.getMonth(), birthday.getDate());
+                const thisYearBirthday = new Date(
+                    today.getFullYear(),
+                    birthday.getMonth(),
+                    birthday.getDate(),
+                );
 
                 if (thisYearBirthday < today) {
                     thisYearBirthday.setFullYear(today.getFullYear() + 1);
@@ -196,14 +217,25 @@ async function getDashboard(request, reply) {
 
             let frequencyDays;
             switch (reminder.frequency_type) {
-                case 'WEEKLY': frequencyDays = 7; break;
-                case 'BIWEEKLY': frequencyDays = 14; break;
-                case 'MONTHLY': frequencyDays = 30; break;
-                case 'QUARTERLY': frequencyDays = 90; break;
-                default: frequencyDays = reminder.frequency_days || 30;
+                case 'WEEKLY':
+                    frequencyDays = 7;
+                    break;
+                case 'BIWEEKLY':
+                    frequencyDays = 14;
+                    break;
+                case 'MONTHLY':
+                    frequencyDays = 30;
+                    break;
+                case 'QUARTERLY':
+                    frequencyDays = 90;
+                    break;
+                default:
+                    frequencyDays = reminder.frequency_days || 30;
             }
 
-            const lastInteraction = reminder.last_interaction_at ? new Date(reminder.last_interaction_at) : null;
+            const lastInteraction = reminder.last_interaction_at
+                ? new Date(reminder.last_interaction_at)
+                : null;
             const daysSince = lastInteraction
                 ? Math.floor((today - lastInteraction) / (1000 * 60 * 60 * 24))
                 : 999;

@@ -1,4 +1,11 @@
-const { WorkEndOfDayReview, WorkTask, WorkTimeEntry, WorkDailyStandup, WorkDailyStandupTask, sequelize } = require('../models');
+const {
+    WorkEndOfDayReview,
+    WorkTask,
+    WorkTimeEntry,
+    WorkDailyStandup,
+    WorkDailyStandupTask,
+    sequelize,
+} = require('../models');
 const { Op } = require('sequelize');
 const { format, addDays, startOfDay, endOfDay } = require('date-fns');
 
@@ -49,7 +56,7 @@ const getTodayTasksCompletion = async (request, reply) => {
         const allTasks = [];
 
         // Add planned tasks
-        plannedTasks.forEach(pt => {
+        plannedTasks.forEach((pt) => {
             const task = pt.task;
             if (task) {
                 allTasks.push({
@@ -69,8 +76,8 @@ const getTodayTasksCompletion = async (request, reply) => {
         });
 
         // Add completed tasks that weren't planned
-        completedToday.forEach(task => {
-            if (!allTasks.find(t => t.id === task.id)) {
+        completedToday.forEach((task) => {
+            if (!allTasks.find((t) => t.id === task.id)) {
                 allTasks.push({
                     id: task.id,
                     title: task.title,
@@ -81,8 +88,8 @@ const getTodayTasksCompletion = async (request, reply) => {
         });
 
         // Add scheduled but not completed
-        scheduledToday.forEach(task => {
-            if (!allTasks.find(t => t.id === task.id)) {
+        scheduledToday.forEach((task) => {
+            if (!allTasks.find((t) => t.id === task.id)) {
                 allTasks.push({
                     id: task.id,
                     title: task.title,
@@ -95,7 +102,8 @@ const getTodayTasksCompletion = async (request, reply) => {
         return reply.send({
             tasksPlanned: plannedCount,
             tasksCompleted: completedCount,
-            completionPercentage: plannedCount > 0 ? Math.round((completedCount / plannedCount) * 100) : 100,
+            completionPercentage:
+                plannedCount > 0 ? Math.round((completedCount / plannedCount) * 100) : 100,
             tasks: allTasks,
         });
     } catch (error) {
@@ -120,9 +128,11 @@ const getTodayWorkedHours = async (request, reply) => {
         });
 
         let totalSeconds = 0;
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
             if (entry.endedAt) {
-                totalSeconds += Math.floor((new Date(entry.endedAt) - new Date(entry.startedAt)) / 1000);
+                totalSeconds += Math.floor(
+                    (new Date(entry.endedAt) - new Date(entry.startedAt)) / 1000,
+                );
             } else if (entry.duration) {
                 totalSeconds += entry.duration * 60;
             }
@@ -157,7 +167,7 @@ const moveUncompletedTasksToTomorrow = async (request, reply) => {
                     scheduledDate: today,
                     completedAt: null,
                 },
-            }
+            },
         );
 
         return reply.send({
@@ -174,11 +184,7 @@ const moveUncompletedTasksToTomorrow = async (request, reply) => {
 const createEndOfDayReview = async (request, reply) => {
     try {
         const { userId } = request.params;
-        const {
-            productivityRating,
-            notes,
-            moveUncompletedTasks,
-        } = request.body;
+        const { productivityRating, notes, moveUncompletedTasks } = request.body;
 
         const today = format(new Date(), 'yyyy-MM-dd');
 
@@ -233,9 +239,11 @@ const createEndOfDayReview = async (request, reply) => {
         });
 
         let totalSeconds = 0;
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
             if (entry.endedAt) {
-                totalSeconds += Math.floor((new Date(entry.endedAt) - new Date(entry.startedAt)) / 1000);
+                totalSeconds += Math.floor(
+                    (new Date(entry.endedAt) - new Date(entry.startedAt)) / 1000,
+                );
             } else if (entry.duration) {
                 totalSeconds += entry.duration * 60;
             }
@@ -255,7 +263,7 @@ const createEndOfDayReview = async (request, reply) => {
                         scheduledDate: today,
                         completedAt: null,
                     },
-                }
+                },
             );
             tasksMoved = true;
         }
@@ -336,25 +344,34 @@ const getProductivityTrends = async (request, reply) => {
                 userId,
                 date: { [Op.gte]: startDate },
             },
-            attributes: ['date', 'productivityRating', 'tasksPlanned', 'tasksCompleted', 'hoursWorked'],
+            attributes: [
+                'date',
+                'productivityRating',
+                'tasksPlanned',
+                'tasksCompleted',
+                'hoursWorked',
+            ],
             order: [['date', 'ASC']],
         });
 
         const totalDays = reviews.length;
-        const averageProductivity = totalDays > 0
-            ? reviews.reduce((acc, r) => acc + r.productivityRating, 0) / totalDays
-            : 0;
-        const averageCompletion = totalDays > 0
-            ? reviews.reduce((acc, r) => {
-                if (r.tasksPlanned > 0) {
-                    return acc + (r.tasksCompleted / r.tasksPlanned) * 100;
-                }
-                return acc + 100;
-            }, 0) / totalDays
-            : 0;
-        const averageHours = totalDays > 0
-            ? reviews.reduce((acc, r) => acc + parseFloat(r.hoursWorked), 0) / totalDays
-            : 0;
+        const averageProductivity =
+            totalDays > 0
+                ? reviews.reduce((acc, r) => acc + r.productivityRating, 0) / totalDays
+                : 0;
+        const averageCompletion =
+            totalDays > 0
+                ? reviews.reduce((acc, r) => {
+                      if (r.tasksPlanned > 0) {
+                          return acc + (r.tasksCompleted / r.tasksPlanned) * 100;
+                      }
+                      return acc + 100;
+                  }, 0) / totalDays
+                : 0;
+        const averageHours =
+            totalDays > 0
+                ? reviews.reduce((acc, r) => acc + parseFloat(r.hoursWorked), 0) / totalDays
+                : 0;
 
         return reply.send({
             data: reviews,

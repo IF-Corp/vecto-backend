@@ -1,4 +1,9 @@
-const { UserPreferences, OnboardingState, GlobalCategory, NotificationConfig } = require('../models');
+const {
+    UserPreferences,
+    OnboardingState,
+    GlobalCategory,
+    NotificationConfig,
+} = require('../models');
 
 class CoreController {
     // ==================== USER PREFERENCES ====================
@@ -8,25 +13,25 @@ class CoreController {
             const { userId } = request.params;
 
             const preferences = await UserPreferences.findOne({
-                where: { user_id: userId }
+                where: { user_id: userId },
             });
 
             if (!preferences) {
                 return reply.status(404).send({
                     success: false,
-                    error: 'Preferences not found'
+                    error: 'Preferences not found',
                 });
             }
 
             return reply.send({
                 success: true,
-                data: preferences
+                data: preferences,
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 success: false,
-                error: error.message
+                error: error.message,
             });
         }
     }
@@ -38,7 +43,7 @@ class CoreController {
 
             const [preferences, created] = await UserPreferences.findOrCreate({
                 where: { user_id: userId },
-                defaults: { user_id: userId, ...data }
+                defaults: { user_id: userId, ...data },
             });
 
             if (!created) {
@@ -48,13 +53,13 @@ class CoreController {
             return reply.status(created ? 201 : 200).send({
                 success: true,
                 data: preferences,
-                created
+                created,
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 success: false,
-                error: error.message
+                error: error.message,
             });
         }
     }
@@ -66,25 +71,25 @@ class CoreController {
             const { userId } = request.params;
 
             const state = await OnboardingState.findOne({
-                where: { user_id: userId }
+                where: { user_id: userId },
             });
 
             if (!state) {
                 return reply.status(404).send({
                     success: false,
-                    error: 'Onboarding state not found'
+                    error: 'Onboarding state not found',
                 });
             }
 
             return reply.send({
                 success: true,
-                data: state
+                data: state,
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 success: false,
-                error: error.message
+                error: error.message,
             });
         }
     }
@@ -100,8 +105,8 @@ class CoreController {
                     user_id: userId,
                     completed: completed || false,
                     current_step,
-                    selected_modules: selected_modules || []
-                }
+                    selected_modules: selected_modules || [],
+                },
             });
 
             if (!created) {
@@ -111,13 +116,13 @@ class CoreController {
             return reply.status(created ? 201 : 200).send({
                 success: true,
                 data: state,
-                created
+                created,
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 success: false,
-                error: error.message
+                error: error.message,
             });
         }
     }
@@ -138,13 +143,13 @@ class CoreController {
 
             return reply.send({
                 success: true,
-                data: categories
+                data: categories,
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 success: false,
-                error: error.message
+                error: error.message,
             });
         }
     }
@@ -157,7 +162,7 @@ class CoreController {
             if (!name) {
                 return reply.status(400).send({
                     success: false,
-                    error: 'Name is required'
+                    error: 'Name is required',
                 });
             }
 
@@ -166,18 +171,18 @@ class CoreController {
                 name,
                 color_hex,
                 icon,
-                type: type || 'TAG'
+                type: type || 'TAG',
             });
 
             return reply.status(201).send({
                 success: true,
-                data: category
+                data: category,
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 success: false,
-                error: error.message
+                error: error.message,
             });
         }
     }
@@ -192,7 +197,7 @@ class CoreController {
             if (!category) {
                 return reply.status(404).send({
                     success: false,
-                    error: 'Category not found'
+                    error: 'Category not found',
                 });
             }
 
@@ -200,13 +205,13 @@ class CoreController {
 
             return reply.send({
                 success: true,
-                data: category
+                data: category,
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 success: false,
-                error: error.message
+                error: error.message,
             });
         }
     }
@@ -220,7 +225,7 @@ class CoreController {
             if (!category) {
                 return reply.status(404).send({
                     success: false,
-                    error: 'Category not found'
+                    error: 'Category not found',
                 });
             }
 
@@ -228,13 +233,13 @@ class CoreController {
 
             return reply.send({
                 success: true,
-                message: 'Category deleted'
+                message: 'Category deleted',
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 success: false,
-                error: error.message
+                error: error.message,
             });
         }
     }
@@ -246,18 +251,18 @@ class CoreController {
             const { userId } = request.params;
 
             const configs = await NotificationConfig.findAll({
-                where: { user_id: userId }
+                where: { user_id: userId },
             });
 
             return reply.send({
                 success: true,
-                data: configs
+                data: configs,
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 success: false,
-                error: error.message
+                error: error.message,
             });
         }
     }
@@ -270,7 +275,7 @@ class CoreController {
             if (!channel || !alert_type) {
                 return reply.status(400).send({
                     success: false,
-                    error: 'Channel and alert_type are required'
+                    error: 'Channel and alert_type are required',
                 });
             }
 
@@ -278,14 +283,14 @@ class CoreController {
                 where: {
                     user_id: userId,
                     channel,
-                    alert_type
+                    alert_type,
                 },
                 defaults: {
                     user_id: userId,
                     channel,
                     alert_type,
-                    active: active !== undefined ? active : true
-                }
+                    active: active !== undefined ? active : true,
+                },
             });
 
             if (!created && active !== undefined) {
@@ -295,13 +300,13 @@ class CoreController {
             return reply.status(created ? 201 : 200).send({
                 success: true,
                 data: config,
-                created
+                created,
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 success: false,
-                error: error.message
+                error: error.message,
             });
         }
     }
@@ -315,7 +320,7 @@ class CoreController {
             if (!config) {
                 return reply.status(404).send({
                     success: false,
-                    error: 'Notification config not found'
+                    error: 'Notification config not found',
                 });
             }
 
@@ -323,13 +328,13 @@ class CoreController {
 
             return reply.send({
                 success: true,
-                message: 'Notification config deleted'
+                message: 'Notification config deleted',
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 success: false,
-                error: error.message
+                error: error.message,
             });
         }
     }

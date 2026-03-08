@@ -8,38 +8,38 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             medication_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'medications',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             taken_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             status: {
                 type: Sequelize.ENUM('TAKEN', 'SKIPPED', 'MISSED'),
-                allowNull: false
+                allowNull: false,
             },
             notes: {
                 type: Sequelize.TEXT,
-                allowNull: true
+                allowNull: true,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('medication_logs', ['medication_id']);
@@ -48,5 +48,5 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('medication_logs');
-    }
+    },
 };

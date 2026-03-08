@@ -18,12 +18,26 @@ const getObjectives = async (request, reply) => {
 
     const objectives = await WorkObjective.findAll({
         where,
-        include: [{
-            model: WorkKeyResult,
-            as: 'keyResults',
-            attributes: ['id', 'description', 'metric_type', 'start_value', 'target_value', 'current_value', 'unit', 'progress'],
-        }],
-        order: [['period_start', 'DESC'], ['created_at', 'DESC']],
+        include: [
+            {
+                model: WorkKeyResult,
+                as: 'keyResults',
+                attributes: [
+                    'id',
+                    'description',
+                    'metric_type',
+                    'start_value',
+                    'target_value',
+                    'current_value',
+                    'unit',
+                    'progress',
+                ],
+            },
+        ],
+        order: [
+            ['period_start', 'DESC'],
+            ['created_at', 'DESC'],
+        ],
     });
 
     return reply.send({ data: objectives });
@@ -33,16 +47,20 @@ const getObjective = async (request, reply) => {
     const { id } = request.params;
 
     const objective = await WorkObjective.findByPk(id, {
-        include: [{
-            model: WorkKeyResult,
-            as: 'keyResults',
-            include: [{
-                model: WorkKeyResultUpdate,
-                as: 'updates',
-                order: [['created_at', 'DESC']],
-                limit: 10,
-            }],
-        }],
+        include: [
+            {
+                model: WorkKeyResult,
+                as: 'keyResults',
+                include: [
+                    {
+                        model: WorkKeyResultUpdate,
+                        as: 'updates',
+                        order: [['created_at', 'DESC']],
+                        limit: 10,
+                    },
+                ],
+            },
+        ],
     });
 
     if (!objective) {
@@ -116,12 +134,14 @@ const getKeyResults = async (request, reply) => {
 
     const keyResults = await WorkKeyResult.findAll({
         where: { objective_id: objectiveId },
-        include: [{
-            model: WorkKeyResultUpdate,
-            as: 'updates',
-            order: [['created_at', 'DESC']],
-            limit: 5,
-        }],
+        include: [
+            {
+                model: WorkKeyResultUpdate,
+                as: 'updates',
+                order: [['created_at', 'DESC']],
+                limit: 5,
+            },
+        ],
         order: [['created_at', 'ASC']],
     });
 
@@ -181,7 +201,7 @@ const updateKeyResult = async (request, reply) => {
             keyResult.start_value,
             keyResult.target_value,
             keyResult.current_value,
-            keyResult.metric_type
+            keyResult.metric_type,
         );
         await keyResult.update({ progress });
         await updateObjectiveProgress(keyResult.objective_id);
@@ -235,7 +255,7 @@ const updateKeyResultValue = async (request, reply) => {
         keyResult.start_value,
         keyResult.target_value,
         newValue,
-        keyResult.metric_type
+        keyResult.metric_type,
     );
 
     // Update key result
@@ -249,12 +269,14 @@ const updateKeyResultValue = async (request, reply) => {
 
     // Fetch updated key result with updates
     const updated = await WorkKeyResult.findByPk(id, {
-        include: [{
-            model: WorkKeyResultUpdate,
-            as: 'updates',
-            order: [['created_at', 'DESC']],
-            limit: 10,
-        }],
+        include: [
+            {
+                model: WorkKeyResultUpdate,
+                as: 'updates',
+                order: [['created_at', 'DESC']],
+                limit: 10,
+            },
+        ],
     });
 
     return reply.send({ data: updated });
@@ -289,7 +311,7 @@ const updateObjectiveProgress = async (objectiveId) => {
 
     await WorkObjective.update(
         { progress: Math.round(avgProgress * 100) / 100 },
-        { where: { id: objectiveId } }
+        { where: { id: objectiveId } },
     );
 };
 

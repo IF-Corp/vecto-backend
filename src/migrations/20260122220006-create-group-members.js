@@ -7,58 +7,58 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             group_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'social_groups',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             user_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             current_score: {
                 type: Sequelize.INTEGER,
                 defaultValue: 0,
-                allowNull: false
+                allowNull: false,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('group_members', ['group_id'], {
-            name: 'group_members_group_id_idx'
+            name: 'group_members_group_id_idx',
         });
 
         await queryInterface.addIndex('group_members', ['user_id'], {
-            name: 'group_members_user_id_idx'
+            name: 'group_members_user_id_idx',
         });
 
         await queryInterface.addIndex('group_members', ['group_id', 'user_id'], {
             name: 'group_members_unique_idx',
-            unique: true
+            unique: true,
         });
     },
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('group_members');
-    }
+    },
 };

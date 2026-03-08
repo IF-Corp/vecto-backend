@@ -114,8 +114,14 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('study_courses_online');
-        await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_study_courses_online_modality";');
-        await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_study_courses_online_category";');
-        await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_study_courses_online_status";');
+        await queryInterface.sequelize.query(
+            'DROP TYPE IF EXISTS "enum_study_courses_online_modality";',
+        );
+        await queryInterface.sequelize.query(
+            'DROP TYPE IF EXISTS "enum_study_courses_online_category";',
+        );
+        await queryInterface.sequelize.query(
+            'DROP TYPE IF EXISTS "enum_study_courses_online_status";',
+        );
     },
 };

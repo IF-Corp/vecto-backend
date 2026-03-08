@@ -46,7 +46,7 @@ const SocialContactProfessional = sequelize.define(
         tableName: 'social_contact_professional',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = SocialContactProfessional;

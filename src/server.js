@@ -3,60 +3,59 @@ const sequelize = require('./config/sequelize');
 const { startScheduler } = require('./jobs/freezeScheduler');
 
 async function startServer() {
-  const required = ['JWT_SECRET', 'FIREBASE_PROJECT_ID'];
-  for (const key of required) {
-    if (!process.env[key]) {
-      console.error(`Missing required env var: ${key}`);
-      process.exit(1);
+    const required = ['JWT_SECRET', 'FIREBASE_PROJECT_ID'];
+    for (const key of required) {
+        if (!process.env[key]) {
+            console.error(`Missing required env var: ${key}`);
+            process.exit(1);
+        }
     }
-  }
 
-  let app;
+    let app;
 
-  try {
-    // Build Fastify app
-    app = await buildApp();
+    try {
+        // Build Fastify app
+        app = await buildApp();
 
-    // Test database connection
-    await sequelize.authenticate();
-    console.log('Database connection has been established successfully.');
+        // Test database connection
+        await sequelize.authenticate();
+        console.log('Database connection has been established successfully.');
 
-    // Start server
-    const port = app.config.PORT || 3000;
-    const host = app.config.HOST || '0.0.0.0';
-    
-    await app.listen({ port: parseInt(port), host });
-    
-    console.log(`Server listening on http://${host}:${port}`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+        // Start server
+        const port = app.config.PORT || 3000;
+        const host = app.config.HOST || '0.0.0.0';
 
-    // Start freeze mode scheduler (runs every hour)
-    const SCHEDULER_INTERVAL = process.env.FREEZE_SCHEDULER_INTERVAL || 60 * 60 * 1000; // 1 hour default
-    startScheduler(parseInt(SCHEDULER_INTERVAL));
+        await app.listen({ port: parseInt(port), host });
 
-  } catch (err) {
-    console.error('Error starting server:', err);
-    process.exit(1);
-  }
+        console.log(`Server listening on http://${host}:${port}`);
+        console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 
-  // Graceful shutdown
-  const signals = ['SIGINT', 'SIGTERM'];
-  
-  signals.forEach(signal => {
-    process.on(signal, async () => {
-      console.log(`${signal} received, closing server gracefully...`);
-      
-      try {
-        await app.close();
-        await sequelize.close();
-        console.log('Server closed successfully');
-        process.exit(0);
-      } catch (err) {
-        console.error('Error during shutdown:', err);
+        // Start freeze mode scheduler (runs every hour)
+        const SCHEDULER_INTERVAL = process.env.FREEZE_SCHEDULER_INTERVAL || 60 * 60 * 1000; // 1 hour default
+        startScheduler(parseInt(SCHEDULER_INTERVAL));
+    } catch (err) {
+        console.error('Error starting server:', err);
         process.exit(1);
-      }
+    }
+
+    // Graceful shutdown
+    const signals = ['SIGINT', 'SIGTERM'];
+
+    signals.forEach((signal) => {
+        process.on(signal, async () => {
+            console.log(`${signal} received, closing server gracefully...`);
+
+            try {
+                await app.close();
+                await sequelize.close();
+                console.log('Server closed successfully');
+                process.exit(0);
+            } catch (err) {
+                console.error('Error during shutdown:', err);
+                process.exit(1);
+            }
+        });
     });
-  });
 }
 
 startServer();

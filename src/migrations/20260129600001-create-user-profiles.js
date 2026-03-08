@@ -8,7 +8,7 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
@@ -16,49 +16,49 @@ module.exports = {
                 unique: true,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             photo_url: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             bio: {
                 type: Sequelize.TEXT,
-                allowNull: true
+                allowNull: true,
             },
             phone: {
                 type: Sequelize.STRING(20),
-                allowNull: true
+                allowNull: true,
             },
             location: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             birth_date: {
                 type: Sequelize.DATEONLY,
-                allowNull: true
+                allowNull: true,
             },
             timezone: {
                 type: Sequelize.STRING(50),
                 allowNull: true,
-                defaultValue: 'America/Sao_Paulo'
+                defaultValue: 'America/Sao_Paulo',
             },
             gamification_enabled: {
                 type: Sequelize.BOOLEAN,
                 allowNull: false,
-                defaultValue: true
+                defaultValue: true,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('user_profiles', ['user_id']);
@@ -66,5 +66,5 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('user_profiles');
-    }
+    },
 };

@@ -8,7 +8,7 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             freeze_period_id: {
                 type: Sequelize.UUID,
@@ -16,44 +16,44 @@ module.exports = {
                 unique: true,
                 references: {
                     model: 'freeze_periods',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             freeze_streaks: {
                 type: Sequelize.BOOLEAN,
                 allowNull: false,
-                defaultValue: true
+                defaultValue: true,
             },
             hide_non_essential_tasks: {
                 type: Sequelize.BOOLEAN,
                 allowNull: false,
-                defaultValue: true
+                defaultValue: true,
             },
             pause_general_notifications: {
                 type: Sequelize.BOOLEAN,
                 allowNull: false,
-                defaultValue: true
+                defaultValue: true,
             },
             pause_goals: {
                 type: Sequelize.BOOLEAN,
                 allowNull: false,
-                defaultValue: true
+                defaultValue: true,
             },
             keep_important_events: {
                 type: Sequelize.BOOLEAN,
                 allowNull: false,
-                defaultValue: true
+                defaultValue: true,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('freeze_options', ['freeze_period_id']);
@@ -61,5 +61,5 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('freeze_options');
-    }
+    },
 };

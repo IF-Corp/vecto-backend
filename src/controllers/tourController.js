@@ -12,8 +12,8 @@ class TourController {
                     app_tour_completed: false,
                     app_tour_current_step: 0,
                     completed_page_tours: [],
-                    skipped_tours: []
-                }
+                    skipped_tours: [],
+                },
             });
 
             return reply.send({
@@ -22,15 +22,15 @@ class TourController {
                     app_tour_completed: tourState.app_tour_completed,
                     app_tour_current_step: tourState.app_tour_current_step,
                     completed_page_tours: tourState.completed_page_tours || [],
-                    skipped_tours: tourState.skipped_tours || []
-                }
+                    skipped_tours: tourState.skipped_tours || [],
+                },
             });
         } catch (error) {
             console.error('Get tour state error:', error);
             return reply.status(500).send({
                 success: false,
                 error: 'Internal Server Error',
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -38,7 +38,8 @@ class TourController {
     async updateTourState(request, reply) {
         try {
             const userId = request.user.id;
-            const { app_tour_completed, app_tour_current_step, complete_page_tour, skip_tour } = request.body;
+            const { app_tour_completed, app_tour_current_step, complete_page_tour, skip_tour } =
+                request.body;
 
             const [tourState] = await TourState.findOrCreate({
                 where: { user_id: userId },
@@ -47,8 +48,8 @@ class TourController {
                     app_tour_completed: false,
                     app_tour_current_step: 0,
                     completed_page_tours: [],
-                    skipped_tours: []
-                }
+                    skipped_tours: [],
+                },
             });
 
             const updates = {};
@@ -85,15 +86,15 @@ class TourController {
                     app_tour_completed: tourState.app_tour_completed,
                     app_tour_current_step: tourState.app_tour_current_step,
                     completed_page_tours: tourState.completed_page_tours || [],
-                    skipped_tours: tourState.skipped_tours || []
-                }
+                    skipped_tours: tourState.skipped_tours || [],
+                },
             });
         } catch (error) {
             console.error('Update tour state error:', error);
             return reply.status(500).send({
                 success: false,
                 error: 'Internal Server Error',
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -104,14 +105,14 @@ class TourController {
             const { tour_id } = request.body;
 
             const tourState = await TourState.findOne({
-                where: { user_id: userId }
+                where: { user_id: userId },
             });
 
             if (!tourState) {
                 return reply.status(404).send({
                     success: false,
                     error: 'Not Found',
-                    message: 'Tour state not found'
+                    message: 'Tour state not found',
                 });
             }
 
@@ -120,20 +121,22 @@ class TourController {
                     app_tour_completed: false,
                     app_tour_current_step: 0,
                     completed_page_tours: [],
-                    skipped_tours: []
+                    skipped_tours: [],
                 });
             } else if (tour_id === 'app') {
                 await tourState.update({
                     app_tour_completed: false,
                     app_tour_current_step: 0,
-                    skipped_tours: (tourState.skipped_tours || []).filter(t => t !== 'app')
+                    skipped_tours: (tourState.skipped_tours || []).filter((t) => t !== 'app'),
                 });
             } else {
-                const completedPages = (tourState.completed_page_tours || []).filter(t => t !== tour_id);
-                const skippedTours = (tourState.skipped_tours || []).filter(t => t !== tour_id);
+                const completedPages = (tourState.completed_page_tours || []).filter(
+                    (t) => t !== tour_id,
+                );
+                const skippedTours = (tourState.skipped_tours || []).filter((t) => t !== tour_id);
                 await tourState.update({
                     completed_page_tours: completedPages,
-                    skipped_tours: skippedTours
+                    skipped_tours: skippedTours,
                 });
             }
 
@@ -143,15 +146,15 @@ class TourController {
                     app_tour_completed: tourState.app_tour_completed,
                     app_tour_current_step: tourState.app_tour_current_step,
                     completed_page_tours: tourState.completed_page_tours || [],
-                    skipped_tours: tourState.skipped_tours || []
-                }
+                    skipped_tours: tourState.skipped_tours || [],
+                },
             });
         } catch (error) {
             console.error('Reset tour error:', error);
             return reply.status(500).send({
                 success: false,
                 error: 'Internal Server Error',
-                message: error.message
+                message: error.message,
             });
         }
     }

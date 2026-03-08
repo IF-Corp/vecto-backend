@@ -4,9 +4,19 @@ const DashboardWidget = require('../models/DashboardWidget');
 const DashboardAlertSetting = require('../models/DashboardAlertSetting');
 const { Op } = require('sequelize');
 const {
-    Transaction, Budget, Habit, HabitLog, Task,
-    WorkTask, SleepMetric, MealLog, StudyFocusSession,
-    HomeTask, HomeTaskOccurrence, HomeSpace, SocialBatteryLog,
+    Transaction,
+    Budget,
+    Habit,
+    HabitLog,
+    Task,
+    WorkTask,
+    SleepMetric,
+    MealLog,
+    StudyFocusSession,
+    HomeTask,
+    HomeTaskOccurrence,
+    HomeSpace,
+    SocialBatteryLog,
 } = require('../models');
 
 // Default quick stats configuration
@@ -122,7 +132,7 @@ const updateQuickStats = async (request, reply) => {
                 statType: stat.statType,
                 isActive: stat.isActive,
                 displayOrder: stat.displayOrder ?? index,
-            }))
+            })),
         );
 
         return reply.send({ success: true, data: quickStats });
@@ -178,7 +188,7 @@ const updateWidgets = async (request, reply) => {
                 isActive: widget.isActive,
                 displayOrder: widget.displayOrder ?? index,
                 columnPosition: widget.columnPosition ?? 0,
-            }))
+            })),
         );
 
         return reply.send({ success: true, data: createdWidgets });
@@ -231,7 +241,7 @@ const updateAlertSettings = async (request, reply) => {
                 alertType: setting.alertType,
                 isActive: setting.isActive,
                 daysBefore: setting.daysBefore ?? 3,
-            }))
+            })),
         );
 
         return reply.send({ success: true, data: alertSettings });
@@ -301,31 +311,99 @@ const getQuickStatsData = async (request, reply) => {
         const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59);
 
         // Gather stat types needed to avoid unnecessary queries
-        const neededTypes = new Set(quickStats.map(s => s.statType));
+        const neededTypes = new Set(quickStats.map((s) => s.statType));
 
         // Parallel data fetching for needed modules
         const [
-            habits, habitLogs, tasks, transactions, budgets,
-            workTasks, lastSleep, todayMeals, todayStudySessions,
-            homeSpaces, socialBattery,
+            habits,
+            habitLogs,
+            tasks,
+            transactions,
+            budgets,
+            workTasks,
+            lastSleep,
+            todayMeals,
+            todayStudySessions,
+            homeSpaces,
+            socialBattery,
         ] = await Promise.all([
-            neededTypes.has('HABITS') ? Habit.findAll({ where: { user_id: userId, status: 'active' } }) : [],
-            neededTypes.has('HABITS') ? HabitLog.findAll({ where: { execution_date: todayStr }, include: [{ model: Habit, as: 'habit', where: { user_id: userId }, attributes: ['id'] }] }) : [],
-            neededTypes.has('TASKS') ? Task.findAll({ where: { user_id: userId, status: { [Op.ne]: 'DONE' } } }) : [],
-            neededTypes.has('BALANCE') ? Transaction.findAll({ where: { user_id: userId, transaction_date: { [Op.between]: [startOfMonth, endOfMonth] } } }) : [],
-            neededTypes.has('BALANCE') ? Budget.findAll({ where: { user_id: userId, is_active: true } }) : [],
-            neededTypes.has('WORK') ? WorkTask.findAll({ where: { user_id: userId, completed_at: null } }) : [],
-            neededTypes.has('RECOVERY') ? SleepMetric.findOne({ where: { user_id: userId }, order: [['sleep_date', 'DESC']] }) : null,
-            neededTypes.has('CALORIES') ? MealLog.findAll({ where: { user_id: userId, meal_date: { [Op.between]: [new Date(todayStr), new Date(todayStr + 'T23:59:59')] } } }) : [],
-            neededTypes.has('STUDY_TIME') ? StudyFocusSession.findAll({ where: { user_id: userId, started_at: { [Op.gte]: new Date(todayStr) }, status: { [Op.in]: ['COMPLETED', 'IN_PROGRESS'] } } }) : [],
-            neededTypes.has('HOME_TASKS') ? HomeSpace.findAll({ where: { user_id: userId, is_active: true }, attributes: ['id'] }) : [],
-            neededTypes.has('SOCIAL_BATTERY') ? SocialBatteryLog.findOne({ where: { user_id: userId }, order: [['date', 'DESC']] }) : null,
+            neededTypes.has('HABITS')
+                ? Habit.findAll({ where: { user_id: userId, status: 'active' } })
+                : [],
+            neededTypes.has('HABITS')
+                ? HabitLog.findAll({
+                      where: { execution_date: todayStr },
+                      include: [
+                          {
+                              model: Habit,
+                              as: 'habit',
+                              where: { user_id: userId },
+                              attributes: ['id'],
+                          },
+                      ],
+                  })
+                : [],
+            neededTypes.has('TASKS')
+                ? Task.findAll({ where: { user_id: userId, status: { [Op.ne]: 'DONE' } } })
+                : [],
+            neededTypes.has('BALANCE')
+                ? Transaction.findAll({
+                      where: {
+                          user_id: userId,
+                          transaction_date: { [Op.between]: [startOfMonth, endOfMonth] },
+                      },
+                  })
+                : [],
+            neededTypes.has('BALANCE')
+                ? Budget.findAll({ where: { user_id: userId, is_active: true } })
+                : [],
+            neededTypes.has('WORK')
+                ? WorkTask.findAll({ where: { user_id: userId, completed_at: null } })
+                : [],
+            neededTypes.has('RECOVERY')
+                ? SleepMetric.findOne({
+                      where: { user_id: userId },
+                      order: [['sleep_date', 'DESC']],
+                  })
+                : null,
+            neededTypes.has('CALORIES')
+                ? MealLog.findAll({
+                      where: {
+                          user_id: userId,
+                          meal_date: {
+                              [Op.between]: [new Date(todayStr), new Date(todayStr + 'T23:59:59')],
+                          },
+                      },
+                  })
+                : [],
+            neededTypes.has('STUDY_TIME')
+                ? StudyFocusSession.findAll({
+                      where: {
+                          user_id: userId,
+                          started_at: { [Op.gte]: new Date(todayStr) },
+                          status: { [Op.in]: ['COMPLETED', 'IN_PROGRESS'] },
+                      },
+                  })
+                : [],
+            neededTypes.has('HOME_TASKS')
+                ? HomeSpace.findAll({
+                      where: { user_id: userId, is_active: true },
+                      attributes: ['id'],
+                  })
+                : [],
+            neededTypes.has('SOCIAL_BATTERY')
+                ? SocialBatteryLog.findOne({
+                      where: { user_id: userId },
+                      order: [['date', 'DESC']],
+                  })
+                : null,
         ]);
 
         // Pre-compute stats
-        let habitsTotal = 0, habitsDone = 0;
+        let habitsTotal = 0,
+            habitsDone = 0;
         if (neededTypes.has('HABITS')) {
-            const todayHabits = habits.filter(h => {
+            const todayHabits = habits.filter((h) => {
                 if (h.frequency === 'DAILY') return true;
                 if (h.frequency === 'WEEKLY' || h.frequency === 'CUSTOM') {
                     const days = h.frequency_days || [];
@@ -334,56 +412,80 @@ const getQuickStatsData = async (request, reply) => {
                 return false;
             });
             habitsTotal = todayHabits.length;
-            habitsDone = habitLogs.filter(l => l.status === 'DONE').length;
+            habitsDone = habitLogs.filter((l) => l.status === 'DONE').length;
         }
 
-        let pendingTasks = 0, overdueTasks = 0;
+        let pendingTasks = 0,
+            overdueTasks = 0;
         if (neededTypes.has('TASKS')) {
             pendingTasks = tasks.length;
-            overdueTasks = tasks.filter(t => t.scheduled_date && t.scheduled_date < todayStr).length;
+            overdueTasks = tasks.filter(
+                (t) => t.scheduled_date && t.scheduled_date < todayStr,
+            ).length;
         }
 
-        let totalIncome = 0, totalExpenses = 0;
+        let totalIncome = 0,
+            totalExpenses = 0;
         if (neededTypes.has('BALANCE')) {
-            totalIncome = transactions.filter(t => t.type === 'INCOME').reduce((sum, t) => sum + parseFloat(t.amount), 0);
-            totalExpenses = transactions.filter(t => t.type === 'EXPENSE').reduce((sum, t) => sum + parseFloat(t.amount), 0);
+            totalIncome = transactions
+                .filter((t) => t.type === 'INCOME')
+                .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+            totalExpenses = transactions
+                .filter((t) => t.type === 'EXPENSE')
+                .reduce((sum, t) => sum + parseFloat(t.amount), 0);
         }
 
         // Work stats
-        let pendingWorkTasks = 0, urgentWorkTasks = 0;
+        let pendingWorkTasks = 0,
+            urgentWorkTasks = 0;
         if (neededTypes.has('WORK')) {
             pendingWorkTasks = workTasks.length;
-            urgentWorkTasks = workTasks.filter(t => t.is_urgent).length;
+            urgentWorkTasks = workTasks.filter((t) => t.is_urgent).length;
         }
 
         // Calories stats
-        let totalCalories = 0, mealCount = 0;
+        let totalCalories = 0,
+            mealCount = 0;
         if (neededTypes.has('CALORIES')) {
             totalCalories = todayMeals.reduce((sum, m) => sum + (parseInt(m.calories) || 0), 0);
             mealCount = todayMeals.length;
         }
 
         // Study time stats
-        let totalStudyMinutes = 0, studySessionCount = 0;
+        let totalStudyMinutes = 0,
+            studySessionCount = 0;
         if (neededTypes.has('STUDY_TIME')) {
-            totalStudyMinutes = todayStudySessions.reduce((sum, s) => sum + (s.total_focus_minutes || 0), 0);
+            totalStudyMinutes = todayStudySessions.reduce(
+                (sum, s) => sum + (s.total_focus_minutes || 0),
+                0,
+            );
             studySessionCount = todayStudySessions.length;
         }
 
         // Home tasks stats
-        let pendingHomeTasks = 0, overdueHomeTasks = 0;
+        let pendingHomeTasks = 0,
+            overdueHomeTasks = 0;
         if (neededTypes.has('HOME_TASKS') && homeSpaces.length > 0) {
-            const spaceIds = homeSpaces.map(s => s.id);
-            const homeTasks = await HomeTask.findAll({ where: { space_id: { [Op.in]: spaceIds }, is_active: true }, attributes: ['id'] });
+            const spaceIds = homeSpaces.map((s) => s.id);
+            const homeTasks = await HomeTask.findAll({
+                where: { space_id: { [Op.in]: spaceIds }, is_active: true },
+                attributes: ['id'],
+            });
             if (homeTasks.length > 0) {
-                const taskIds = homeTasks.map(t => t.id);
-                const pendingOccurrences = await HomeTaskOccurrence.findAll({ where: { task_id: { [Op.in]: taskIds }, status: 'PENDING', due_date: { [Op.lte]: todayStr } } });
+                const taskIds = homeTasks.map((t) => t.id);
+                const pendingOccurrences = await HomeTaskOccurrence.findAll({
+                    where: {
+                        task_id: { [Op.in]: taskIds },
+                        status: 'PENDING',
+                        due_date: { [Op.lte]: todayStr },
+                    },
+                });
                 pendingHomeTasks = pendingOccurrences.length;
-                overdueHomeTasks = pendingOccurrences.filter(o => o.due_date < todayStr).length;
+                overdueHomeTasks = pendingOccurrences.filter((o) => o.due_date < todayStr).length;
             }
         }
 
-        const statsData = quickStats.map(stat => {
+        const statsData = quickStats.map((stat) => {
             const base = {
                 type: stat.statType,
                 label: getStatLabel(stat.statType),
@@ -398,18 +500,29 @@ const getQuickStatsData = async (request, reply) => {
                     const pct = habitsTotal > 0 ? Math.round((habitsDone / habitsTotal) * 100) : 0;
                     base.value = `${habitsDone}/${habitsTotal}`;
                     base.subtext = habitsTotal > 0 ? `${pct}% concluído` : 'Nenhum hábito hoje';
-                    base.status = habitsTotal === 0 ? 'neutral' : pct >= 80 ? 'good' : pct >= 50 ? 'warning' : 'bad';
+                    base.status =
+                        habitsTotal === 0
+                            ? 'neutral'
+                            : pct >= 80
+                              ? 'good'
+                              : pct >= 50
+                                ? 'warning'
+                                : 'bad';
                     break;
                 }
                 case 'TASKS': {
                     base.value = pendingTasks.toString();
-                    base.subtext = overdueTasks > 0 ? `${overdueTasks} atrasada${overdueTasks > 1 ? 's' : ''}` : 'Nenhuma atrasada';
+                    base.subtext =
+                        overdueTasks > 0
+                            ? `${overdueTasks} atrasada${overdueTasks > 1 ? 's' : ''}`
+                            : 'Nenhuma atrasada';
                     base.status = overdueTasks > 0 ? 'bad' : pendingTasks > 0 ? 'warning' : 'good';
                     break;
                 }
                 case 'BALANCE': {
                     const balance = totalIncome - totalExpenses;
-                    const fmt = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    const fmt = (v) =>
+                        v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                     base.value = fmt(balance);
                     base.subtext = `Receitas: ${fmt(totalIncome)}`;
                     base.status = balance > 0 ? 'good' : balance === 0 ? 'neutral' : 'bad';
@@ -417,19 +530,37 @@ const getQuickStatsData = async (request, reply) => {
                 }
                 case 'WORK': {
                     base.value = pendingWorkTasks.toString();
-                    base.subtext = urgentWorkTasks > 0 ? `${urgentWorkTasks} urgente${urgentWorkTasks > 1 ? 's' : ''}` : 'Nenhuma urgente';
-                    base.status = urgentWorkTasks > 0 ? 'bad' : pendingWorkTasks > 5 ? 'warning' : 'good';
+                    base.subtext =
+                        urgentWorkTasks > 0
+                            ? `${urgentWorkTasks} urgente${urgentWorkTasks > 1 ? 's' : ''}`
+                            : 'Nenhuma urgente';
+                    base.status =
+                        urgentWorkTasks > 0 ? 'bad' : pendingWorkTasks > 5 ? 'warning' : 'good';
                     break;
                 }
                 case 'RECOVERY': {
                     if (lastSleep && lastSleep.duration_minutes) {
                         const hours = Math.floor(lastSleep.duration_minutes / 60);
                         const mins = lastSleep.duration_minutes % 60;
-                        base.value = mins > 0 ? `${hours}h${mins.toString().padStart(2, '0')}` : `${hours}h`;
+                        base.value =
+                            mins > 0 ? `${hours}h${mins.toString().padStart(2, '0')}` : `${hours}h`;
                         const quality = lastSleep.quality_rating;
-                        const qualityLabels = { 1: 'Péssima', 2: 'Ruim', 3: 'Regular', 4: 'Boa', 5: 'Ótima' };
-                        base.subtext = quality ? `Qualidade: ${qualityLabels[quality] || quality}` : lastSleep.sleep_date;
-                        base.status = lastSleep.duration_minutes >= 420 ? 'good' : lastSleep.duration_minutes >= 300 ? 'warning' : 'bad';
+                        const qualityLabels = {
+                            1: 'Péssima',
+                            2: 'Ruim',
+                            3: 'Regular',
+                            4: 'Boa',
+                            5: 'Ótima',
+                        };
+                        base.subtext = quality
+                            ? `Qualidade: ${qualityLabels[quality] || quality}`
+                            : lastSleep.sleep_date;
+                        base.status =
+                            lastSleep.duration_minutes >= 420
+                                ? 'good'
+                                : lastSleep.duration_minutes >= 300
+                                  ? 'warning'
+                                  : 'bad';
                     } else {
                         base.value = '—';
                         base.subtext = 'Nenhum registro de sono';
@@ -453,7 +584,12 @@ const getQuickStatsData = async (request, reply) => {
                     if (totalStudyMinutes > 0) {
                         const h = Math.floor(totalStudyMinutes / 60);
                         const m = totalStudyMinutes % 60;
-                        base.value = h > 0 ? (m > 0 ? `${h}h${m.toString().padStart(2, '0')}` : `${h}h`) : `${m}min`;
+                        base.value =
+                            h > 0
+                                ? m > 0
+                                    ? `${h}h${m.toString().padStart(2, '0')}`
+                                    : `${h}h`
+                                : `${m}min`;
                         base.subtext = `${studySessionCount} sessão${studySessionCount > 1 ? 'ões' : ''} hoje`;
                         base.status = totalStudyMinutes >= 60 ? 'good' : 'warning';
                     } else {
@@ -465,15 +601,24 @@ const getQuickStatsData = async (request, reply) => {
                 }
                 case 'HOME_TASKS': {
                     base.value = pendingHomeTasks.toString();
-                    base.subtext = overdueHomeTasks > 0 ? `${overdueHomeTasks} atrasada${overdueHomeTasks > 1 ? 's' : ''}` : 'Nenhuma atrasada';
-                    base.status = overdueHomeTasks > 0 ? 'bad' : pendingHomeTasks > 0 ? 'warning' : 'good';
+                    base.subtext =
+                        overdueHomeTasks > 0
+                            ? `${overdueHomeTasks} atrasada${overdueHomeTasks > 1 ? 's' : ''}`
+                            : 'Nenhuma atrasada';
+                    base.status =
+                        overdueHomeTasks > 0 ? 'bad' : pendingHomeTasks > 0 ? 'warning' : 'good';
                     break;
                 }
                 case 'SOCIAL_BATTERY': {
                     if (socialBattery) {
                         const level = socialBattery.battery_level;
                         base.value = `${level}%`;
-                        base.subtext = level >= 70 ? 'Energia social alta' : level >= 40 ? 'Energia moderada' : 'Energia baixa';
+                        base.subtext =
+                            level >= 70
+                                ? 'Energia social alta'
+                                : level >= 40
+                                  ? 'Energia moderada'
+                                  : 'Energia baixa';
                         base.status = level >= 70 ? 'good' : level >= 40 ? 'warning' : 'bad';
                     } else {
                         base.value = '—';
@@ -511,23 +656,42 @@ const getDashboardOverview = async (request, reply) => {
         ]);
 
         // Create defaults if needed (ignoreDuplicates handles race conditions with parallel requests)
-        const finalSettings = settings || await DashboardSettings.findOrCreate({ where: { userId }, defaults: { userId } }).then(([s]) => s);
+        const finalSettings =
+            settings ||
+            (await DashboardSettings.findOrCreate({ where: { userId }, defaults: { userId } }).then(
+                ([s]) => s,
+            ));
 
         let finalQuickStats = quickStats;
         if (quickStats.length === 0) {
-            await DashboardQuickStat.bulkCreate(DEFAULT_QUICK_STATS.map((s) => ({ userId, ...s })), { ignoreDuplicates: true });
-            finalQuickStats = await DashboardQuickStat.findAll({ where: { userId }, order: [['displayOrder', 'ASC']] });
+            await DashboardQuickStat.bulkCreate(
+                DEFAULT_QUICK_STATS.map((s) => ({ userId, ...s })),
+                { ignoreDuplicates: true },
+            );
+            finalQuickStats = await DashboardQuickStat.findAll({
+                where: { userId },
+                order: [['displayOrder', 'ASC']],
+            });
         }
 
         let finalWidgets = widgets;
         if (widgets.length === 0) {
-            await DashboardWidget.bulkCreate(DEFAULT_WIDGETS.map((w) => ({ userId, ...w })), { ignoreDuplicates: true });
-            finalWidgets = await DashboardWidget.findAll({ where: { userId }, order: [['displayOrder', 'ASC']] });
+            await DashboardWidget.bulkCreate(
+                DEFAULT_WIDGETS.map((w) => ({ userId, ...w })),
+                { ignoreDuplicates: true },
+            );
+            finalWidgets = await DashboardWidget.findAll({
+                where: { userId },
+                order: [['displayOrder', 'ASC']],
+            });
         }
 
         let finalAlertSettings = alertSettings;
         if (alertSettings.length === 0) {
-            await DashboardAlertSetting.bulkCreate(DEFAULT_ALERT_SETTINGS.map((a) => ({ userId, ...a })), { ignoreDuplicates: true });
+            await DashboardAlertSetting.bulkCreate(
+                DEFAULT_ALERT_SETTINGS.map((a) => ({ userId, ...a })),
+                { ignoreDuplicates: true },
+            );
             finalAlertSettings = await DashboardAlertSetting.findAll({ where: { userId } });
         }
 

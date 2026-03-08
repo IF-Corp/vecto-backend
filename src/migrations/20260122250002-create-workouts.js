@@ -8,50 +8,50 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             name: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: false,
             },
             workout_type: {
                 type: Sequelize.ENUM('STRENGTH', 'CARDIO', 'FLEXIBILITY', 'SPORTS', 'OTHER'),
-                allowNull: false
+                allowNull: false,
             },
             duration_minutes: {
                 type: Sequelize.INTEGER,
-                allowNull: true
+                allowNull: true,
             },
             calories_burned: {
                 type: Sequelize.INTEGER,
-                allowNull: true
+                allowNull: true,
             },
             workout_date: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             notes: {
                 type: Sequelize.TEXT,
-                allowNull: true
+                allowNull: true,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('workouts', ['user_id']);
@@ -60,5 +60,5 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('workouts');
-    }
+    },
 };

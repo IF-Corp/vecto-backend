@@ -1,79 +1,83 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/sequelize');
 
-const WorkMode = sequelize.define('WorkMode', {
-    id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
+const WorkMode = sequelize.define(
+    'WorkMode',
+    {
+        id: {
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
+            primaryKey: true,
+        },
+        userId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            field: 'user_id',
+        },
+        name: {
+            type: DataTypes.STRING(100),
+            allowNull: false,
+        },
+        icon: {
+            type: DataTypes.STRING(50),
+            allowNull: false,
+            defaultValue: '🎯',
+        },
+        description: {
+            type: DataTypes.STRING(255),
+            allowNull: true,
+        },
+        suggestedDuration: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 50,
+            field: 'suggested_duration',
+        },
+        minDuration: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            field: 'min_duration',
+        },
+        maxDuration: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            field: 'max_duration',
+        },
+        notificationLevel: {
+            type: DataTypes.ENUM('silent', 'minimal', 'normal'),
+            allowNull: false,
+            defaultValue: 'minimal',
+            field: 'notification_level',
+        },
+        breakDuration: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 10,
+            field: 'break_duration',
+        },
+        isDefault: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
+            field: 'is_default',
+        },
+        isSystem: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
+            field: 'is_system',
+        },
+        color: {
+            type: DataTypes.STRING(20),
+            allowNull: true,
+        },
     },
-    userId: {
-        type: DataTypes.UUID,
-        allowNull: false,
-        field: 'user_id',
+    {
+        tableName: 'work_modes',
+        underscored: true,
+        timestamps: true,
     },
-    name: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-    },
-    icon: {
-        type: DataTypes.STRING(50),
-        allowNull: false,
-        defaultValue: '🎯',
-    },
-    description: {
-        type: DataTypes.STRING(255),
-        allowNull: true,
-    },
-    suggestedDuration: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 50,
-        field: 'suggested_duration',
-    },
-    minDuration: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        field: 'min_duration',
-    },
-    maxDuration: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        field: 'max_duration',
-    },
-    notificationLevel: {
-        type: DataTypes.ENUM('silent', 'minimal', 'normal'),
-        allowNull: false,
-        defaultValue: 'minimal',
-        field: 'notification_level',
-    },
-    breakDuration: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 10,
-        field: 'break_duration',
-    },
-    isDefault: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-        field: 'is_default',
-    },
-    isSystem: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-        field: 'is_system',
-    },
-    color: {
-        type: DataTypes.STRING(20),
-        allowNull: true,
-    },
-}, {
-    tableName: 'work_modes',
-    underscored: true,
-    timestamps: true,
-});
+);
 
 WorkMode.associate = (models) => {
     WorkMode.belongsTo(models.User, {

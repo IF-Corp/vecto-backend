@@ -32,7 +32,7 @@ const HomeBill = sequelize.define(
                 'PHONE',
                 'STREAMING',
                 'INSURANCE',
-                'OTHER'
+                'OTHER',
             ),
             allowNull: false,
             defaultValue: 'OTHER',
@@ -64,7 +64,7 @@ const HomeBill = sequelize.define(
         tableName: 'home_bills',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = HomeBill;

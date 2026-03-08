@@ -11,8 +11,8 @@ async function authPlugin(fastify, opts) {
     await fastify.register(jwt, {
         secret: jwtSecret,
         sign: {
-            expiresIn: '15m'
-        }
+            expiresIn: '15m',
+        },
     });
 
     // Decorator: authenticate - verifies JWT token
@@ -23,9 +23,10 @@ async function authPlugin(fastify, opts) {
             reply.status(401).send({
                 success: false,
                 error: 'Unauthorized',
-                message: err.message === 'Authorization token expired'
-                    ? 'Token expired'
-                    : 'Invalid or missing token'
+                message:
+                    err.message === 'Authorization token expired'
+                        ? 'Token expired'
+                        : 'Invalid or missing token',
             });
         }
     });
@@ -40,16 +41,17 @@ async function authPlugin(fastify, opts) {
                 return reply.status(403).send({
                     success: false,
                     error: 'Forbidden',
-                    message: 'You do not have access to this resource'
+                    message: 'You do not have access to this resource',
                 });
             }
         } catch (err) {
             reply.status(401).send({
                 success: false,
                 error: 'Unauthorized',
-                message: err.message === 'Authorization token expired'
-                    ? 'Token expired'
-                    : 'Invalid or missing token'
+                message:
+                    err.message === 'Authorization token expired'
+                        ? 'Token expired'
+                        : 'Invalid or missing token',
             });
         }
     });
@@ -69,5 +71,5 @@ async function authPlugin(fastify, opts) {
 }
 
 module.exports = fp(authPlugin, {
-    name: 'auth-plugin'
+    name: 'auth-plugin',
 });

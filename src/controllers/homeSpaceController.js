@@ -57,8 +57,8 @@ const createSpace = async (request, reply) => {
                     space_id: space.id,
                     module_type: moduleType,
                     is_enabled: true,
-                })
-            )
+                }),
+            ),
         );
 
         const spaceWithModules = await HomeSpace.findByPk(space.id, {
@@ -124,8 +124,8 @@ const updateSpaceModules = async (request, reply) => {
                     module_type: mod.module_type,
                     is_enabled: mod.is_enabled !== false,
                     settings: mod.settings || null,
-                })
-            )
+                }),
+            ),
         );
 
         const space = await HomeSpace.findByPk(id, {

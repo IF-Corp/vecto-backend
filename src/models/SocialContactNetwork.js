@@ -14,7 +14,16 @@ const SocialContactNetwork = sequelize.define(
             allowNull: false,
         },
         network_type: {
-            type: DataTypes.ENUM('INSTAGRAM', 'LINKEDIN', 'FACEBOOK', 'TWITTER', 'TIKTOK', 'WHATSAPP', 'TELEGRAM', 'OTHER'),
+            type: DataTypes.ENUM(
+                'INSTAGRAM',
+                'LINKEDIN',
+                'FACEBOOK',
+                'TWITTER',
+                'TIKTOK',
+                'WHATSAPP',
+                'TELEGRAM',
+                'OTHER',
+            ),
             allowNull: false,
         },
         username: {
@@ -32,7 +41,7 @@ const SocialContactNetwork = sequelize.define(
         createdAt: 'created_at',
         updatedAt: false,
         underscored: true,
-    }
+    },
 );
 
 module.exports = SocialContactNetwork;

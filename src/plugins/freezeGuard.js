@@ -3,50 +3,50 @@ const fp = require('fastify-plugin');
 // Map first URL segment (after /api/ or /api/users/:uuid/) to freeze module type
 const SEGMENT_TO_MODULE = {
     // HABITS
-    'habits': 'HABITS',
+    habits: 'HABITS',
 
     // TASKS (productivity)
-    'projects': 'TASKS',
+    projects: 'TASKS',
 
     // FINANCE
-    'accounts': 'FINANCE',
-    'cards': 'FINANCE',
-    'transactions': 'FINANCE',
-    'invoices': 'FINANCE',
-    'categories': 'FINANCE',
+    accounts: 'FINANCE',
+    cards: 'FINANCE',
+    transactions: 'FINANCE',
+    invoices: 'FINANCE',
+    categories: 'FINANCE',
     'recurring-expenses': 'FINANCE',
-    'budgets': 'FINANCE',
-    'goals': 'FINANCE',
-    'investments': 'FINANCE',
+    budgets: 'FINANCE',
+    goals: 'FINANCE',
+    investments: 'FINANCE',
     'finance-profile': 'FINANCE',
 
     // HEALTH
     'health-profile': 'HEALTH',
-    'weight': 'HEALTH',
-    'meals': 'HEALTH',
-    'workouts': 'HEALTH',
+    weight: 'HEALTH',
+    meals: 'HEALTH',
+    workouts: 'HEALTH',
     'workout-details': 'HEALTH',
-    'medications': 'HEALTH',
+    medications: 'HEALTH',
     'medication-logs': 'HEALTH',
-    'sleep': 'HEALTH',
-    'diets': 'HEALTH',
+    sleep: 'HEALTH',
+    diets: 'HEALTH',
 
     // STUDIES
-    'study': 'STUDIES',
+    study: 'STUDIES',
 
     // WORK
-    'work': 'WORK',
+    work: 'WORK',
     'work-modes': 'WORK',
     'daily-standup': 'WORK',
     'weekly-plan': 'WORK',
     'end-of-day': 'WORK',
 
     // SOCIAL
-    'social': 'SOCIAL',
+    social: 'SOCIAL',
 
     // HOME
-    'spaces': 'HOME',
-    'shopping': 'HOME',
+    spaces: 'HOME',
+    shopping: 'HOME',
 };
 
 const WRITE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
@@ -84,22 +84,22 @@ async function getActiveFrozenModules(userId, FreezePeriod, FreezeModule) {
     const activePeriod = await FreezePeriod.findOne({
         where: {
             user_id: userId,
-            status: 'ACTIVE'
+            status: 'ACTIVE',
         },
-        include: [{
-            model: FreezeModule,
-            as: 'modules',
-            attributes: ['module_type']
-        }]
+        include: [
+            {
+                model: FreezeModule,
+                as: 'modules',
+                attributes: ['module_type'],
+            },
+        ],
     });
 
-    const frozenModules = activePeriod
-        ? activePeriod.modules.map(m => m.module_type)
-        : [];
+    const frozenModules = activePeriod ? activePeriod.modules.map((m) => m.module_type) : [];
 
     freezeCache.set(cacheKey, {
         modules: frozenModules,
-        timestamp: Date.now()
+        timestamp: Date.now(),
     });
 
     return frozenModules;
@@ -144,7 +144,7 @@ async function freezeGuardPlugin(fastify, opts) {
                 success: false,
                 error: 'ModuleFrozen',
                 message: 'Este módulo está pausado no Modo Congelar',
-                module: moduleType
+                module: moduleType,
             });
         }
     });
@@ -152,5 +152,5 @@ async function freezeGuardPlugin(fastify, opts) {
 
 module.exports = fp(freezeGuardPlugin, {
     name: 'freeze-guard-plugin',
-    dependencies: ['auth-plugin']
+    dependencies: ['auth-plugin'],
 });

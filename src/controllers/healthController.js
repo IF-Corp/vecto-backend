@@ -1,4 +1,16 @@
-const { MealLog, Workout, WorkoutDetail, WorkoutSchedule, Medication, MedicationLog, SleepMetric, HealthProfile, WeightLog, Diet, DietMeal } = require('../models');
+const {
+    MealLog,
+    Workout,
+    WorkoutDetail,
+    WorkoutSchedule,
+    Medication,
+    MedicationLog,
+    SleepMetric,
+    HealthProfile,
+    WeightLog,
+    Diet,
+    DietMeal,
+} = require('../models');
 
 // ==================== HEALTH PROFILE ====================
 
@@ -6,7 +18,7 @@ const getHealthProfile = async (request, reply) => {
     try {
         const { userId } = request.params;
         let profile = await HealthProfile.findOne({
-            where: { user_id: userId }
+            where: { user_id: userId },
         });
 
         // Auto-create profile if doesn't exist
@@ -37,14 +49,14 @@ const updateHealthProfile = async (request, reply) => {
         }
 
         let profile = await HealthProfile.findOne({
-            where: { user_id: userId }
+            where: { user_id: userId },
         });
 
         if (!profile) {
             // Create if doesn't exist
             profile = await HealthProfile.create({
                 ...cleanData,
-                user_id: userId
+                user_id: userId,
             });
             reply.status(201);
             return { success: true, data: profile, created: true };
@@ -61,7 +73,7 @@ const updateHealthProfile = async (request, reply) => {
             return {
                 success: false,
                 error: 'Validation error',
-                details: error.errors?.map(e => ({ field: e.path, message: e.message }))
+                details: error.errors?.map((e) => ({ field: e.path, message: e.message })),
             };
         }
 
@@ -82,7 +94,7 @@ const getWeightLogs = async (request, reply) => {
         const { userId } = request.params;
         const logs = await WeightLog.findAll({
             where: { user_id: userId },
-            order: [['date', 'DESC']]
+            order: [['date', 'DESC']],
         });
         return { success: true, data: logs };
     } catch (error) {
@@ -96,7 +108,7 @@ const createWeightLog = async (request, reply) => {
         const { userId } = request.params;
         const log = await WeightLog.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: log, created: true };
@@ -115,7 +127,7 @@ const updateWeightLog = async (request, reply) => {
     try {
         const { id } = request.params;
         const [updated] = await WeightLog.update(request.body, {
-            where: { id }
+            where: { id },
         });
         if (!updated) {
             reply.status(404);
@@ -149,7 +161,7 @@ const getLatestWeight = async (request, reply) => {
         const { userId } = request.params;
         const log = await WeightLog.findOne({
             where: { user_id: userId },
-            order: [['date', 'DESC']]
+            order: [['date', 'DESC']],
         });
         return { success: true, data: log };
     } catch (error) {
@@ -165,7 +177,7 @@ const getMealLogs = async (request, reply) => {
         const { userId } = request.params;
         const meals = await MealLog.findAll({
             where: { user_id: userId },
-            order: [['meal_date', 'DESC']]
+            order: [['meal_date', 'DESC']],
         });
         return { success: true, data: meals };
     } catch (error) {
@@ -179,7 +191,7 @@ const createMealLog = async (request, reply) => {
         const { userId } = request.params;
         const meal = await MealLog.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: meal, created: true };
@@ -193,7 +205,7 @@ const updateMealLog = async (request, reply) => {
     try {
         const { id } = request.params;
         const [updated] = await MealLog.update(request.body, {
-            where: { id }
+            where: { id },
         });
         if (!updated) {
             reply.status(404);
@@ -230,7 +242,7 @@ const getWorkouts = async (request, reply) => {
         const workouts = await Workout.findAll({
             where: { user_id: userId },
             include: [{ association: 'details' }],
-            order: [['workout_date', 'DESC']]
+            order: [['workout_date', 'DESC']],
         });
         return { success: true, data: workouts };
     } catch (error) {
@@ -263,14 +275,14 @@ const updateWorkout = async (request, reply) => {
         const updateData = { ...rest };
         if (workout_type !== undefined) updateData.type = workout_type;
         const [updated] = await Workout.update(updateData, {
-            where: { id }
+            where: { id },
         });
         if (!updated) {
             reply.status(404);
             return { success: false, error: 'Workout not found' };
         }
         const workout = await Workout.findByPk(id, {
-            include: [{ association: 'details' }]
+            include: [{ association: 'details' }],
         });
         return { success: true, data: workout };
     } catch (error) {
@@ -301,7 +313,7 @@ const addWorkoutDetail = async (request, reply) => {
         const { workoutId } = request.params;
         const detail = await WorkoutDetail.create({
             ...request.body,
-            workout_id: workoutId
+            workout_id: workoutId,
         });
         reply.status(201);
         return { success: true, data: detail, created: true };
@@ -315,7 +327,7 @@ const updateWorkoutDetail = async (request, reply) => {
     try {
         const { id } = request.params;
         const [updated] = await WorkoutDetail.update(request.body, {
-            where: { id }
+            where: { id },
         });
         if (!updated) {
             reply.status(404);
@@ -351,7 +363,10 @@ const getWorkoutSchedules = async (request, reply) => {
         const { userId } = request.params;
         const schedules = await WorkoutSchedule.findAll({
             where: { user_id: userId },
-            order: [['day_of_week', 'ASC'], ['scheduled_time', 'ASC']]
+            order: [
+                ['day_of_week', 'ASC'],
+                ['scheduled_time', 'ASC'],
+            ],
         });
         return { success: true, data: schedules };
     } catch (error) {
@@ -365,7 +380,7 @@ const createWorkoutSchedule = async (request, reply) => {
         const { userId } = request.params;
         const schedule = await WorkoutSchedule.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: schedule, created: true };
@@ -379,7 +394,7 @@ const updateWorkoutSchedule = async (request, reply) => {
     try {
         const { id } = request.params;
         const [updated] = await WorkoutSchedule.update(request.body, {
-            where: { id }
+            where: { id },
         });
         if (!updated) {
             reply.status(404);
@@ -416,7 +431,7 @@ const getMedications = async (request, reply) => {
         const medications = await Medication.findAll({
             where: { user_id: userId },
             include: [{ association: 'logs' }],
-            order: [['created_at', 'DESC']]
+            order: [['created_at', 'DESC']],
         });
         return { success: true, data: medications };
     } catch (error) {
@@ -430,7 +445,7 @@ const createMedication = async (request, reply) => {
         const { userId } = request.params;
         const medication = await Medication.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: medication, created: true };
@@ -444,7 +459,7 @@ const updateMedication = async (request, reply) => {
     try {
         const { id } = request.params;
         const [updated] = await Medication.update(request.body, {
-            where: { id }
+            where: { id },
         });
         if (!updated) {
             reply.status(404);
@@ -555,7 +570,7 @@ const getSleepMetrics = async (request, reply) => {
         const { userId } = request.params;
         const metrics = await SleepMetric.findAll({
             where: { user_id: userId },
-            order: [['sleep_date', 'DESC']]
+            order: [['sleep_date', 'DESC']],
         });
         return { success: true, data: metrics.map(transformSleepMetric) };
     } catch (error) {
@@ -570,7 +585,7 @@ const createSleepMetric = async (request, reply) => {
         const data = prepareSleepData(request.body);
         const metric = await SleepMetric.create({
             ...data,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: transformSleepMetric(metric), created: true };
@@ -585,7 +600,7 @@ const updateSleepMetric = async (request, reply) => {
         const { id } = request.params;
         const data = prepareSleepData(request.body);
         const [updated] = await SleepMetric.update(data, {
-            where: { id }
+            where: { id },
         });
         if (!updated) {
             reply.status(404);
@@ -622,7 +637,10 @@ const getDiets = async (request, reply) => {
         const diets = await Diet.findAll({
             where: { user_id: userId },
             include: [{ model: DietMeal, as: 'meals' }],
-            order: [['created_at', 'DESC'], [{ model: DietMeal, as: 'meals' }, 'meal_order', 'ASC']]
+            order: [
+                ['created_at', 'DESC'],
+                [{ model: DietMeal, as: 'meals' }, 'meal_order', 'ASC'],
+            ],
         });
         return { success: true, data: diets };
     } catch (error) {
@@ -637,7 +655,10 @@ const getActiveDiet = async (request, reply) => {
         const diet = await Diet.findOne({
             where: { user_id: userId, is_active: true },
             include: [{ model: DietMeal, as: 'meals' }],
-            order: [['created_at', 'DESC'], [{ model: DietMeal, as: 'meals' }, 'meal_order', 'ASC']]
+            order: [
+                ['created_at', 'DESC'],
+                [{ model: DietMeal, as: 'meals' }, 'meal_order', 'ASC'],
+            ],
         });
         return { success: true, data: diet };
     } catch (error) {
@@ -654,13 +675,13 @@ const createDiet = async (request, reply) => {
         if (request.body.is_active !== false) {
             await Diet.update(
                 { is_active: false },
-                { where: { user_id: userId, is_active: true } }
+                { where: { user_id: userId, is_active: true } },
             );
         }
 
         const diet = await Diet.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: diet, created: true };
@@ -685,7 +706,13 @@ const updateDiet = async (request, reply) => {
         if (request.body.is_active === true) {
             await Diet.update(
                 { is_active: false },
-                { where: { user_id: existingDiet.user_id, is_active: true, id: { [require('sequelize').Op.ne]: id } } }
+                {
+                    where: {
+                        user_id: existingDiet.user_id,
+                        is_active: true,
+                        id: { [require('sequelize').Op.ne]: id },
+                    },
+                },
             );
         }
 
@@ -732,7 +759,7 @@ const addDietMeal = async (request, reply) => {
 
         const meal = await DietMeal.create({
             ...body,
-            diet_id: dietId
+            diet_id: dietId,
         });
         reply.status(201);
         return { success: true, data: meal, created: true };
@@ -824,5 +851,5 @@ module.exports = {
     // Diet Meals
     addDietMeal,
     updateDietMeal,
-    deleteDietMeal
+    deleteDietMeal,
 };

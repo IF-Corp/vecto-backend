@@ -6,8 +6,8 @@ jest.mock('../../../src/models', () => ({
     User: {
         findOne: jest.fn(),
         create: jest.fn(),
-        findByPk: jest.fn()
-    }
+        findByPk: jest.fn(),
+    },
 }));
 jest.mock('../../../src/services/tokenService');
 
@@ -25,12 +25,12 @@ describe('AuthController', () => {
         mockRequest = {
             body: {},
             params: {},
-            user: {}
+            user: {},
         };
 
         mockReply = {
             status: jest.fn().mockReturnThis(),
-            send: jest.fn().mockReturnThis()
+            send: jest.fn().mockReturnThis(),
         };
     });
 
@@ -39,7 +39,7 @@ describe('AuthController', () => {
             mockRequest.body = {
                 email: 'new@example.com',
                 password: 'password123',
-                name: 'New User'
+                name: 'New User',
             };
 
             User.findOne.mockResolvedValue(null);
@@ -47,11 +47,11 @@ describe('AuthController', () => {
             User.create.mockResolvedValue({
                 id: 'user-uuid',
                 email: 'new@example.com',
-                name: 'New User'
+                name: 'New User',
             });
             tokenService.generateTokens.mockReturnValue({
                 accessToken: 'access-token',
-                refreshToken: 'refresh-token'
+                refreshToken: 'refresh-token',
             });
 
             await authController.register(mockRequest, mockReply);
@@ -62,7 +62,7 @@ describe('AuthController', () => {
                 email: 'new@example.com',
                 password_hash: 'hashed_password',
                 name: 'New User',
-                is_onboarded: false
+                is_onboarded: false,
             });
             expect(mockReply.status).toHaveBeenCalledWith(201);
             expect(mockReply.send).toHaveBeenCalledWith(
@@ -70,16 +70,16 @@ describe('AuthController', () => {
                     success: true,
                     data: expect.objectContaining({
                         accessToken: 'access-token',
-                        refreshToken: 'refresh-token'
-                    })
-                })
+                        refreshToken: 'refresh-token',
+                    }),
+                }),
             );
         });
 
         it('should return 409 if email already exists', async () => {
             mockRequest.body = {
                 email: 'existing@example.com',
-                password: 'password123'
+                password: 'password123',
             };
 
             User.findOne.mockResolvedValue({ id: 'existing-user' });
@@ -90,8 +90,8 @@ describe('AuthController', () => {
             expect(mockReply.send).toHaveBeenCalledWith(
                 expect.objectContaining({
                     success: false,
-                    error: 'Conflict'
-                })
+                    error: 'Conflict',
+                }),
             );
         });
     });
@@ -100,19 +100,19 @@ describe('AuthController', () => {
         it('should return tokens on valid credentials', async () => {
             mockRequest.body = {
                 email: 'user@example.com',
-                password: 'password123'
+                password: 'password123',
             };
 
             User.findOne.mockResolvedValue({
                 id: 'user-uuid',
                 email: 'user@example.com',
                 name: 'Test User',
-                password_hash: 'hashed_password'
+                password_hash: 'hashed_password',
             });
             bcrypt.compare.mockResolvedValue(true);
             tokenService.generateTokens.mockReturnValue({
                 accessToken: 'access-token',
-                refreshToken: 'refresh-token'
+                refreshToken: 'refresh-token',
             });
 
             await authController.login(mockRequest, mockReply);
@@ -121,16 +121,16 @@ describe('AuthController', () => {
                 expect.objectContaining({
                     success: true,
                     data: expect.objectContaining({
-                        accessToken: 'access-token'
-                    })
-                })
+                        accessToken: 'access-token',
+                    }),
+                }),
             );
         });
 
         it('should return 401 on invalid email', async () => {
             mockRequest.body = {
                 email: 'nonexistent@example.com',
-                password: 'password123'
+                password: 'password123',
             };
 
             User.findOne.mockResolvedValue(null);
@@ -141,20 +141,20 @@ describe('AuthController', () => {
             expect(mockReply.send).toHaveBeenCalledWith(
                 expect.objectContaining({
                     success: false,
-                    error: 'Unauthorized'
-                })
+                    error: 'Unauthorized',
+                }),
             );
         });
 
         it('should return 401 on invalid password', async () => {
             mockRequest.body = {
                 email: 'user@example.com',
-                password: 'wrongpassword'
+                password: 'wrongpassword',
             };
 
             User.findOne.mockResolvedValue({
                 id: 'user-uuid',
-                password_hash: 'hashed_password'
+                password_hash: 'hashed_password',
             });
             bcrypt.compare.mockResolvedValue(false);
 
@@ -166,12 +166,12 @@ describe('AuthController', () => {
         it('should return 401 if user has no password set', async () => {
             mockRequest.body = {
                 email: 'user@example.com',
-                password: 'password123'
+                password: 'password123',
             };
 
             User.findOne.mockResolvedValue({
                 id: 'user-uuid',
-                password_hash: null
+                password_hash: null,
             });
 
             await authController.login(mockRequest, mockReply);
@@ -179,8 +179,8 @@ describe('AuthController', () => {
             expect(mockReply.status).toHaveBeenCalledWith(401);
             expect(mockReply.send).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    message: 'Account requires password setup'
-                })
+                    message: 'Account requires password setup',
+                }),
             );
         });
     });
@@ -188,17 +188,17 @@ describe('AuthController', () => {
     describe('refresh', () => {
         it('should return new tokens on valid refresh token', async () => {
             mockRequest.body = {
-                refreshToken: 'valid-refresh-token'
+                refreshToken: 'valid-refresh-token',
             };
 
             tokenService.verifyRefreshToken.mockReturnValue({ id: 'user-uuid' });
             User.findByPk.mockResolvedValue({
                 id: 'user-uuid',
-                email: 'user@example.com'
+                email: 'user@example.com',
             });
             tokenService.generateTokens.mockReturnValue({
                 accessToken: 'new-access-token',
-                refreshToken: 'new-refresh-token'
+                refreshToken: 'new-refresh-token',
             });
 
             await authController.refresh(mockRequest, mockReply);
@@ -207,15 +207,15 @@ describe('AuthController', () => {
                 expect.objectContaining({
                     success: true,
                     data: expect.objectContaining({
-                        accessToken: 'new-access-token'
-                    })
-                })
+                        accessToken: 'new-access-token',
+                    }),
+                }),
             );
         });
 
         it('should return 401 on invalid refresh token', async () => {
             mockRequest.body = {
-                refreshToken: 'invalid-token'
+                refreshToken: 'invalid-token',
             };
 
             tokenService.verifyRefreshToken.mockImplementation(() => {
@@ -235,18 +235,18 @@ describe('AuthController', () => {
             User.findByPk.mockResolvedValue({
                 id: 'user-uuid',
                 email: 'user@example.com',
-                name: 'Test User'
+                name: 'Test User',
             });
 
             await authController.me(mockRequest, mockReply);
 
             expect(User.findByPk).toHaveBeenCalledWith('user-uuid', {
-                attributes: { exclude: ['password_hash'] }
+                attributes: { exclude: ['password_hash'] },
             });
             expect(mockReply.send).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    success: true
-                })
+                    success: true,
+                }),
             );
         });
 

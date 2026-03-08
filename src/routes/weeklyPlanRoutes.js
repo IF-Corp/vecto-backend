@@ -4,7 +4,10 @@ async function weeklyPlanRoutes(fastify, options) {
     // Get data for planning
     fastify.get('/users/:userId/weekly-plan/meetings', weeklyPlanController.getWeeklyMeetings);
     fastify.get('/users/:userId/weekly-plan/deadlines', weeklyPlanController.getWeeklyDeadlines);
-    fastify.get('/users/:userId/weekly-plan/available-hours', weeklyPlanController.calculateAvailableHours);
+    fastify.get(
+        '/users/:userId/weekly-plan/available-hours',
+        weeklyPlanController.calculateAvailableHours,
+    );
 
     // Weekly plan CRUD
     fastify.get('/users/:userId/weekly-plan', weeklyPlanController.getWeeklyPlan);

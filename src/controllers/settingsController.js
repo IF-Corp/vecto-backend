@@ -194,13 +194,13 @@ const getAllSettings = async (request, reply) => {
         let finalModules = modules;
         if (modules.length === 0) {
             finalModules = await UserModule.bulkCreate(
-                ALL_MODULES.map((moduleType) => ({ userId, moduleType, isActive: true }))
+                ALL_MODULES.map((moduleType) => ({ userId, moduleType, isActive: true })),
             );
         }
 
-        const finalAppearance = appearance || await AppearanceSettings.create({ userId });
-        const finalNotifications = notifications || await NotificationSettings.create({ userId });
-        const finalPreferences = preferences || await PreferenceSettings.create({ userId });
+        const finalAppearance = appearance || (await AppearanceSettings.create({ userId }));
+        const finalNotifications = notifications || (await NotificationSettings.create({ userId }));
+        const finalPreferences = preferences || (await PreferenceSettings.create({ userId }));
 
         return reply.send({
             success: true,

@@ -35,29 +35,29 @@ module.exports = {
 
         // 4. Update status enum values (if old values still exist)
         const [statusEnums] = await queryInterface.sequelize.query(
-            `SELECT enumlabel FROM pg_enum e JOIN pg_type t ON e.enumtypid = t.oid WHERE t.typname = 'enum_study_projects_status'`
+            `SELECT enumlabel FROM pg_enum e JOIN pg_type t ON e.enumtypid = t.oid WHERE t.typname = 'enum_study_projects_status'`,
         );
-        const labels = statusEnums.map(e => e.enumlabel);
+        const labels = statusEnums.map((e) => e.enumlabel);
 
         if (labels.includes('PLANNED')) {
             await queryInterface.sequelize.query(
-                `ALTER TYPE "enum_study_projects_status" RENAME VALUE 'PLANNED' TO 'PLANNING';`
+                `ALTER TYPE "enum_study_projects_status" RENAME VALUE 'PLANNED' TO 'PLANNING';`,
             );
         }
         if (labels.includes('ACTIVE')) {
             await queryInterface.sequelize.query(
-                `ALTER TYPE "enum_study_projects_status" RENAME VALUE 'ACTIVE' TO 'IN_PROGRESS';`
+                `ALTER TYPE "enum_study_projects_status" RENAME VALUE 'ACTIVE' TO 'IN_PROGRESS';`,
             );
         }
         if (labels.includes('PAUSED')) {
             await queryInterface.sequelize.query(
-                `ALTER TYPE "enum_study_projects_status" RENAME VALUE 'PAUSED' TO 'ON_HOLD';`
+                `ALTER TYPE "enum_study_projects_status" RENAME VALUE 'PAUSED' TO 'ON_HOLD';`,
             );
         }
 
         // 5. Update the default value for status column
         await queryInterface.sequelize.query(
-            `ALTER TABLE "study_projects" ALTER COLUMN "status" SET DEFAULT 'PLANNING'::enum_study_projects_status;`
+            `ALTER TABLE "study_projects" ALTER COLUMN "status" SET DEFAULT 'PLANNING'::enum_study_projects_status;`,
         );
 
         // 6. Ensure indexes exist
@@ -69,17 +69,17 @@ module.exports = {
     async down(queryInterface, Sequelize) {
         // Reverse status enum
         await queryInterface.sequelize.query(
-            `ALTER TYPE "enum_study_projects_status" RENAME VALUE 'PLANNING' TO 'PLANNED';`
+            `ALTER TYPE "enum_study_projects_status" RENAME VALUE 'PLANNING' TO 'PLANNED';`,
         );
         await queryInterface.sequelize.query(
-            `ALTER TYPE "enum_study_projects_status" RENAME VALUE 'IN_PROGRESS' TO 'ACTIVE';`
+            `ALTER TYPE "enum_study_projects_status" RENAME VALUE 'IN_PROGRESS' TO 'ACTIVE';`,
         );
         await queryInterface.sequelize.query(
-            `ALTER TYPE "enum_study_projects_status" RENAME VALUE 'ON_HOLD' TO 'PAUSED';`
+            `ALTER TYPE "enum_study_projects_status" RENAME VALUE 'ON_HOLD' TO 'PAUSED';`,
         );
 
         await queryInterface.sequelize.query(
-            `ALTER TABLE "study_projects" ALTER COLUMN "status" SET DEFAULT 'PLANNED'::enum_study_projects_status;`
+            `ALTER TABLE "study_projects" ALTER COLUMN "status" SET DEFAULT 'PLANNED'::enum_study_projects_status;`,
         );
 
         // Rename target_date back to deadline
@@ -90,7 +90,9 @@ module.exports = {
 
         // Remove project_type column and enum
         await queryInterface.removeColumn('study_projects', 'project_type');
-        await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_study_projects_project_type";');
+        await queryInterface.sequelize.query(
+            'DROP TYPE IF EXISTS "enum_study_projects_project_type";',
+        );
 
         // Restore indexes
         await queryInterface.removeIndex('study_projects', ['target_date']).catch(() => {});

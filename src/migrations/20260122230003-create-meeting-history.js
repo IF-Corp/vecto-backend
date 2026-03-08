@@ -7,54 +7,54 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             project_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'projects',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             title: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: false,
             },
             start_date: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             actual_duration: {
                 type: Sequelize.INTEGER,
-                allowNull: true
+                allowNull: true,
             },
             agenda_description: {
                 type: Sequelize.TEXT,
-                allowNull: true
+                allowNull: true,
             },
             documentation_link: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('meeting_history', ['project_id'], {
-            name: 'meeting_history_project_id_idx'
+            name: 'meeting_history_project_id_idx',
         });
     },
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('meeting_history');
-    }
+    },
 };

@@ -2,7 +2,10 @@
 
 const priorityEnum = { type: 'string', enum: ['LOW', 'MEDIUM', 'HIGH'] };
 const choreFrequencyEnum = { type: 'string', enum: ['DAILY', 'WEEKLY', 'MONTHLY', 'AS_NEEDED'] };
-const eventTypeEnum = { type: 'string', enum: ['MEETING', 'APPOINTMENT', 'REMINDER', 'SOCIAL', 'OTHER'] };
+const eventTypeEnum = {
+    type: 'string',
+    enum: ['MEETING', 'APPOINTMENT', 'REMINDER', 'SOCIAL', 'OTHER'],
+};
 
 // Shopping List schemas
 const createShoppingListBody = {
@@ -17,15 +20,15 @@ const createShoppingListBody = {
                     name: { type: 'string' },
                     quantity: { type: 'integer', minimum: 1 },
                     unit: { type: 'string' },
-                    is_checked: { type: 'boolean' }
-                }
+                    is_checked: { type: 'boolean' },
+                },
             },
-            default: []
+            default: [],
         },
-        is_completed: { type: 'boolean', default: false }
+        is_completed: { type: 'boolean', default: false },
     },
     required: ['name'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateShoppingListBody = {
@@ -40,13 +43,13 @@ const updateShoppingListBody = {
                     name: { type: 'string' },
                     quantity: { type: 'integer', minimum: 1 },
                     unit: { type: 'string' },
-                    is_checked: { type: 'boolean' }
-                }
-            }
+                    is_checked: { type: 'boolean' },
+                },
+            },
         },
-        is_completed: { type: 'boolean' }
+        is_completed: { type: 'boolean' },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Household Inventory schemas
@@ -59,10 +62,10 @@ const createInventoryBody = {
         unit: { type: 'string', maxLength: 50, nullable: true },
         min_quantity: { type: 'integer', minimum: 0, nullable: true },
         expiry_date: { type: 'string', format: 'date', nullable: true },
-        location: { type: 'string', maxLength: 200, nullable: true }
+        location: { type: 'string', maxLength: 200, nullable: true },
     },
     required: ['name'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateInventoryBody = {
@@ -74,9 +77,9 @@ const updateInventoryBody = {
         unit: { type: 'string', maxLength: 50, nullable: true },
         min_quantity: { type: 'integer', minimum: 0, nullable: true },
         expiry_date: { type: 'string', format: 'date', nullable: true },
-        location: { type: 'string', maxLength: 200, nullable: true }
+        location: { type: 'string', maxLength: 200, nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Household Chore schemas
@@ -89,10 +92,10 @@ const createChoreBody = {
         priority: priorityEnum,
         assigned_to: { type: 'string', maxLength: 100, nullable: true },
         last_completed: { type: 'string', format: 'date-time', nullable: true },
-        next_due: { type: 'string', format: 'date-time', nullable: true }
+        next_due: { type: 'string', format: 'date-time', nullable: true },
     },
     required: ['name', 'frequency'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateChoreBody = {
@@ -104,9 +107,9 @@ const updateChoreBody = {
         priority: priorityEnum,
         assigned_to: { type: 'string', maxLength: 100, nullable: true },
         last_completed: { type: 'string', format: 'date-time', nullable: true },
-        next_due: { type: 'string', format: 'date-time', nullable: true }
+        next_due: { type: 'string', format: 'date-time', nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Contact schemas
@@ -120,10 +123,10 @@ const createContactBody = {
         birthday: { type: 'string', format: 'date', nullable: true },
         notes: { type: 'string', maxLength: 2000, nullable: true },
         photo_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
-        tags: { type: 'array', items: { type: 'string' }, default: [] }
+        tags: { type: 'array', items: { type: 'string' }, default: [] },
     },
     required: ['name'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateContactBody = {
@@ -136,9 +139,9 @@ const updateContactBody = {
         birthday: { type: 'string', format: 'date', nullable: true },
         notes: { type: 'string', maxLength: 2000, nullable: true },
         photo_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
-        tags: { type: 'array', items: { type: 'string' } }
+        tags: { type: 'array', items: { type: 'string' } },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Calendar Event schemas
@@ -154,10 +157,10 @@ const createCalendarEventBody = {
         location: { type: 'string', maxLength: 300, nullable: true },
         reminder_minutes: { type: 'integer', minimum: 0, nullable: true },
         is_recurring: { type: 'boolean', default: false },
-        recurrence_rule: { type: 'string', maxLength: 200, nullable: true }
+        recurrence_rule: { type: 'string', maxLength: 200, nullable: true },
     },
     required: ['title', 'event_type', 'start_time'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateCalendarEventBody = {
@@ -172,9 +175,9 @@ const updateCalendarEventBody = {
         location: { type: 'string', maxLength: 300, nullable: true },
         reminder_minutes: { type: 'integer', minimum: 0, nullable: true },
         is_recurring: { type: 'boolean' },
-        recurrence_rule: { type: 'string', maxLength: 200, nullable: true }
+        recurrence_rule: { type: 'string', maxLength: 200, nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 module.exports = {
@@ -190,5 +193,5 @@ module.exports = {
     updateCalendarEventBody,
     priorityEnum,
     choreFrequencyEnum,
-    eventTypeEnum
+    eventTypeEnum,
 };

@@ -23,7 +23,7 @@ const getPlants = async (request, reply) => {
                     ...plant.toJSON(),
                     careTypes,
                 };
-            })
+            }),
         );
 
         return reply.send({ success: true, data: plantsWithCare });
@@ -86,8 +86,8 @@ const createPlant = async (request, reply) => {
                         ...care,
                         plant_id: plant.id,
                         next_due_at: new Date(),
-                    })
-                )
+                    }),
+                ),
             );
         }
 

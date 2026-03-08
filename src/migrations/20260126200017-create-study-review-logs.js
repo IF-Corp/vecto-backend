@@ -55,6 +55,8 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('study_review_logs');
-        await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_study_review_logs_response_rating";');
+        await queryInterface.sequelize.query(
+            'DROP TYPE IF EXISTS "enum_study_review_logs_response_rating";',
+        );
     },
 };

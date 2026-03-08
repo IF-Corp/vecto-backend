@@ -8,61 +8,61 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             category: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: false,
             },
             limit_amount: {
                 type: Sequelize.DECIMAL(10, 2),
-                allowNull: false
+                allowNull: false,
             },
             spent_amount: {
                 type: Sequelize.DECIMAL(10, 2),
                 defaultValue: 0,
-                allowNull: false
+                allowNull: false,
             },
             period: {
                 type: Sequelize.ENUM('WEEKLY', 'MONTHLY', 'YEARLY'),
-                allowNull: false
+                allowNull: false,
             },
             start_date: {
                 type: Sequelize.DATEONLY,
-                allowNull: false
+                allowNull: false,
             },
             end_date: {
                 type: Sequelize.DATEONLY,
-                allowNull: true
+                allowNull: true,
             },
             alert_threshold: {
                 type: Sequelize.INTEGER,
                 defaultValue: 80,
-                allowNull: false
+                allowNull: false,
             },
             is_active: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: true,
-                allowNull: false
+                allowNull: false,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('budgets', ['user_id']);
@@ -72,5 +72,5 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('budgets');
-    }
+    },
 };

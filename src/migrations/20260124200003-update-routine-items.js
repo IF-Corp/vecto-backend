@@ -5,19 +5,19 @@ module.exports = {
         // Add new columns to routine_items for standalone items (not linked to habits)
         await queryInterface.addColumn('routine_items', 'title', {
             type: Sequelize.STRING(200),
-            allowNull: true
+            allowNull: true,
         });
 
         await queryInterface.addColumn('routine_items', 'estimated_duration', {
             type: Sequelize.INTEGER,
             allowNull: true,
-            comment: 'Duration in minutes'
+            comment: 'Duration in minutes',
         });
 
         // Make habit_id nullable since items can be standalone
         await queryInterface.changeColumn('routine_items', 'habit_id', {
             type: Sequelize.UUID,
-            allowNull: true
+            allowNull: true,
         });
 
         // Rename execution_order to order for consistency
@@ -29,10 +29,10 @@ module.exports = {
 
         await queryInterface.changeColumn('routine_items', 'habit_id', {
             type: Sequelize.UUID,
-            allowNull: false
+            allowNull: false,
         });
 
         await queryInterface.removeColumn('routine_items', 'estimated_duration');
         await queryInterface.removeColumn('routine_items', 'title');
-    }
+    },
 };

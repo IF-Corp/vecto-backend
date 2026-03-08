@@ -15,7 +15,7 @@ const { Op } = require('sequelize');
 async function syncLegacyConfig(userId, isActive, startDate, endDate, reason) {
     try {
         let config = await FreezeModeConfig.findOne({
-            where: { user_id: userId }
+            where: { user_id: userId },
         });
 
         if (!config) {
@@ -24,14 +24,14 @@ async function syncLegacyConfig(userId, isActive, startDate, endDate, reason) {
                 is_active: isActive,
                 start_date: startDate ? new Date(startDate) : null,
                 end_date: endDate ? new Date(endDate) : null,
-                reason
+                reason,
             });
         } else {
             await config.update({
                 is_active: isActive,
                 start_date: startDate ? new Date(startDate) : null,
                 end_date: endDate ? new Date(endDate) : null,
-                reason: isActive ? reason : null
+                reason: isActive ? reason : null,
             });
         }
     } catch (error) {
@@ -51,8 +51,8 @@ async function activateScheduledPeriods() {
         const periodsToActivate = await FreezePeriod.findAll({
             where: {
                 status: 'SCHEDULED',
-                start_date: { [Op.lte]: today }
-            }
+                start_date: { [Op.lte]: today },
+            },
         });
 
         for (const period of periodsToActivate) {
@@ -62,8 +62,8 @@ async function activateScheduledPeriods() {
                     where: {
                         user_id: period.user_id,
                         status: 'ACTIVE',
-                        id: { [Op.ne]: period.id }
-                    }
+                        id: { [Op.ne]: period.id },
+                    },
                 });
 
                 if (existingActive) {
@@ -71,12 +71,12 @@ async function activateScheduledPeriods() {
                     // Mark this one as cancelled to avoid conflicts
                     await period.update({
                         status: 'CANCELLED',
-                        deactivated_at: new Date()
+                        deactivated_at: new Date(),
                     });
                     results.errors.push({
                         periodId: period.id,
                         userId: period.user_id,
-                        error: 'User already has an active freeze period'
+                        error: 'User already has an active freeze period',
                     });
                     continue;
                 }
@@ -84,7 +84,7 @@ async function activateScheduledPeriods() {
                 // Activate the period
                 await period.update({
                     status: 'ACTIVE',
-                    activated_at: new Date()
+                    activated_at: new Date(),
                 });
 
                 // Sync legacy config
@@ -93,18 +93,23 @@ async function activateScheduledPeriods() {
                     true,
                     period.start_date,
                     period.end_date,
-                    period.reason
+                    period.reason,
                 );
 
                 results.activated++;
-                console.log(`[FreezeScheduler] Activated period ${period.id} for user ${period.user_id}`);
+                console.log(
+                    `[FreezeScheduler] Activated period ${period.id} for user ${period.user_id}`,
+                );
             } catch (error) {
                 results.errors.push({
                     periodId: period.id,
                     userId: period.user_id,
-                    error: error.message
+                    error: error.message,
                 });
-                console.error(`[FreezeScheduler] Error activating period ${period.id}:`, error.message);
+                console.error(
+                    `[FreezeScheduler] Error activating period ${period.id}:`,
+                    error.message,
+                );
             }
         }
     } catch (error) {
@@ -127,8 +132,8 @@ async function completeExpiredPeriods() {
         const periodsToComplete = await FreezePeriod.findAll({
             where: {
                 status: 'ACTIVE',
-                end_date: { [Op.lt]: today }
-            }
+                end_date: { [Op.lt]: today },
+            },
         });
 
         for (const period of periodsToComplete) {
@@ -136,21 +141,26 @@ async function completeExpiredPeriods() {
                 // Complete the period
                 await period.update({
                     status: 'COMPLETED',
-                    deactivated_at: new Date()
+                    deactivated_at: new Date(),
                 });
 
                 // Sync legacy config
                 await syncLegacyConfig(period.user_id, false, null, null, null);
 
                 results.completed++;
-                console.log(`[FreezeScheduler] Completed period ${period.id} for user ${period.user_id}`);
+                console.log(
+                    `[FreezeScheduler] Completed period ${period.id} for user ${period.user_id}`,
+                );
             } catch (error) {
                 results.errors.push({
                     periodId: period.id,
                     userId: period.user_id,
-                    error: error.message
+                    error: error.message,
                 });
-                console.error(`[FreezeScheduler] Error completing period ${period.id}:`, error.message);
+                console.error(
+                    `[FreezeScheduler] Error completing period ${period.id}:`,
+                    error.message,
+                );
             }
         }
     } catch (error) {
@@ -175,7 +185,7 @@ async function processScheduledFreezePeriods() {
     console.log(`[FreezeScheduler] Completed in ${duration}ms:`, {
         activated: activationResults.activated,
         completed: completionResults.completed,
-        errors: activationResults.errors.length + completionResults.errors.length
+        errors: activationResults.errors.length + completionResults.errors.length,
     });
 
     return {
@@ -183,7 +193,7 @@ async function processScheduledFreezePeriods() {
         activationErrors: activationResults.errors,
         completed: completionResults.completed,
         completionErrors: completionResults.errors,
-        duration
+        duration,
     };
 }
 
@@ -195,13 +205,13 @@ function startScheduler(intervalMs = 60 * 60 * 1000) {
     console.log(`[FreezeScheduler] Starting scheduler with interval ${intervalMs}ms`);
 
     // Run immediately on startup
-    processScheduledFreezePeriods().catch(err => {
+    processScheduledFreezePeriods().catch((err) => {
         console.error('[FreezeScheduler] Error on initial run:', err);
     });
 
     // Then run at interval
     const intervalId = setInterval(() => {
-        processScheduledFreezePeriods().catch(err => {
+        processScheduledFreezePeriods().catch((err) => {
             console.error('[FreezeScheduler] Error on scheduled run:', err);
         });
     }, intervalMs);
@@ -213,5 +223,5 @@ module.exports = {
     processScheduledFreezePeriods,
     activateScheduledPeriods,
     completeExpiredPeriods,
-    startScheduler
+    startScheduler,
 };

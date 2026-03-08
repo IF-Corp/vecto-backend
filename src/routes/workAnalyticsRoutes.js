@@ -13,7 +13,10 @@ async function workAnalyticsRoutes(fastify, options) {
 
     // ==================== WORK-LIFE BALANCE ====================
     // Get work-life balance data
-    fastify.get('/users/:userId/work/work-life-balance', workAnalyticsController.getWorkLifeBalance);
+    fastify.get(
+        '/users/:userId/work/work-life-balance',
+        workAnalyticsController.getWorkLifeBalance,
+    );
 
     // ==================== ENERGY MAPPING ====================
     // Get energy mapping analysis
@@ -27,10 +30,16 @@ async function workAnalyticsRoutes(fastify, options) {
 
     // ==================== CONTEXT SWITCHING ====================
     // Get context switching data for a day
-    fastify.get('/users/:userId/work/context-switching', contextSwitchingController.getContextSwitching);
+    fastify.get(
+        '/users/:userId/work/context-switching',
+        contextSwitchingController.getContextSwitching,
+    );
 
     // Get context switching history
-    fastify.get('/users/:userId/work/context-switching/history', contextSwitchingController.getContextSwitchingHistory);
+    fastify.get(
+        '/users/:userId/work/context-switching/history',
+        contextSwitchingController.getContextSwitchingHistory,
+    );
 }
 
 module.exports = workAnalyticsRoutes;

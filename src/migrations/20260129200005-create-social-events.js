@@ -21,7 +21,16 @@ module.exports = {
                 allowNull: false,
             },
             event_type: {
-                type: Sequelize.ENUM('PARTY', 'BBQ', 'MEETUP', 'DINNER', 'TRIP', 'BIRTHDAY', 'WEDDING', 'OTHER'),
+                type: Sequelize.ENUM(
+                    'PARTY',
+                    'BBQ',
+                    'MEETUP',
+                    'DINNER',
+                    'TRIP',
+                    'BIRTHDAY',
+                    'WEDDING',
+                    'OTHER',
+                ),
                 allowNull: false,
                 defaultValue: 'MEETUP',
             },
@@ -130,7 +139,9 @@ module.exports = {
 
         await queryInterface.addIndex('social_event_guests', ['event_id']);
         await queryInterface.addIndex('social_event_guests', ['contact_id']);
-        await queryInterface.addIndex('social_event_guests', ['event_id', 'contact_id'], { unique: true });
+        await queryInterface.addIndex('social_event_guests', ['event_id', 'contact_id'], {
+            unique: true,
+        });
 
         // Event Checklist
         await queryInterface.createTable('social_event_checklist', {

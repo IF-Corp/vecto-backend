@@ -78,7 +78,15 @@ module.exports = {
                 onDelete: 'CASCADE',
             },
             care_type: {
-                type: Sequelize.ENUM('VACCINE', 'DEWORMING', 'BATH', 'VET_CHECKUP', 'GROOMING', 'MEDICATION', 'OTHER'),
+                type: Sequelize.ENUM(
+                    'VACCINE',
+                    'DEWORMING',
+                    'BATH',
+                    'VET_CHECKUP',
+                    'GROOMING',
+                    'MEDICATION',
+                    'OTHER',
+                ),
                 allowNull: false,
             },
             name: {

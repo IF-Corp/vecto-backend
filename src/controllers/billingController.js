@@ -1,9 +1,4 @@
-const {
-    WorkInvoice,
-    WorkClient,
-    WorkProject,
-    WorkTimeEntry,
-} = require('../models');
+const { WorkInvoice, WorkClient, WorkProject, WorkTimeEntry } = require('../models');
 const { Op, fn, col, literal } = require('sequelize');
 
 // ==================== BILLING ====================
@@ -60,7 +55,8 @@ const getBillingSummary = async (request, reply) => {
                 // Calculate value using project rate or client rate
                 let totalValue = 0;
                 entries.forEach((e) => {
-                    const rate = parseFloat(e.project?.hourly_rate) || parseFloat(client.hourly_rate) || 0;
+                    const rate =
+                        parseFloat(e.project?.hourly_rate) || parseFloat(client.hourly_rate) || 0;
                     const hours = (e.duration_minutes || 0) / 60;
                     totalValue += hours * rate;
                 });
@@ -97,7 +93,7 @@ const getBillingSummary = async (request, reply) => {
                     pendingValue: Math.round((totalValue - invoicedValue) * 100) / 100,
                     invoices,
                 };
-            })
+            }),
         );
 
         const validClientBilling = clientBilling.filter((c) => c !== null);
@@ -111,7 +107,7 @@ const getBillingSummary = async (request, reply) => {
                 paidValue: acc.paidValue + c.paidValue,
                 pendingValue: acc.pendingValue + c.pendingValue,
             }),
-            { totalHours: 0, totalValue: 0, invoicedValue: 0, paidValue: 0, pendingValue: 0 }
+            { totalHours: 0, totalValue: 0, invoicedValue: 0, paidValue: 0, pendingValue: 0 },
         );
 
         return {
@@ -145,9 +141,7 @@ const getInvoices = async (request, reply) => {
 
         const invoices = await WorkInvoice.findAll({
             where,
-            include: [
-                { association: 'client', attributes: ['id', 'name', 'company'] },
-            ],
+            include: [{ association: 'client', attributes: ['id', 'name', 'company'] }],
             order: [['created_at', 'DESC']],
         });
 
@@ -162,9 +156,7 @@ const getInvoice = async (request, reply) => {
     try {
         const { id } = request.params;
         const invoice = await WorkInvoice.findByPk(id, {
-            include: [
-                { association: 'client' },
-            ],
+            include: [{ association: 'client' }],
         });
 
         if (!invoice) {
@@ -224,9 +216,7 @@ const createInvoice = async (request, reply) => {
                     [Op.between]: [new Date(periodStart), new Date(periodEnd + 'T23:59:59')],
                 },
             },
-            include: [
-                { association: 'project', attributes: ['id', 'hourly_rate'] },
-            ],
+            include: [{ association: 'project', attributes: ['id', 'hourly_rate'] }],
         });
 
         const totalMinutes = entries.reduce((sum, e) => sum + (e.duration_minutes || 0), 0);
@@ -240,7 +230,10 @@ const createInvoice = async (request, reply) => {
             totalValue += hours * rate;
         });
 
-        const hourlyRate = totalHours > 0 ? Math.round((totalValue / totalHours) * 100) / 100 : parseFloat(client.hourly_rate) || 0;
+        const hourlyRate =
+            totalHours > 0
+                ? Math.round((totalValue / totalHours) * 100) / 100
+                : parseFloat(client.hourly_rate) || 0;
 
         // Generate invoice number
         const invoiceCount = await WorkInvoice.count({ where: { user_id: userId } });
@@ -391,9 +384,7 @@ const getTimesheetReport = async (request, reply) => {
                 {
                     association: 'project',
                     attributes: ['id', 'name', 'color', 'client_id'],
-                    include: [
-                        { association: 'clientRef', attributes: ['id', 'name'] },
-                    ],
+                    include: [{ association: 'clientRef', attributes: ['id', 'name'] }],
                 },
                 { association: 'task', attributes: ['id', 'title'] },
             ],
@@ -408,7 +399,11 @@ const getTimesheetReport = async (request, reply) => {
             const projectId = e.project_id || 'no-project';
             if (!byProject[projectId]) {
                 byProject[projectId] = {
-                    project: e.project || { id: 'no-project', name: 'Sem Projeto', color: '#6b7280' },
+                    project: e.project || {
+                        id: 'no-project',
+                        name: 'Sem Projeto',
+                        color: '#6b7280',
+                    },
                     minutes: 0,
                     entries: [],
                 };

@@ -7,7 +7,7 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
@@ -15,67 +15,67 @@ module.exports = {
                 unique: true,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             default_currency: {
                 type: Sequelize.ENUM('BRL', 'USD', 'EUR'),
                 defaultValue: 'BRL',
-                allowNull: false
+                allowNull: false,
             },
             timezone: {
                 type: Sequelize.STRING,
                 defaultValue: 'America/Sao_Paulo',
-                allowNull: false
+                allowNull: false,
             },
             language: {
                 type: Sequelize.STRING,
                 defaultValue: 'pt-BR',
-                allowNull: false
+                allowNull: false,
             },
             date_format: {
                 type: Sequelize.ENUM('DD/MM', 'MM/DD'),
                 defaultValue: 'DD/MM',
-                allowNull: false
+                allowNull: false,
             },
             week_start_day: {
                 type: Sequelize.ENUM('SUN', 'MON'),
                 defaultValue: 'SUN',
-                allowNull: false
+                allowNull: false,
             },
             theme: {
                 type: Sequelize.ENUM('DARK', 'LIGHT', 'SYSTEM'),
                 defaultValue: 'SYSTEM',
-                allowNull: false
+                allowNull: false,
             },
             sounds_enabled: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: true,
-                allowNull: false
+                allowNull: false,
             },
             compact_mode: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false,
-                allowNull: false
+                allowNull: false,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('user_preferences', ['user_id'], {
-            name: 'user_preferences_user_id_idx'
+            name: 'user_preferences_user_id_idx',
         });
     },
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('user_preferences');
-    }
+    },
 };

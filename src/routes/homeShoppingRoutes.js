@@ -47,127 +47,175 @@ async function homeShoppingRoutes(fastify, options) {
 
     // ==================== LISTS ====================
 
-    fastify.get('/users/:userId/home/spaces/:spaceId/shopping', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get all shopping lists for a space',
-            tags: ['Home - Shopping'],
-            security: [{ bearerAuth: [] }],
-            params: spaceIdParams,
+    fastify.get(
+        '/users/:userId/home/spaces/:spaceId/shopping',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get all shopping lists for a space',
+                tags: ['Home - Shopping'],
+                security: [{ bearerAuth: [] }],
+                params: spaceIdParams,
+            },
         },
-    }, homeShoppingController.getShoppingLists);
+        homeShoppingController.getShoppingLists,
+    );
 
-    fastify.get('/users/:userId/home/spaces/:spaceId/shopping/frequent-items', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get frequently purchased items',
-            tags: ['Home - Shopping'],
-            security: [{ bearerAuth: [] }],
-            params: spaceIdParams,
+    fastify.get(
+        '/users/:userId/home/spaces/:spaceId/shopping/frequent-items',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get frequently purchased items',
+                tags: ['Home - Shopping'],
+                security: [{ bearerAuth: [] }],
+                params: spaceIdParams,
+            },
         },
-    }, homeShoppingController.getFrequentItems);
+        homeShoppingController.getFrequentItems,
+    );
 
-    fastify.get('/users/:userId/home/spaces/:spaceId/shopping/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get a shopping list with items',
-            tags: ['Home - Shopping'],
-            security: [{ bearerAuth: [] }],
-            params: listIdParams,
+    fastify.get(
+        '/users/:userId/home/spaces/:spaceId/shopping/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get a shopping list with items',
+                tags: ['Home - Shopping'],
+                security: [{ bearerAuth: [] }],
+                params: listIdParams,
+            },
         },
-    }, homeShoppingController.getShoppingList);
+        homeShoppingController.getShoppingList,
+    );
 
-    fastify.post('/users/:userId/home/spaces/:spaceId/shopping', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a shopping list',
-            tags: ['Home - Shopping'],
-            security: [{ bearerAuth: [] }],
-            params: spaceIdParams,
+    fastify.post(
+        '/users/:userId/home/spaces/:spaceId/shopping',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a shopping list',
+                tags: ['Home - Shopping'],
+                security: [{ bearerAuth: [] }],
+                params: spaceIdParams,
+            },
         },
-    }, homeShoppingController.createShoppingList);
+        homeShoppingController.createShoppingList,
+    );
 
-    fastify.put('/users/:userId/home/spaces/:spaceId/shopping/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Update a shopping list',
-            tags: ['Home - Shopping'],
-            security: [{ bearerAuth: [] }],
-            params: listIdParams,
+    fastify.put(
+        '/users/:userId/home/spaces/:spaceId/shopping/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Update a shopping list',
+                tags: ['Home - Shopping'],
+                security: [{ bearerAuth: [] }],
+                params: listIdParams,
+            },
         },
-    }, homeShoppingController.updateShoppingList);
+        homeShoppingController.updateShoppingList,
+    );
 
-    fastify.delete('/users/:userId/home/spaces/:spaceId/shopping/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Delete a shopping list',
-            tags: ['Home - Shopping'],
-            security: [{ bearerAuth: [] }],
-            params: listIdParams,
+    fastify.delete(
+        '/users/:userId/home/spaces/:spaceId/shopping/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Delete a shopping list',
+                tags: ['Home - Shopping'],
+                security: [{ bearerAuth: [] }],
+                params: listIdParams,
+            },
         },
-    }, homeShoppingController.deleteShoppingList);
+        homeShoppingController.deleteShoppingList,
+    );
 
-    fastify.post('/users/:userId/home/spaces/:spaceId/shopping/:id/clear-purchased', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Clear purchased items from list',
-            tags: ['Home - Shopping'],
-            security: [{ bearerAuth: [] }],
-            params: listIdParams,
+    fastify.post(
+        '/users/:userId/home/spaces/:spaceId/shopping/:id/clear-purchased',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Clear purchased items from list',
+                tags: ['Home - Shopping'],
+                security: [{ bearerAuth: [] }],
+                params: listIdParams,
+            },
         },
-    }, homeShoppingController.clearPurchasedItems);
+        homeShoppingController.clearPurchasedItems,
+    );
 
     // ==================== ITEMS ====================
 
-    fastify.post('/users/:userId/home/spaces/:spaceId/shopping/:listId/items', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Add item to list',
-            tags: ['Home - Shopping'],
-            security: [{ bearerAuth: [] }],
-            params: listItemParams,
+    fastify.post(
+        '/users/:userId/home/spaces/:spaceId/shopping/:listId/items',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Add item to list',
+                tags: ['Home - Shopping'],
+                security: [{ bearerAuth: [] }],
+                params: listItemParams,
+            },
         },
-    }, homeShoppingController.addItem);
+        homeShoppingController.addItem,
+    );
 
-    fastify.post('/users/:userId/home/spaces/:spaceId/shopping/:listId/items/bulk', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Add multiple items to list',
-            tags: ['Home - Shopping'],
-            security: [{ bearerAuth: [] }],
-            params: listItemParams,
+    fastify.post(
+        '/users/:userId/home/spaces/:spaceId/shopping/:listId/items/bulk',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Add multiple items to list',
+                tags: ['Home - Shopping'],
+                security: [{ bearerAuth: [] }],
+                params: listItemParams,
+            },
         },
-    }, homeShoppingController.bulkAddItems);
+        homeShoppingController.bulkAddItems,
+    );
 
-    fastify.put('/users/:userId/home/spaces/:spaceId/shopping/:listId/items/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Update an item',
-            tags: ['Home - Shopping'],
-            security: [{ bearerAuth: [] }],
-            params: itemIdParams,
+    fastify.put(
+        '/users/:userId/home/spaces/:spaceId/shopping/:listId/items/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Update an item',
+                tags: ['Home - Shopping'],
+                security: [{ bearerAuth: [] }],
+                params: itemIdParams,
+            },
         },
-    }, homeShoppingController.updateItem);
+        homeShoppingController.updateItem,
+    );
 
-    fastify.post('/users/:userId/home/spaces/:spaceId/shopping/:listId/items/:id/toggle', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Toggle item purchased status',
-            tags: ['Home - Shopping'],
-            security: [{ bearerAuth: [] }],
-            params: itemIdParams,
+    fastify.post(
+        '/users/:userId/home/spaces/:spaceId/shopping/:listId/items/:id/toggle',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Toggle item purchased status',
+                tags: ['Home - Shopping'],
+                security: [{ bearerAuth: [] }],
+                params: itemIdParams,
+            },
         },
-    }, homeShoppingController.toggleItemPurchased);
+        homeShoppingController.toggleItemPurchased,
+    );
 
-    fastify.delete('/users/:userId/home/spaces/:spaceId/shopping/:listId/items/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Delete an item',
-            tags: ['Home - Shopping'],
-            security: [{ bearerAuth: [] }],
-            params: itemIdParams,
+    fastify.delete(
+        '/users/:userId/home/spaces/:spaceId/shopping/:listId/items/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Delete an item',
+                tags: ['Home - Shopping'],
+                security: [{ bearerAuth: [] }],
+                params: itemIdParams,
+            },
         },
-    }, homeShoppingController.deleteItem);
+        homeShoppingController.deleteItem,
+    );
 }
 
 module.exports = homeShoppingRoutes;

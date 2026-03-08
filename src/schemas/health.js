@@ -1,11 +1,17 @@
 // Health module schemas
 
 const mealTypeEnum = { type: 'string', enum: ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'] };
-const workoutTypeEnum = { type: 'string', enum: ['CARDIO', 'STRENGTH', 'FLEXIBILITY', 'SPORTS', 'OTHER'] };
+const workoutTypeEnum = {
+    type: 'string',
+    enum: ['CARDIO', 'STRENGTH', 'FLEXIBILITY', 'SPORTS', 'OTHER'],
+};
 const sleepQualityEnum = { type: 'string', enum: ['POOR', 'FAIR', 'GOOD', 'EXCELLENT'] };
 const dietGoalEnum = { type: 'string', enum: ['LOSE_WEIGHT', 'MAINTAIN', 'GAIN_MUSCLE', 'CUSTOM'] };
 const sexEnum = { type: 'string', enum: ['male', 'female', 'other'] };
-const activityLevelEnum = { type: 'string', enum: ['sedentary', 'light', 'moderate', 'active', 'very_active'] };
+const activityLevelEnum = {
+    type: 'string',
+    enum: ['sedentary', 'light', 'moderate', 'active', 'very_active'],
+};
 
 // Health Profile schemas
 const createHealthProfileBody = {
@@ -14,9 +20,12 @@ const createHealthProfileBody = {
         birth_date: { type: ['string', 'null'], format: 'date' },
         sex: { type: ['string', 'null'], enum: ['male', 'female', 'other', null] },
         height_cm: { type: ['number', 'null'], minimum: 50, maximum: 300 },
-        activity_level: { type: ['string', 'null'], enum: ['sedentary', 'light', 'moderate', 'active', 'very_active', null] }
+        activity_level: {
+            type: ['string', 'null'],
+            enum: ['sedentary', 'light', 'moderate', 'active', 'very_active', null],
+        },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateHealthProfileBody = {
@@ -25,9 +34,12 @@ const updateHealthProfileBody = {
         birth_date: { type: ['string', 'null'], format: 'date' },
         sex: { type: ['string', 'null'], enum: ['male', 'female', 'other', null] },
         height_cm: { type: ['number', 'null'], minimum: 50, maximum: 300 },
-        activity_level: { type: ['string', 'null'], enum: ['sedentary', 'light', 'moderate', 'active', 'very_active', null] }
+        activity_level: {
+            type: ['string', 'null'],
+            enum: ['sedentary', 'light', 'moderate', 'active', 'very_active', null],
+        },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Weight Log schemas
@@ -38,10 +50,10 @@ const createWeightLogBody = {
         weight_kg: { type: 'number', minimum: 20, maximum: 500 },
         body_fat_percentage: { type: 'number', minimum: 1, maximum: 70, nullable: true },
         muscle_mass_kg: { type: 'number', minimum: 10, maximum: 150, nullable: true },
-        notes: { type: 'string', maxLength: 1000, nullable: true }
+        notes: { type: 'string', maxLength: 1000, nullable: true },
     },
     required: ['date', 'weight_kg'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateWeightLogBody = {
@@ -51,9 +63,9 @@ const updateWeightLogBody = {
         weight_kg: { type: 'number', minimum: 20, maximum: 500 },
         body_fat_percentage: { type: 'number', minimum: 1, maximum: 70, nullable: true },
         muscle_mass_kg: { type: 'number', minimum: 10, maximum: 150, nullable: true },
-        notes: { type: 'string', maxLength: 1000, nullable: true }
+        notes: { type: 'string', maxLength: 1000, nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Meal Log schemas
@@ -70,10 +82,10 @@ const createMealLogBody = {
         carbs: { type: 'number', minimum: 0, nullable: true },
         fat: { type: 'number', minimum: 0, nullable: true },
         photo_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
-        meal_source: mealSourceEnum
+        meal_source: mealSourceEnum,
     },
     required: ['meal_type', 'meal_date'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateMealLogBody = {
@@ -87,9 +99,9 @@ const updateMealLogBody = {
         carbs: { type: 'number', minimum: 0, nullable: true },
         fat: { type: 'number', minimum: 0, nullable: true },
         photo_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
-        meal_source: mealSourceEnum
+        meal_source: mealSourceEnum,
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Workout schemas
@@ -101,10 +113,10 @@ const createWorkoutBody = {
         workout_date: { type: 'string', format: 'date-time' },
         duration_minutes: { type: 'integer', minimum: 1, nullable: true },
         calories_burned: { type: 'integer', minimum: 0, nullable: true },
-        notes: { type: 'string', maxLength: 2000, nullable: true }
+        notes: { type: 'string', maxLength: 2000, nullable: true },
     },
     required: ['name', 'workout_type', 'workout_date'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateWorkoutBody = {
@@ -115,9 +127,9 @@ const updateWorkoutBody = {
         workout_date: { type: 'string', format: 'date-time' },
         duration_minutes: { type: 'integer', minimum: 1, nullable: true },
         calories_burned: { type: 'integer', minimum: 0, nullable: true },
-        notes: { type: 'string', maxLength: 2000, nullable: true }
+        notes: { type: 'string', maxLength: 2000, nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Workout Detail schemas
@@ -129,14 +141,17 @@ const createWorkoutDetailBody = {
         sets: { type: 'integer', minimum: 1, nullable: true },
         reps: { type: 'integer', minimum: 1, nullable: true },
         weight: { type: 'number', minimum: 0, nullable: true },
-        duration_seconds: { type: 'integer', minimum: 1, nullable: true }
+        duration_seconds: { type: 'integer', minimum: 1, nullable: true },
     },
     required: ['workout_id', 'exercise_name'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Medication schemas
-const medicationFrequencyEnum = { type: 'string', enum: ['ONCE_DAILY', 'TWICE_DAILY', 'THREE_TIMES_DAILY', 'AS_NEEDED', 'WEEKLY'] };
+const medicationFrequencyEnum = {
+    type: 'string',
+    enum: ['ONCE_DAILY', 'TWICE_DAILY', 'THREE_TIMES_DAILY', 'AS_NEEDED', 'WEEKLY'],
+};
 
 const createMedicationBody = {
     type: 'object',
@@ -149,10 +164,10 @@ const createMedicationBody = {
         start_date: { type: 'string', format: 'date' },
         end_date: { type: 'string', format: 'date', nullable: true },
         instructions: { type: 'string', nullable: true },
-        is_active: { type: 'boolean', default: true }
+        is_active: { type: 'boolean', default: true },
     },
     required: ['name', 'frequency', 'start_date'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateMedicationBody = {
@@ -166,9 +181,9 @@ const updateMedicationBody = {
         start_date: { type: 'string', format: 'date', nullable: true },
         end_date: { type: 'string', format: 'date', nullable: true },
         instructions: { type: 'string', nullable: true },
-        is_active: { type: 'boolean' }
+        is_active: { type: 'boolean' },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Medication Log schemas
@@ -179,10 +194,10 @@ const createMedicationLogBody = {
     properties: {
         taken_at: { type: 'string', format: 'date-time' },
         status: medicationLogStatusEnum,
-        notes: { type: 'string', maxLength: 500, nullable: true }
+        notes: { type: 'string', maxLength: 500, nullable: true },
     },
     required: ['taken_at', 'status'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Sleep Metric schemas
@@ -194,10 +209,10 @@ const createSleepMetricBody = {
         wake_time: { type: 'string', format: 'date-time', nullable: true },
         duration_hours: { type: 'number', minimum: 0, maximum: 24, nullable: true },
         quality: sleepQualityEnum,
-        notes: { type: 'string', maxLength: 1000, nullable: true }
+        notes: { type: 'string', maxLength: 1000, nullable: true },
     },
     required: ['sleep_date'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateSleepMetricBody = {
@@ -208,9 +223,9 @@ const updateSleepMetricBody = {
         wake_time: { type: 'string', format: 'date-time', nullable: true },
         duration_hours: { type: 'number', minimum: 0, maximum: 24, nullable: true },
         quality: sleepQualityEnum,
-        notes: { type: 'string', maxLength: 1000, nullable: true }
+        notes: { type: 'string', maxLength: 1000, nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Diet schemas
@@ -226,10 +241,10 @@ const createDietBody = {
         description: { type: 'string', maxLength: 2000, nullable: true },
         start_date: { type: 'string', format: 'date', nullable: true },
         end_date: { type: 'string', format: 'date', nullable: true },
-        is_active: { type: 'boolean', default: true }
+        is_active: { type: 'boolean', default: true },
     },
     required: ['name', 'goal', 'daily_calories_target'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateDietBody = {
@@ -244,9 +259,9 @@ const updateDietBody = {
         description: { type: 'string', maxLength: 2000, nullable: true },
         start_date: { type: 'string', format: 'date', nullable: true },
         end_date: { type: 'string', format: 'date', nullable: true },
-        is_active: { type: 'boolean' }
+        is_active: { type: 'boolean' },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Diet Meal schemas
@@ -254,31 +269,39 @@ const createDietMealBody = {
     type: 'object',
     properties: {
         name: { type: 'string', minLength: 1, maxLength: 200 },
-        meal_type: { type: 'string', enum: ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'], nullable: true },
+        meal_type: {
+            type: 'string',
+            enum: ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'],
+            nullable: true,
+        },
         meal_time: { type: 'string', pattern: '^\\d{2}:\\d{2}$', nullable: true },
         calories: { type: 'integer', minimum: 0, nullable: true },
         protein: { type: 'number', minimum: 0, nullable: true },
         carbs: { type: 'number', minimum: 0, nullable: true },
         fat: { type: 'number', minimum: 0, nullable: true },
-        meal_order: { type: 'integer', minimum: 0 }
+        meal_order: { type: 'integer', minimum: 0 },
     },
     required: ['name'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateDietMealBody = {
     type: 'object',
     properties: {
         name: { type: 'string', minLength: 1, maxLength: 200 },
-        meal_type: { type: 'string', enum: ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'], nullable: true },
+        meal_type: {
+            type: 'string',
+            enum: ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'],
+            nullable: true,
+        },
         meal_time: { type: 'string', pattern: '^\\d{2}:\\d{2}$', nullable: true },
         calories: { type: 'integer', minimum: 0, nullable: true },
         protein: { type: 'number', minimum: 0, nullable: true },
         carbs: { type: 'number', minimum: 0, nullable: true },
         fat: { type: 'number', minimum: 0, nullable: true },
-        meal_order: { type: 'integer', minimum: 0 }
+        meal_order: { type: 'integer', minimum: 0 },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Workout Schedule schemas
@@ -291,10 +314,10 @@ const createWorkoutScheduleBody = {
         scheduled_time: { type: 'string', pattern: '^\\d{2}:\\d{2}$', nullable: true },
         duration_minutes: { type: 'integer', minimum: 1, nullable: true },
         notes: { type: 'string', maxLength: 2000, nullable: true },
-        is_active: { type: 'boolean', default: true }
+        is_active: { type: 'boolean', default: true },
     },
     required: ['name', 'workout_type', 'day_of_week'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateWorkoutScheduleBody = {
@@ -306,9 +329,9 @@ const updateWorkoutScheduleBody = {
         scheduled_time: { type: 'string', pattern: '^\\d{2}:\\d{2}$', nullable: true },
         duration_minutes: { type: 'integer', minimum: 1, nullable: true },
         notes: { type: 'string', maxLength: 2000, nullable: true },
-        is_active: { type: 'boolean' }
+        is_active: { type: 'boolean' },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 module.exports = {
@@ -347,5 +370,5 @@ module.exports = {
     mealTypeEnum,
     workoutTypeEnum,
     sleepQualityEnum,
-    dietGoalEnum
+    dietGoalEnum,
 };

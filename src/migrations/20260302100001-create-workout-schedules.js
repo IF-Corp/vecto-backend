@@ -8,55 +8,55 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             name: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: false,
             },
             workout_type: {
                 type: Sequelize.ENUM('CARDIO', 'STRENGTH', 'FLEXIBILITY', 'SPORTS', 'OTHER'),
-                allowNull: false
+                allowNull: false,
             },
             day_of_week: {
                 type: Sequelize.INTEGER,
-                allowNull: false
+                allowNull: false,
             },
             scheduled_time: {
                 type: Sequelize.STRING(5),
-                allowNull: true
+                allowNull: true,
             },
             duration_minutes: {
                 type: Sequelize.INTEGER,
-                allowNull: true
+                allowNull: true,
             },
             notes: {
                 type: Sequelize.TEXT,
-                allowNull: true
+                allowNull: true,
             },
             is_active: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: true,
-                allowNull: false
+                allowNull: false,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('workout_schedules', ['user_id']);
@@ -66,5 +66,5 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('workout_schedules');
-    }
+    },
 };

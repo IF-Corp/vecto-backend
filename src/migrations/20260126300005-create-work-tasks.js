@@ -4,9 +4,13 @@
 module.exports = {
     async up(queryInterface, Sequelize) {
         // Create priority quadrant ENUM
-        await queryInterface.sequelize.query(`
+        await queryInterface.sequelize
+            .query(
+                `
             CREATE TYPE priority_quadrant AS ENUM ('DO_NOW', 'SCHEDULE', 'DELEGATE', 'ELIMINATE');
-        `).catch(() => {}); // Ignore if already exists
+        `,
+            )
+            .catch(() => {}); // Ignore if already exists
 
         await queryInterface.createTable('work_tasks', {
             id: {
@@ -135,6 +139,8 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('work_tasks');
-        await queryInterface.sequelize.query('DROP TYPE IF EXISTS priority_quadrant;').catch(() => {});
+        await queryInterface.sequelize
+            .query('DROP TYPE IF EXISTS priority_quadrant;')
+            .catch(() => {});
     },
 };

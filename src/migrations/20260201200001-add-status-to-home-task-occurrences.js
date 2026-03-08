@@ -26,6 +26,8 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.removeColumn('home_task_occurrences', 'status');
-        await queryInterface.sequelize.query('DROP TYPE IF EXISTS enum_home_task_occurrences_status;');
+        await queryInterface.sequelize.query(
+            'DROP TYPE IF EXISTS enum_home_task_occurrences_status;',
+        );
     },
 };

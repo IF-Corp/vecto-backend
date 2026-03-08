@@ -1,12 +1,12 @@
 // Mock dependencies before requiring the controller
 jest.mock('../../../src/models', () => ({
     User: {
-        findByPk: jest.fn()
+        findByPk: jest.fn(),
     },
     UserPreferences: {
         findOne: jest.fn(),
-        create: jest.fn()
-    }
+        create: jest.fn(),
+    },
 }));
 
 const userController = require('../../../src/controllers/userController');
@@ -22,12 +22,12 @@ describe('UserController', () => {
         mockRequest = {
             body: {},
             params: {},
-            user: { id: 'user-uuid' }
+            user: { id: 'user-uuid' },
         };
 
         mockReply = {
             status: jest.fn().mockReturnThis(),
-            send: jest.fn().mockReturnThis()
+            send: jest.fn().mockReturnThis(),
         };
     });
 
@@ -45,8 +45,8 @@ describe('UserController', () => {
                     studies: false,
                     work: false,
                     social: false,
-                    home: false
-                }
+                    home: false,
+                },
             };
 
             const mockUser = {
@@ -55,14 +55,14 @@ describe('UserController', () => {
                 name: 'Test User',
                 nickname: null,
                 is_onboarded: false,
-                save: jest.fn()
+                save: jest.fn(),
             };
 
             const mockPreferences = {
                 timezone: 'America/Sao_Paulo',
                 default_currency: 'BRL',
                 enabled_modules: ['habits', 'productivity'],
-                update: jest.fn()
+                update: jest.fn(),
             };
 
             User.findByPk.mockResolvedValue(mockUser);
@@ -77,7 +77,7 @@ describe('UserController', () => {
             expect(mockPreferences.update).toHaveBeenCalledWith({
                 timezone: 'America/Sao_Paulo',
                 default_currency: 'BRL',
-                enabled_modules: ['habits', 'productivity']
+                enabled_modules: ['habits', 'productivity'],
             });
             expect(mockReply.send).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -85,10 +85,10 @@ describe('UserController', () => {
                     data: expect.objectContaining({
                         user: expect.objectContaining({
                             nickname: 'TestUser',
-                            is_onboarded: true
-                        })
-                    })
-                })
+                            is_onboarded: true,
+                        }),
+                    }),
+                }),
             );
         });
 
@@ -105,8 +105,8 @@ describe('UserController', () => {
                     studies: false,
                     work: false,
                     social: false,
-                    home: false
-                }
+                    home: false,
+                },
             };
 
             const mockUser = {
@@ -115,14 +115,14 @@ describe('UserController', () => {
                 name: 'New User',
                 nickname: null,
                 is_onboarded: false,
-                save: jest.fn()
+                save: jest.fn(),
             };
 
             const createdPreferences = {
                 user_id: 'user-uuid',
                 timezone: 'Europe/London',
                 default_currency: 'EUR',
-                enabled_modules: ['habits', 'finance']
+                enabled_modules: ['habits', 'finance'],
             };
 
             User.findByPk.mockResolvedValue(mockUser);
@@ -135,12 +135,12 @@ describe('UserController', () => {
                 user_id: 'user-uuid',
                 timezone: 'Europe/London',
                 default_currency: 'EUR',
-                enabled_modules: ['habits', 'finance']
+                enabled_modules: ['habits', 'finance'],
             });
             expect(mockReply.send).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    success: true
-                })
+                    success: true,
+                }),
             );
         });
 
@@ -149,7 +149,7 @@ describe('UserController', () => {
                 nickname: 'Test',
                 timezone: 'America/Sao_Paulo',
                 currency: 'BRL',
-                modules: {}
+                modules: {},
             };
 
             User.findByPk.mockResolvedValue(null);
@@ -160,8 +160,8 @@ describe('UserController', () => {
             expect(mockReply.send).toHaveBeenCalledWith(
                 expect.objectContaining({
                     success: false,
-                    error: 'Not Found'
-                })
+                    error: 'Not Found',
+                }),
             );
         });
 
@@ -170,7 +170,7 @@ describe('UserController', () => {
                 nickname: '',
                 timezone: 'America/Sao_Paulo',
                 currency: 'BRL',
-                modules: { habits: true }
+                modules: { habits: true },
             };
 
             const mockUser = {
@@ -179,14 +179,14 @@ describe('UserController', () => {
                 name: 'Test User',
                 nickname: null,
                 is_onboarded: false,
-                save: jest.fn()
+                save: jest.fn(),
             };
 
             const mockPreferences = {
                 timezone: 'America/Sao_Paulo',
                 default_currency: 'BRL',
                 enabled_modules: ['habits'],
-                update: jest.fn()
+                update: jest.fn(),
             };
 
             User.findByPk.mockResolvedValue(mockUser);

@@ -29,7 +29,12 @@ const verbose = process.argv.includes('--verbose');
 
 // Fields automatically managed by the system (excluded from schema checks)
 const AUTO_FIELDS = new Set([
-    'id', 'user_id', 'createdAt', 'updatedAt', 'created_at', 'updated_at',
+    'id',
+    'user_id',
+    'createdAt',
+    'updatedAt',
+    'created_at',
+    'updated_at',
 ]);
 
 // Sequelize DataType key → JSON Schema type
@@ -163,16 +168,25 @@ const KNOWN_ALIASES = {
 
     // camelCase aliases for frontend convenience
     Transaction: new Set([
-        'accountId', 'categoryId', 'cardId', 'date',
-        'recurringExpenseId', 'account_name',
+        'accountId',
+        'categoryId',
+        'cardId',
+        'date',
+        'recurringExpenseId',
+        'account_name',
     ]),
     Invoice: new Set(['accountId', 'cardId']),
 
     // Freeze mode: legacy schema maps to config model with different structure
     FreezePeriod: new Set(['modules', 'options', 'activate_immediately']),
     FreezeModeConfig: new Set([
-        'pause_habits', 'pause_tasks', 'pause_notifications', 'auto_resume',
-        'start_date', 'end_date', 'reason',
+        'pause_habits',
+        'pause_tasks',
+        'pause_notifications',
+        'auto_resume',
+        'start_date',
+        'end_date',
+        'reason',
     ]),
 };
 
@@ -209,7 +223,7 @@ function isNullableInSchema(schemaProp) {
     if (schemaProp.nullable === true) return true;
     if (Array.isArray(schemaProp.type) && schemaProp.type.includes('null')) return true;
     if (Array.isArray(schemaProp.anyOf)) {
-        return schemaProp.anyOf.some(s => s.type === 'null' || s.nullable === true);
+        return schemaProp.anyOf.some((s) => s.type === 'null' || s.nullable === true);
     }
     return false;
 }
@@ -218,7 +232,7 @@ function getSchemaType(schemaProp) {
     if (!schemaProp) return null;
     if (typeof schemaProp.type === 'string') return schemaProp.type;
     if (Array.isArray(schemaProp.type)) {
-        return schemaProp.type.find(t => t !== 'null') || schemaProp.type[0];
+        return schemaProp.type.find((t) => t !== 'null') || schemaProp.type[0];
     }
     // Enum objects used as schema values (e.g., timePeriodEnum = { type: 'string', enum: [...] })
     if (schemaProp.enum && !schemaProp.type) return 'string';
@@ -262,7 +276,9 @@ let totalPairsClean = 0;
 function validatePair(modelName, schemaKey, schemaObj, moduleName) {
     const model = db[modelName];
     if (!model) {
-        console.log(`  ${YELLOW}!${RESET} Model "${modelName}" not found (mapped from ${moduleName}:${schemaKey})`);
+        console.log(
+            `  ${YELLOW}!${RESET} Model "${modelName}" not found (mapped from ${moduleName}:${schemaKey})`,
+        );
         totalWarnings++;
         return;
     }
@@ -323,15 +339,17 @@ function validatePair(modelName, schemaKey, schemaObj, moduleName) {
         const schemaEnumValues = propDef.enum;
         if (modelEnumValues && schemaEnumValues) {
             const modelSet = new Set(modelEnumValues);
-            const schemaSet = new Set(schemaEnumValues.filter(v => v !== null));
+            const schemaSet = new Set(schemaEnumValues.filter((v) => v !== null));
 
-            const missingInSchema = modelEnumValues.filter(v => !schemaSet.has(v));
-            const extraInSchema = [...schemaSet].filter(v => !modelSet.has(v));
+            const missingInSchema = modelEnumValues.filter((v) => !schemaSet.has(v));
+            const extraInSchema = [...schemaSet].filter((v) => !modelSet.has(v));
 
             if (missingInSchema.length > 0 || extraInSchema.length > 0) {
                 const parts = [];
-                if (missingInSchema.length) parts.push(`missing in schema: [${missingInSchema.join(', ')}]`);
-                if (extraInSchema.length) parts.push(`extra in schema: [${extraInSchema.join(', ')}]`);
+                if (missingInSchema.length)
+                    parts.push(`missing in schema: [${missingInSchema.join(', ')}]`);
+                if (extraInSchema.length)
+                    parts.push(`extra in schema: [${extraInSchema.join(', ')}]`);
                 issues.push({
                     level: 'error',
                     type: 'ENUM_MISMATCH',
@@ -377,9 +395,9 @@ function validatePair(modelName, schemaKey, schemaObj, moduleName) {
     }
 
     // Print results
-    const errors = issues.filter(i => i.level === 'error');
-    const warnings = issues.filter(i => i.level === 'warn');
-    const infos = issues.filter(i => i.level === 'info');
+    const errors = issues.filter((i) => i.level === 'error');
+    const warnings = issues.filter((i) => i.level === 'warn');
+    const infos = issues.filter((i) => i.level === 'info');
 
     totalErrors += errors.length;
     totalWarnings += warnings.length;
@@ -528,10 +546,14 @@ function main() {
     console.log();
 
     if (totalErrors > 0) {
-        console.log(`${RED}${BOLD}FAIL${RESET} Schema validation found ${totalErrors} error(s). Fix before deploying.\n`);
+        console.log(
+            `${RED}${BOLD}FAIL${RESET} Schema validation found ${totalErrors} error(s). Fix before deploying.\n`,
+        );
         process.exit(1);
     } else if (totalWarnings > 0) {
-        console.log(`${YELLOW}${BOLD}PASS (with warnings)${RESET} ${totalWarnings} warning(s) found. Review recommended.\n`);
+        console.log(
+            `${YELLOW}${BOLD}PASS (with warnings)${RESET} ${totalWarnings} warning(s) found. Review recommended.\n`,
+        );
         process.exit(0);
     } else {
         console.log(`${GREEN}${BOLD}PASS${RESET} All schemas are aligned with models.\n`);
