@@ -52,6 +52,23 @@ async function routes(fastify) {
         userIdSchema,
         dashboardController.updateAlertSettings,
     );
+
+    // Turn Calendar
+    fastify.get(
+        '/users/:userId/dashboard/turn-calendar',
+        {
+            schema: {
+                params: common.userIdParams,
+                querystring: {
+                    type: 'object',
+                    properties: {
+                        hours: { type: 'integer', default: 8 },
+                    },
+                },
+            },
+        },
+        dashboardController.getTurnCalendar,
+    );
 }
 
 module.exports = routes;
