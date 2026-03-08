@@ -48,7 +48,9 @@ module.exports = {
         });
 
         await queryInterface.addIndex('dashboard_quick_stats', ['user_id']);
-        await queryInterface.addIndex('dashboard_quick_stats', ['user_id', 'stat_type'], { unique: true });
+        await queryInterface.addIndex('dashboard_quick_stats', ['user_id', 'stat_type'], {
+            unique: true,
+        });
     },
 
     async down(queryInterface) {

@@ -39,7 +39,7 @@ module.exports = {
         await queryInterface.changeColumn('transactions', 'status', {
             type: Sequelize.ENUM('PENDING', 'CONFIRMED', 'CANCELLED', 'CONSOLIDATED'),
             defaultValue: 'CONFIRMED',
-            allowNull: false
+            allowNull: false,
         });
     },
 
@@ -50,17 +50,17 @@ module.exports = {
             allowNull: false,
             references: {
                 model: 'accounts',
-                key: 'id'
+                key: 'id',
             },
             onUpdate: 'CASCADE',
-            onDelete: 'CASCADE'
+            onDelete: 'CASCADE',
         });
 
         // Revert status default
         await queryInterface.changeColumn('transactions', 'status', {
             type: Sequelize.ENUM('PENDING', 'CONSOLIDATED'),
             defaultValue: 'PENDING',
-            allowNull: false
+            allowNull: false,
         });
-    }
+    },
 };

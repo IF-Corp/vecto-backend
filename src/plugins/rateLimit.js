@@ -14,23 +14,23 @@ async function rateLimitPlugin(fastify, opts) {
                 success: false,
                 error: 'Too Many Requests',
                 message: `Rate limit exceeded. Try again in ${context.after}`,
-                statusCode: 429
+                statusCode: 429,
             };
         },
         addHeadersOnExceeding: {
             'x-ratelimit-limit': true,
             'x-ratelimit-remaining': true,
-            'x-ratelimit-reset': true
+            'x-ratelimit-reset': true,
         },
         addHeaders: {
             'x-ratelimit-limit': true,
             'x-ratelimit-remaining': true,
             'x-ratelimit-reset': true,
-            'retry-after': true
-        }
+            'retry-after': true,
+        },
     });
 }
 
 module.exports = fp(rateLimitPlugin, {
-    name: 'rate-limit-plugin'
+    name: 'rate-limit-plugin',
 });

@@ -49,7 +49,7 @@ async function routes(fastify, options) {
         return {
             status: 'ok',
             timestamp: new Date().toISOString(),
-            service: 'vecto-backend'
+            service: 'vecto-backend',
         };
     });
 

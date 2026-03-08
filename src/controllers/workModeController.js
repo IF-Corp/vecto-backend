@@ -8,7 +8,10 @@ const getWorkModes = async (request, reply) => {
 
         const modes = await WorkMode.findAll({
             where: { userId },
-            order: [['isDefault', 'DESC'], ['name', 'ASC']],
+            order: [
+                ['isDefault', 'DESC'],
+                ['name', 'ASC'],
+            ],
         });
 
         return { success: true, data: modes };
@@ -130,7 +133,9 @@ const initializeDefaultModes = async (request, reply) => {
         return reply.status(201).send({ success: true, data: modes });
     } catch (error) {
         console.error('Error initializing default modes:', error);
-        return reply.status(500).send({ success: false, error: 'Failed to initialize default modes' });
+        return reply
+            .status(500)
+            .send({ success: false, error: 'Failed to initialize default modes' });
     }
 };
 
@@ -149,7 +154,9 @@ const startSession = async (request, reply) => {
         });
 
         if (activeSession) {
-            return reply.status(400).send({ success: false, error: 'An active session already exists' });
+            return reply
+                .status(400)
+                .send({ success: false, error: 'An active session already exists' });
         }
 
         const mode = await WorkMode.findByPk(modeId);
@@ -262,7 +269,7 @@ const finishSession = async (request, reply) => {
         // If paused, add the current pause time
         if (session.status === 'paused' && session.pausedAt) {
             const currentPause = Math.floor((finishedAt - new Date(session.pausedAt)) / 1000);
-            actualDuration -= (session.pausedDuration + currentPause);
+            actualDuration -= session.pausedDuration + currentPause;
         } else {
             actualDuration -= session.pausedDuration;
         }
@@ -408,7 +415,7 @@ const getSessionStats = async (request, reply) => {
 
         // Group by mode
         const byMode = {};
-        sessions.forEach(session => {
+        sessions.forEach((session) => {
             const modeName = session.mode?.name || 'Unknown';
             if (!byMode[modeName]) {
                 byMode[modeName] = {

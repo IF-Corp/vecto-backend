@@ -50,21 +50,25 @@ vecto-backend/
 ### Installation
 
 1. Clone the repository and navigate to the backend directory:
+
 ```bash
 cd vecto-backend
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Set up environment variables:
+
 ```bash
 cp .env.example .env
 ```
 
 Edit `.env` and update the database credentials:
+
 ```env
 DB_HOST=localhost
 DB_PORT=5432
@@ -74,16 +78,19 @@ DB_PASSWORD=your_postgres_password
 ```
 
 4. Create the PostgreSQL database:
+
 ```bash
 createdb vecto_db
 ```
 
 Or using psql:
+
 ```sql
 CREATE DATABASE vecto_db;
 ```
 
 5. Run database migrations:
+
 ```bash
 npm run migrate
 ```
@@ -91,11 +98,13 @@ npm run migrate
 ### Running the Server
 
 Development mode (with auto-reload):
+
 ```bash
 npm run dev
 ```
 
 Production mode:
+
 ```bash
 npm start
 ```
@@ -105,31 +114,36 @@ The server will start on `http://localhost:3000` (or the port specified in your 
 ## API Endpoints
 
 ### Health Check
+
 - `GET /health` - Check server status
 
 ### Users
+
 - `POST /api/users` - Create or update user (upsert)
-  - Body: `{ "email": "user@example.com", "name": "John Doe" }`
+    - Body: `{ "email": "user@example.com", "name": "John Doe" }`
 - `GET /api/users/:id` - Get user by ID
 - `GET /api/users?email=user@example.com` - Get user by email
 - `PUT /api/users/:id` - Update user profile
-  - Body: `{ "name": "New Name", "is_onboarded": true }`
+    - Body: `{ "name": "New Name", "is_onboarded": true }`
 - `PATCH /api/users/:id/onboarding` - Update onboarding status
-  - Body: `{ "is_onboarded": true }`
+    - Body: `{ "is_onboarded": true }`
 
 ## Database Migrations
 
 Run migrations:
+
 ```bash
 npm run migrate
 ```
 
 Undo last migration:
+
 ```bash
 npm run migrate:undo
 ```
 
 Undo all migrations:
+
 ```bash
 npm run migrate:undo:all
 ```
@@ -147,17 +161,17 @@ The `users` table has the following columns:
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `NODE_ENV` | Environment (development/production) | development |
-| `PORT` | Server port | 3000 |
-| `HOST` | Server host | 0.0.0.0 |
-| `DB_HOST` | PostgreSQL host | localhost |
-| `DB_PORT` | PostgreSQL port | 5432 |
-| `DB_NAME` | Database name | vecto_db |
-| `DB_USER` | Database user | postgres |
-| `DB_PASSWORD` | Database password | - |
-| `CORS_ORIGIN` | CORS allowed origin | * |
+| Variable      | Description                          | Default     |
+| ------------- | ------------------------------------ | ----------- |
+| `NODE_ENV`    | Environment (development/production) | development |
+| `PORT`        | Server port                          | 3000        |
+| `HOST`        | Server host                          | 0.0.0.0     |
+| `DB_HOST`     | PostgreSQL host                      | localhost   |
+| `DB_PORT`     | PostgreSQL port                      | 5432        |
+| `DB_NAME`     | Database name                        | vecto_db    |
+| `DB_USER`     | Database user                        | postgres    |
+| `DB_PASSWORD` | Database password                    | -           |
+| `CORS_ORIGIN` | CORS allowed origin                  | \*          |
 
 ## Development
 
@@ -172,10 +186,10 @@ The project follows the MVC pattern:
 ### Error Handling
 
 Global error handling is implemented in `src/middleware/errorHandler.js` and handles:
+
 - Validation errors
 - Sequelize errors (unique constraints, validation)
 - Generic server errors
-
 
 ## License
 

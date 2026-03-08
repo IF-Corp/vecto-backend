@@ -10,5 +10,5 @@ jest.setTimeout(10000);
 // Clean up after all tests
 afterAll(async () => {
     // Give time for any async operations to complete
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 });

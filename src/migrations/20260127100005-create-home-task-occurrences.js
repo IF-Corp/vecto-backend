@@ -61,7 +61,9 @@ module.exports = {
 
         await queryInterface.addIndex('home_task_occurrences', ['task_id']);
         await queryInterface.addIndex('home_task_occurrences', ['due_date']);
-        await queryInterface.addIndex('home_task_occurrences', ['task_id', 'due_date'], { unique: true });
+        await queryInterface.addIndex('home_task_occurrences', ['task_id', 'due_date'], {
+            unique: true,
+        });
     },
 
     async down(queryInterface, Sequelize) {

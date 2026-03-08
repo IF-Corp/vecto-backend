@@ -120,8 +120,8 @@ const copyPreviousWeek = async (request, reply) => {
                     meal_type: meal.meal_type,
                     description: meal.description,
                     recipe_id: meal.recipe_id,
-                })
-            )
+                }),
+            ),
         );
 
         const newMeals = await HomeMeal.findAll({

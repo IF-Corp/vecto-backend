@@ -54,7 +54,7 @@ const SocialContact = sequelize.define(
         tableName: 'social_contacts',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = SocialContact;

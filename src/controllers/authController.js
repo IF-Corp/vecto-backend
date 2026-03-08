@@ -15,7 +15,7 @@ class AuthController {
                 return reply.status(409).send({
                     success: false,
                     error: 'Conflict',
-                    message: 'Email already registered'
+                    message: 'Email already registered',
                 });
             }
 
@@ -25,7 +25,7 @@ class AuthController {
                 email,
                 password_hash: passwordHash,
                 name: name || null,
-                is_onboarded: false
+                is_onboarded: false,
             });
 
             const tokens = tokenService.generateTokens(user);
@@ -36,17 +36,17 @@ class AuthController {
                     user: {
                         id: user.id,
                         email: user.email,
-                        name: user.name
+                        name: user.name,
                     },
-                    ...tokens
-                }
+                    ...tokens,
+                },
             });
         } catch (error) {
             console.error('Register error:', error);
             return reply.status(500).send({
                 success: false,
                 error: 'Internal Server Error',
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -61,7 +61,7 @@ class AuthController {
                 return reply.status(401).send({
                     success: false,
                     error: 'Unauthorized',
-                    message: 'Invalid credentials'
+                    message: 'Invalid credentials',
                 });
             }
 
@@ -69,7 +69,7 @@ class AuthController {
                 return reply.status(401).send({
                     success: false,
                     error: 'Unauthorized',
-                    message: 'Account requires password setup'
+                    message: 'Account requires password setup',
                 });
             }
 
@@ -78,7 +78,7 @@ class AuthController {
                 return reply.status(401).send({
                     success: false,
                     error: 'Unauthorized',
-                    message: 'Invalid credentials'
+                    message: 'Invalid credentials',
                 });
             }
 
@@ -90,17 +90,17 @@ class AuthController {
                     user: {
                         id: user.id,
                         email: user.email,
-                        name: user.name
+                        name: user.name,
                     },
-                    ...tokens
-                }
+                    ...tokens,
+                },
             });
         } catch (error) {
             console.error('Login error:', error);
             return reply.status(500).send({
                 success: false,
                 error: 'Internal Server Error',
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -118,7 +118,7 @@ class AuthController {
                 return reply.status(400).send({
                     success: false,
                     error: 'Bad Request',
-                    message: 'Google ID token is required'
+                    message: 'Google ID token is required',
                 });
             }
 
@@ -130,13 +130,13 @@ class AuthController {
                 return reply.status(401).send({
                     success: false,
                     error: 'Unauthorized',
-                    message: error.message
+                    message: error.message,
                 });
             }
 
             // Check if user exists by google_id or email
             let user = await User.findOne({
-                where: { google_id: googleUser.googleId }
+                where: { google_id: googleUser.googleId },
             });
 
             let isNewUser = false;
@@ -144,7 +144,7 @@ class AuthController {
             if (!user) {
                 // Check by email (user might have registered with email first)
                 user = await User.findOne({
-                    where: { email: googleUser.email }
+                    where: { email: googleUser.email },
                 });
 
                 if (user) {
@@ -153,7 +153,7 @@ class AuthController {
                         google_id: googleUser.googleId,
                         auth_provider: 'google',
                         avatar_url: user.avatar_url || googleUser.picture,
-                        name: user.name || googleUser.name
+                        name: user.name || googleUser.name,
                     });
                 } else {
                     // Create new user
@@ -163,7 +163,7 @@ class AuthController {
                         name: googleUser.name,
                         avatar_url: googleUser.picture,
                         auth_provider: 'google',
-                        is_onboarded: false
+                        is_onboarded: false,
                     });
                     isNewUser = true;
                 }
@@ -179,18 +179,18 @@ class AuthController {
                         email: user.email,
                         name: user.name,
                         avatar_url: user.avatar_url,
-                        is_onboarded: user.is_onboarded
+                        is_onboarded: user.is_onboarded,
                     },
                     isNewUser,
-                    ...tokens
-                }
+                    ...tokens,
+                },
             });
         } catch (error) {
             console.error('Google login error:', error);
             return reply.status(500).send({
                 success: false,
                 error: 'Internal Server Error',
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -206,7 +206,7 @@ class AuthController {
                 return reply.status(401).send({
                     success: false,
                     error: 'Unauthorized',
-                    message: 'Invalid or expired refresh token'
+                    message: 'Invalid or expired refresh token',
                 });
             }
 
@@ -215,7 +215,7 @@ class AuthController {
                 return reply.status(401).send({
                     success: false,
                     error: 'Unauthorized',
-                    message: 'User not found'
+                    message: 'User not found',
                 });
             }
 
@@ -223,14 +223,14 @@ class AuthController {
 
             return reply.send({
                 success: true,
-                data: tokens
+                data: tokens,
             });
         } catch (error) {
             console.error('Refresh error:', error);
             return reply.status(500).send({
                 success: false,
                 error: 'Internal Server Error',
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -238,27 +238,27 @@ class AuthController {
     async me(request, reply) {
         try {
             const user = await User.findByPk(request.user.id, {
-                attributes: { exclude: ['password_hash'] }
+                attributes: { exclude: ['password_hash'] },
             });
 
             if (!user) {
                 return reply.status(404).send({
                     success: false,
                     error: 'Not Found',
-                    message: 'User not found'
+                    message: 'User not found',
                 });
             }
 
             return reply.send({
                 success: true,
-                data: user
+                data: user,
             });
         } catch (error) {
             console.error('Me error:', error);
             return reply.status(500).send({
                 success: false,
                 error: 'Internal Server Error',
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -272,7 +272,7 @@ class AuthController {
                 return reply.status(404).send({
                     success: false,
                     error: 'Not Found',
-                    message: 'User not found'
+                    message: 'User not found',
                 });
             }
 
@@ -282,7 +282,7 @@ class AuthController {
                     return reply.status(401).send({
                         success: false,
                         error: 'Unauthorized',
-                        message: 'Current password is incorrect'
+                        message: 'Current password is incorrect',
                     });
                 }
             }
@@ -292,14 +292,14 @@ class AuthController {
 
             return reply.send({
                 success: true,
-                message: 'Password changed successfully'
+                message: 'Password changed successfully',
             });
         } catch (error) {
             console.error('Change password error:', error);
             return reply.status(500).send({
                 success: false,
                 error: 'Internal Server Error',
-                message: error.message
+                message: error.message,
             });
         }
     }

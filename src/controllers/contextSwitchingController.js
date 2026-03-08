@@ -46,7 +46,10 @@ const detectContextSwitches = async (userId, date = new Date()) => {
         // Build timeline item
         const timelineItem = {
             id: entry.id,
-            startTime: startTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+            startTime: startTime.toLocaleTimeString('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit',
+            }),
             endTime: endTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
             duration: durationMinutes,
             durationFormatted: formatDuration(durationMinutes),
@@ -61,23 +64,30 @@ const detectContextSwitches = async (userId, date = new Date()) => {
 
         // Detect switch from previous entry
         if (previousEntry) {
-            const isSwitch = (
+            const isSwitch =
                 entry.projectId !== previousEntry.projectId ||
-                entry.taskId !== previousEntry.taskId
-            );
+                entry.taskId !== previousEntry.taskId;
 
             if (isSwitch) {
                 switches.push({
-                    time: startTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                    time: startTime.toLocaleTimeString('pt-BR', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                    }),
                     from: {
                         projectName: previousEntry.project?.name || 'Sem projeto',
-                        taskTitle: previousEntry.task?.title || previousEntry.description || 'Sem tarefa',
+                        taskTitle:
+                            previousEntry.task?.title || previousEntry.description || 'Sem tarefa',
                     },
                     to: {
                         projectName: entry.project?.name || 'Sem projeto',
                         taskTitle: entry.task?.title || entry.description || 'Sem tarefa',
                     },
-                    focusedMinutesBefore: Math.round((new Date(previousEntry.endedAt || startTime) - new Date(previousEntry.startedAt)) / 60000),
+                    focusedMinutesBefore: Math.round(
+                        (new Date(previousEntry.endedAt || startTime) -
+                            new Date(previousEntry.startedAt)) /
+                            60000,
+                    ),
                 });
             }
         }
@@ -86,8 +96,8 @@ const detectContextSwitches = async (userId, date = new Date()) => {
     }
 
     // Count unique projects and tasks
-    const uniqueProjects = new Set(entries.map(e => e.projectId).filter(Boolean)).size;
-    const uniqueTasks = new Set(entries.map(e => e.taskId).filter(Boolean)).size;
+    const uniqueProjects = new Set(entries.map((e) => e.projectId).filter(Boolean)).size;
+    const uniqueTasks = new Set(entries.map((e) => e.taskId).filter(Boolean)).size;
 
     return {
         totalSwitches: switches.length,
@@ -112,7 +122,7 @@ const calculateAverageFocusTime = async (userId, date = new Date()) => {
     }
 
     // Calculate focus times (duration of each session)
-    const focusTimes = timeline.map(t => t.duration);
+    const focusTimes = timeline.map((t) => t.duration);
     const totalFocusTime = focusTimes.reduce((sum, t) => sum + t, 0);
     const averageMinutes = Math.round(totalFocusTime / timeline.length);
 
@@ -181,10 +191,12 @@ const suggestTaskGrouping = async (userId) => {
         }
 
         if (entry.task) {
-            projectGroups[projectId].tasks.add(JSON.stringify({
-                id: entry.task.id,
-                title: entry.task.title,
-            }));
+            projectGroups[projectId].tasks.add(
+                JSON.stringify({
+                    id: entry.task.id,
+                    title: entry.task.title,
+                }),
+            );
         }
 
         const duration = entry.endedAt
@@ -195,9 +207,9 @@ const suggestTaskGrouping = async (userId) => {
     }
 
     // Convert to array and calculate fragmentation
-    const projects = Object.values(projectGroups).map(p => ({
+    const projects = Object.values(projectGroups).map((p) => ({
         ...p,
-        tasks: [...p.tasks].map(t => JSON.parse(t)),
+        tasks: [...p.tasks].map((t) => JSON.parse(t)),
         totalFormatted: formatDuration(Math.round(p.totalMinutes)),
         fragmentationScore: p.entriesCount / Math.max(1, p.totalMinutes / 60), // Entries per hour
     }));
@@ -209,9 +221,12 @@ const suggestTaskGrouping = async (userId) => {
     const suggestions = [];
 
     // Find most fragmented projects
-    const fragmentedProjects = projects.filter(p => p.fragmentationScore > 2);
+    const fragmentedProjects = projects.filter((p) => p.fragmentationScore > 2);
     if (fragmentedProjects.length > 0) {
-        const projectNames = fragmentedProjects.slice(0, 2).map(p => p.projectName).join(' e ');
+        const projectNames = fragmentedProjects
+            .slice(0, 2)
+            .map((p) => p.projectName)
+            .join(' e ');
         suggestions.push({
             type: 'grouping',
             message: `Agrupe tarefas de ${projectNames} em blocos maiores para reduzir trocas.`,
@@ -262,7 +277,10 @@ const getContextSwitching = async (request, reply) => {
 
         const switchData = await detectContextSwitches(userId, targetDate);
         const focusData = await calculateAverageFocusTime(userId, targetDate);
-        const productivityLoss = estimateProductivityLoss(switchData.totalSwitches, focusData.averageMinutes);
+        const productivityLoss = estimateProductivityLoss(
+            switchData.totalSwitches,
+            focusData.averageMinutes,
+        );
         const groupingSuggestions = await suggestTaskGrouping(userId);
 
         return reply.send({
@@ -315,8 +333,12 @@ const getContextSwitchingHistory = async (request, reply) => {
         }
 
         // Calculate averages
-        const avgSwitches = Math.round(history.reduce((sum, h) => sum + h.switches, 0) / history.length);
-        const avgFocus = Math.round(history.reduce((sum, h) => sum + h.averageFocusMinutes, 0) / history.length);
+        const avgSwitches = Math.round(
+            history.reduce((sum, h) => sum + h.switches, 0) / history.length,
+        );
+        const avgFocus = Math.round(
+            history.reduce((sum, h) => sum + h.averageFocusMinutes, 0) / history.length,
+        );
 
         return reply.send({
             history,

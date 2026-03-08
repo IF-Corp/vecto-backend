@@ -7,62 +7,62 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             name: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: false,
             },
             start_time: {
                 type: Sequelize.TIME,
-                allowNull: true
+                allowNull: true,
             },
             frequency: {
                 type: Sequelize.ENUM('DAILY', 'WEEKLY', 'CUSTOM'),
                 defaultValue: 'DAILY',
-                allowNull: false
+                allowNull: false,
             },
             frequency_days: {
                 type: Sequelize.ARRAY(Sequelize.INTEGER),
                 defaultValue: [],
-                allowNull: true
+                allowNull: true,
             },
             current_streak: {
                 type: Sequelize.INTEGER,
                 defaultValue: 0,
-                allowNull: false
+                allowNull: false,
             },
             is_frozen: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false,
-                allowNull: false
+                allowNull: false,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('routines', ['user_id'], {
-            name: 'routines_user_id_idx'
+            name: 'routines_user_id_idx',
         });
     },
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('routines');
-    }
+    },
 };

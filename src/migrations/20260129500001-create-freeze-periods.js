@@ -18,55 +18,55 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             start_date: {
                 type: Sequelize.DATEONLY,
-                allowNull: false
+                allowNull: false,
             },
             end_date: {
                 type: Sequelize.DATEONLY,
-                allowNull: false
+                allowNull: false,
             },
             reason: {
                 type: 'freeze_reason',
-                allowNull: true
+                allowNull: true,
             },
             reason_custom: {
                 type: Sequelize.TEXT,
-                allowNull: true
+                allowNull: true,
             },
             status: {
                 type: 'freeze_status',
                 allowNull: false,
-                defaultValue: 'SCHEDULED'
+                defaultValue: 'SCHEDULED',
             },
             activated_at: {
                 type: Sequelize.DATE,
-                allowNull: true
+                allowNull: true,
             },
             deactivated_at: {
                 type: Sequelize.DATE,
-                allowNull: true
+                allowNull: true,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('freeze_periods', ['user_id']);
@@ -78,5 +78,5 @@ module.exports = {
         await queryInterface.dropTable('freeze_periods');
         await queryInterface.sequelize.query('DROP TYPE IF EXISTS freeze_status;');
         await queryInterface.sequelize.query('DROP TYPE IF EXISTS freeze_reason;');
-    }
+    },
 };

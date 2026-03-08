@@ -6,7 +6,10 @@ async function routes(fastify) {
 
     // Modules
     fastify.get('/users/:userId/settings/modules', settingsController.getModules);
-    fastify.put('/users/:userId/settings/modules/:moduleType/toggle', settingsController.toggleModule);
+    fastify.put(
+        '/users/:userId/settings/modules/:moduleType/toggle',
+        settingsController.toggleModule,
+    );
 
     // Appearance
     fastify.get('/users/:userId/settings/appearance', settingsController.getAppearance);

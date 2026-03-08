@@ -3,10 +3,15 @@ const sequelize = require('../config/sequelize');
 
 // Analyze energy patterns over multiple weeks
 const analyzeEnergyPatterns = async (userId, weeks = 4) => {
-    const { WorkEnergyLog, WorkDailyStandup, WorkEndOfDayReview, WorkModeSession } = require('../models');
+    const {
+        WorkEnergyLog,
+        WorkDailyStandup,
+        WorkEndOfDayReview,
+        WorkModeSession,
+    } = require('../models');
     const endDate = new Date();
     const startDate = new Date();
-    startDate.setDate(startDate.getDate() - (weeks * 7));
+    startDate.setDate(startDate.getDate() - weeks * 7);
 
     // Get all energy logs
     const energyLogs = await WorkEnergyLog.findAll({
@@ -72,9 +77,8 @@ const analyzeEnergyPatterns = async (userId, weeks = 4) => {
     // Calculate averages
     const hourlyAverages = {};
     for (const [hour, data] of Object.entries(hourlyEnergy)) {
-        hourlyAverages[hour] = data.count > 0
-            ? Math.round((data.total / data.count) * 10) / 10
-            : null;
+        hourlyAverages[hour] =
+            data.count > 0 ? Math.round((data.total / data.count) * 10) / 10 : null;
     }
 
     // Determine data sufficiency
@@ -97,7 +101,8 @@ const findPeakHours = async (userId) => {
     if (!hasEnoughData) {
         return {
             hasEnoughData: false,
-            message: 'Precisa de mais dados. Continue registrando sua energia por pelo menos 2 semanas.',
+            message:
+                'Precisa de mais dados. Continue registrando sua energia por pelo menos 2 semanas.',
             peakHours: null,
             lowHours: null,
             secondPeak: null,
@@ -132,9 +137,7 @@ const findPeakHours = async (userId) => {
     const lowEnd = Math.min(22, lowHour.hour + 1);
 
     // Find second peak (not adjacent to first)
-    const secondPeakCandidates = validHours.filter(h =>
-        Math.abs(h.hour - peakHour.hour) >= 3
-    );
+    const secondPeakCandidates = validHours.filter((h) => Math.abs(h.hour - peakHour.hour) >= 3);
     const secondPeak = secondPeakCandidates.length > 0 ? secondPeakCandidates[0] : null;
 
     return {
@@ -151,12 +154,14 @@ const findPeakHours = async (userId) => {
             energy: lowHour.energy,
             label: 'Baixa energia',
         },
-        secondPeak: secondPeak ? {
-            start: `${String(Math.max(6, secondPeak.hour - 1)).padStart(2, '0')}:00`,
-            end: `${String(Math.min(22, secondPeak.hour + 1)).padStart(2, '0')}:00`,
-            energy: secondPeak.energy,
-            label: 'Segundo pico',
-        } : null,
+        secondPeak: secondPeak
+            ? {
+                  start: `${String(Math.max(6, secondPeak.hour - 1)).padStart(2, '0')}:00`,
+                  end: `${String(Math.min(22, secondPeak.hour + 1)).padStart(2, '0')}:00`,
+                  energy: secondPeak.energy,
+                  label: 'Segundo pico',
+              }
+            : null,
     };
 };
 
@@ -167,10 +172,13 @@ const generateEnergyBasedSuggestions = async (userId) => {
     if (!peakAnalysis.hasEnoughData) {
         return {
             hasEnoughData: false,
-            suggestions: [{
-                type: 'info',
-                message: 'Continue registrando sua energia para receber sugestoes personalizadas.',
-            }],
+            suggestions: [
+                {
+                    type: 'info',
+                    message:
+                        'Continue registrando sua energia para receber sugestoes personalizadas.',
+                },
+            ],
         };
     }
 

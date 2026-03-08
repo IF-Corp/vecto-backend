@@ -8,5 +8,5 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.renameColumn('workouts', 'workout_type', 'type');
-    }
+    },
 };

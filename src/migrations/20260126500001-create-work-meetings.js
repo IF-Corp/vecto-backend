@@ -48,7 +48,15 @@ module.exports = {
                 defaultValue: 60,
             },
             category: {
-                type: Sequelize.ENUM('ONE_ON_ONE', 'DAILY', 'PLANNING', 'RETROSPECTIVE', 'CLIENT', 'INTERVIEW', 'OTHER'),
+                type: Sequelize.ENUM(
+                    'ONE_ON_ONE',
+                    'DAILY',
+                    'PLANNING',
+                    'RETROSPECTIVE',
+                    'CLIENT',
+                    'INTERVIEW',
+                    'OTHER',
+                ),
                 allowNull: false,
                 defaultValue: 'OTHER',
             },

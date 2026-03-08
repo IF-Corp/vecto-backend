@@ -20,7 +20,16 @@ module.exports = {
                 onDelete: 'CASCADE',
             },
             evaluation_type: {
-                type: Sequelize.ENUM('EXAM_1', 'EXAM_2', 'EXAM_3', 'FINAL_EXAM', 'ASSIGNMENT', 'PROJECT', 'PARTICIPATION', 'OTHER'),
+                type: Sequelize.ENUM(
+                    'EXAM_1',
+                    'EXAM_2',
+                    'EXAM_3',
+                    'FINAL_EXAM',
+                    'ASSIGNMENT',
+                    'PROJECT',
+                    'PARTICIPATION',
+                    'OTHER',
+                ),
                 allowNull: false,
             },
             name: {
@@ -72,7 +81,11 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('study_evaluations');
-        await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_study_evaluations_evaluation_type";');
-        await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_study_evaluations_status";');
+        await queryInterface.sequelize.query(
+            'DROP TYPE IF EXISTS "enum_study_evaluations_evaluation_type";',
+        );
+        await queryInterface.sequelize.query(
+            'DROP TYPE IF EXISTS "enum_study_evaluations_status";',
+        );
     },
 };

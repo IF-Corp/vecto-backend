@@ -8,7 +8,7 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
@@ -16,29 +16,29 @@ module.exports = {
                 unique: true,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             total_xp: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
-                defaultValue: 0
+                defaultValue: 0,
             },
             current_level: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
-                defaultValue: 1
+                defaultValue: 1,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('user_xp', ['user_id']);
@@ -48,5 +48,5 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('user_xp');
-    }
+    },
 };

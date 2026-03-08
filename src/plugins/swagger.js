@@ -10,14 +10,14 @@ async function swaggerPlugin(fastify, opts) {
                 description: 'Backend API for Vecto - Personal Life Management Application',
                 version: '1.0.0',
                 contact: {
-                    name: 'Vecto Team'
-                }
+                    name: 'Vecto Team',
+                },
             },
             servers: [
                 {
                     url: 'http://localhost:3000',
-                    description: 'Development server'
-                }
+                    description: 'Development server',
+                },
             ],
             components: {
                 securitySchemes: {
@@ -25,23 +25,26 @@ async function swaggerPlugin(fastify, opts) {
                         type: 'http',
                         scheme: 'bearer',
                         bearerFormat: 'JWT',
-                        description: 'Enter your JWT token'
-                    }
-                }
+                        description: 'Enter your JWT token',
+                    },
+                },
             },
             tags: [
                 { name: 'Auth', description: 'Authentication endpoints' },
                 { name: 'Users', description: 'User management' },
-                { name: 'Core', description: 'Core features (preferences, categories, notifications)' },
+                {
+                    name: 'Core',
+                    description: 'Core features (preferences, categories, notifications)',
+                },
                 { name: 'Habits', description: 'Habits, routines, and social groups' },
                 { name: 'Projects', description: 'Projects, tasks, and meetings' },
                 { name: 'Finance', description: 'Accounts, transactions, budgets' },
                 { name: 'Health', description: 'Meals, workouts, medications, sleep' },
                 { name: 'Study', description: 'Library, sessions, reviews, notes' },
                 { name: 'Home', description: 'Shopping, inventory, chores, contacts, events' },
-                { name: 'Freeze Mode', description: 'Freeze mode configuration' }
-            ]
-        }
+                { name: 'Freeze Mode', description: 'Freeze mode configuration' },
+            ],
+        },
     });
 
     await fastify.register(swaggerUi, {
@@ -52,13 +55,13 @@ async function swaggerPlugin(fastify, opts) {
             displayRequestDuration: true,
             filter: true,
             showExtensions: true,
-            showCommonExtensions: true
+            showCommonExtensions: true,
         },
         staticCSP: true,
-        transformStaticCSP: (header) => header
+        transformStaticCSP: (header) => header,
     });
 }
 
 module.exports = fp(swaggerPlugin, {
-    name: 'swagger-plugin'
+    name: 'swagger-plugin',
 });

@@ -6,21 +6,51 @@ const itemTypeEnum = { type: 'string', enum: ['BOOK', 'ARTICLE', 'VIDEO', 'COURS
 const reviewDifficultyEnum = { type: 'string', enum: ['EASY', 'MEDIUM', 'HARD'] };
 const courseStatusEnum = { type: 'string', enum: ['ACTIVE', 'COMPLETED', 'PAUSED', 'DROPPED'] };
 const periodStatusEnum = { type: 'string', enum: ['UPCOMING', 'IN_PROGRESS', 'COMPLETED'] };
-const bookStatusEnum = { type: 'string', enum: ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'PAUSED'] };
+const bookStatusEnum = {
+    type: 'string',
+    enum: ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'PAUSED'],
+};
 const bookFormatEnum = { type: 'string', enum: ['PHYSICAL', 'KINDLE', 'PDF', 'AUDIOBOOK_ONLY'] };
-const courseOnlineStatusEnum = { type: 'string', enum: ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'PAUSED'] };
-const topicStatusEnum = { type: 'string', enum: ['NOT_STARTED', 'LEARNING', 'REVIEWING', 'MASTERED'] };
-const topicSourceTypeEnum = { type: 'string', enum: ['SUBJECT', 'BOOK', 'COURSE_ONLINE', 'PROJECT', 'STANDALONE'] };
-const evaluationTypeEnum = { type: 'string', enum: ['EXAM', 'ASSIGNMENT', 'PROJECT', 'PRESENTATION', 'QUIZ', 'OTHER'] };
-const flashcardDifficultyEnum = { type: 'string', enum: ['NEW', 'LEARNING', 'RELEARNING', 'REVIEW', 'MASTERED'] };
+const courseOnlineStatusEnum = {
+    type: 'string',
+    enum: ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'PAUSED'],
+};
+const topicStatusEnum = {
+    type: 'string',
+    enum: ['NOT_STARTED', 'LEARNING', 'REVIEWING', 'MASTERED'],
+};
+const topicSourceTypeEnum = {
+    type: 'string',
+    enum: ['SUBJECT', 'BOOK', 'COURSE_ONLINE', 'PROJECT', 'STANDALONE'],
+};
+const evaluationTypeEnum = {
+    type: 'string',
+    enum: ['EXAM', 'ASSIGNMENT', 'PROJECT', 'PRESENTATION', 'QUIZ', 'OTHER'],
+};
+const flashcardDifficultyEnum = {
+    type: 'string',
+    enum: ['NEW', 'LEARNING', 'RELEARNING', 'REVIEW', 'MASTERED'],
+};
 const reviewRatingEnum = { type: 'string', enum: ['AGAIN', 'HARD', 'GOOD', 'EASY'] };
-const projectStatusEnum = { type: 'string', enum: ['PLANNING', 'IN_PROGRESS', 'COMPLETED', 'ON_HOLD', 'CANCELLED'] };
+const projectStatusEnum = {
+    type: 'string',
+    enum: ['PLANNING', 'IN_PROGRESS', 'COMPLETED', 'ON_HOLD', 'CANCELLED'],
+};
 const resourceTypeEnum = { type: 'string', enum: ['BOOK', 'COURSE_ONLINE', 'SUBJECT', 'DECK'] };
-const focusSessionStatusEnum = { type: 'string', enum: ['IN_PROGRESS', 'PAUSED', 'COMPLETED', 'CANCELLED'] };
+const focusSessionStatusEnum = {
+    type: 'string',
+    enum: ['IN_PROGRESS', 'PAUSED', 'COMPLETED', 'CANCELLED'],
+};
 const focusBlockTypeEnum = { type: 'string', enum: ['FOCUS', 'SHORT_BREAK', 'LONG_BREAK'] };
 const algorithmTypeEnum = { type: 'string', enum: ['FSRS', 'SM2', 'LEITNER'] };
-const progressTypeEnum = { type: 'string', enum: ['BOOK_PAGE', 'COURSE_LESSON', 'TOPIC_STUDY', 'REVIEW_SESSION'] };
-const retentionLevelEnum = { type: 'string', enum: ['NEW', 'LEARNING', 'FAMILIAR', 'CONFIDENT', 'MASTERED'] };
+const progressTypeEnum = {
+    type: 'string',
+    enum: ['BOOK_PAGE', 'COURSE_LESSON', 'TOPIC_STUDY', 'REVIEW_SESSION'],
+};
+const retentionLevelEnum = {
+    type: 'string',
+    enum: ['NEW', 'LEARNING', 'FAMILIAR', 'CONFIDENT', 'MASTERED'],
+};
 
 // ==================== SETTINGS ====================
 const updateSettingsBody = {
@@ -32,9 +62,9 @@ const updateSettingsBody = {
         show_streak_notifications: { type: 'boolean' },
         auto_schedule_reviews: { type: 'boolean' },
         review_reminder_time: { type: 'string', pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9]$' },
-        theme_color: { type: 'string', maxLength: 20 }
+        theme_color: { type: 'string', maxLength: 20 },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== COURSES (FORMAL EDUCATION) ====================
@@ -48,10 +78,10 @@ const createCourseBody = {
         expected_end_date: { type: 'string', format: 'date', nullable: true },
         status: courseStatusEnum,
         color: { type: 'string', maxLength: 20, nullable: true },
-        notes: { type: 'string', maxLength: 5000, nullable: true }
+        notes: { type: 'string', maxLength: 5000, nullable: true },
     },
     required: ['name'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateCourseBody = {
@@ -65,9 +95,9 @@ const updateCourseBody = {
         actual_end_date: { type: 'string', format: 'date', nullable: true },
         status: courseStatusEnum,
         color: { type: 'string', maxLength: 20, nullable: true },
-        notes: { type: 'string', maxLength: 5000, nullable: true }
+        notes: { type: 'string', maxLength: 5000, nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== PERIODS ====================
@@ -79,10 +109,10 @@ const createPeriodBody = {
         start_date: { type: 'string', format: 'date', nullable: true },
         end_date: { type: 'string', format: 'date', nullable: true },
         status: periodStatusEnum,
-        order_index: { type: 'integer', minimum: 0 }
+        order_index: { type: 'integer', minimum: 0 },
     },
     required: ['course_id', 'name'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updatePeriodBody = {
@@ -92,9 +122,9 @@ const updatePeriodBody = {
         start_date: { type: 'string', format: 'date', nullable: true },
         end_date: { type: 'string', format: 'date', nullable: true },
         status: periodStatusEnum,
-        order_index: { type: 'integer', minimum: 0 }
+        order_index: { type: 'integer', minimum: 0 },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== SUBJECTS ====================
@@ -108,10 +138,10 @@ const createSubjectBody = {
         credits: { type: 'number', minimum: 0, nullable: true },
         color: { type: 'string', maxLength: 20, nullable: true },
         target_grade: { type: 'number', minimum: 0, maximum: 10, nullable: true },
-        notes: { type: 'string', maxLength: 5000, nullable: true }
+        notes: { type: 'string', maxLength: 5000, nullable: true },
     },
     required: ['period_id', 'name'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateSubjectBody = {
@@ -124,9 +154,9 @@ const updateSubjectBody = {
         color: { type: 'string', maxLength: 20, nullable: true },
         target_grade: { type: 'number', minimum: 0, maximum: 10, nullable: true },
         current_grade: { type: 'number', minimum: 0, maximum: 10, nullable: true },
-        notes: { type: 'string', maxLength: 5000, nullable: true }
+        notes: { type: 'string', maxLength: 5000, nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== SUBJECT WEIGHTS ====================
@@ -135,19 +165,19 @@ const createSubjectWeightBody = {
     properties: {
         subject_id: { type: 'string', format: 'uuid' },
         name: { type: 'string', minLength: 1, maxLength: 100 },
-        weight_percent: { type: 'number', minimum: 0, maximum: 100 }
+        weight_percent: { type: 'number', minimum: 0, maximum: 100 },
     },
     required: ['subject_id', 'name', 'weight_percent'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateSubjectWeightBody = {
     type: 'object',
     properties: {
         name: { type: 'string', minLength: 1, maxLength: 100 },
-        weight_percent: { type: 'number', minimum: 0, maximum: 100 }
+        weight_percent: { type: 'number', minimum: 0, maximum: 100 },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== EVALUATIONS ====================
@@ -162,10 +192,10 @@ const createEvaluationBody = {
         max_score: { type: 'number', minimum: 0, default: 10 },
         weight_override: { type: 'number', minimum: 0, maximum: 100, nullable: true },
         notes: { type: 'string', maxLength: 5000, nullable: true },
-        topic_ids: { type: 'array', items: { type: 'string', format: 'uuid' }, default: [] }
+        topic_ids: { type: 'array', items: { type: 'string', format: 'uuid' }, default: [] },
     },
     required: ['subject_id', 'name', 'evaluation_type'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateEvaluationBody = {
@@ -180,9 +210,9 @@ const updateEvaluationBody = {
         obtained_score: { type: 'number', minimum: 0, nullable: true },
         weight_override: { type: 'number', minimum: 0, maximum: 100, nullable: true },
         notes: { type: 'string', maxLength: 5000, nullable: true },
-        topic_ids: { type: 'array', items: { type: 'string', format: 'uuid' } }
+        topic_ids: { type: 'array', items: { type: 'string', format: 'uuid' } },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== EVALUATION FEEDBACK ====================
@@ -194,10 +224,10 @@ const createEvaluationFeedbackBody = {
         what_to_improve: { type: 'string', maxLength: 2000, nullable: true },
         difficulty_rating: { type: 'integer', minimum: 1, maximum: 5, nullable: true },
         time_spent_minutes: { type: 'integer', minimum: 0, nullable: true },
-        study_effectiveness: { type: 'integer', minimum: 1, maximum: 5, nullable: true }
+        study_effectiveness: { type: 'integer', minimum: 1, maximum: 5, nullable: true },
     },
     required: ['evaluation_id'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateEvaluationFeedbackBody = {
@@ -207,9 +237,9 @@ const updateEvaluationFeedbackBody = {
         what_to_improve: { type: 'string', maxLength: 2000, nullable: true },
         difficulty_rating: { type: 'integer', minimum: 1, maximum: 5, nullable: true },
         time_spent_minutes: { type: 'integer', minimum: 0, nullable: true },
-        study_effectiveness: { type: 'integer', minimum: 1, maximum: 5, nullable: true }
+        study_effectiveness: { type: 'integer', minimum: 1, maximum: 5, nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== BOOKS ====================
@@ -227,10 +257,10 @@ const createBookBody = {
         status: bookStatusEnum,
         category: { type: 'string', maxLength: 100, nullable: true },
         notes: { type: 'string', maxLength: 5000, nullable: true },
-        started_at: { type: 'string', format: 'date', nullable: true }
+        started_at: { type: 'string', format: 'date', nullable: true },
     },
     required: ['title'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateBookBody = {
@@ -249,13 +279,16 @@ const updateBookBody = {
         rating: { type: 'integer', minimum: 1, maximum: 5, nullable: true },
         notes: { type: 'string', maxLength: 5000, nullable: true },
         started_at: { type: 'string', format: 'date', nullable: true },
-        finished_at: { type: 'string', format: 'date', nullable: true }
+        finished_at: { type: 'string', format: 'date', nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== ONLINE COURSES ====================
-const courseOnlineCategoryEnum = { type: 'string', enum: ['EXTRACURRICULAR', 'CERTIFICATION', 'EXTENSION', 'FREE'] };
+const courseOnlineCategoryEnum = {
+    type: 'string',
+    enum: ['EXTRACURRICULAR', 'CERTIFICATION', 'EXTENSION', 'FREE'],
+};
 const courseOnlineModalityEnum = { type: 'string', enum: ['ONLINE', 'IN_PERSON', 'HYBRID'] };
 
 const createCourseOnlineBody = {
@@ -271,10 +304,10 @@ const createCourseOnlineBody = {
         total_lessons: { type: 'integer', minimum: 1, nullable: true },
         total_hours: { type: 'number', minimum: 0, nullable: true },
         status: courseOnlineStatusEnum,
-        notes: { type: 'string', maxLength: 5000, nullable: true }
+        notes: { type: 'string', maxLength: 5000, nullable: true },
     },
     required: ['name'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateCourseOnlineBody = {
@@ -295,9 +328,9 @@ const updateCourseOnlineBody = {
         rating: { type: 'integer', minimum: 1, maximum: 5, nullable: true },
         notes: { type: 'string', maxLength: 5000, nullable: true },
         started_at: { type: 'string', format: 'date', nullable: true },
-        finished_at: { type: 'string', format: 'date', nullable: true }
+        finished_at: { type: 'string', format: 'date', nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== TOPICS ====================
@@ -310,10 +343,10 @@ const createTopicBody = {
         source_id: { type: 'string', format: 'uuid', nullable: true },
         parent_topic_id: { type: 'string', format: 'uuid', nullable: true },
         status: topicStatusEnum,
-        order_index: { type: 'integer', minimum: 0, default: 0 }
+        order_index: { type: 'integer', minimum: 0, default: 0 },
     },
     required: ['name', 'source_type'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateTopicBody = {
@@ -325,9 +358,9 @@ const updateTopicBody = {
         status: topicStatusEnum,
         retention_level: retentionLevelEnum,
         last_reviewed_at: { type: 'string', format: 'date-time', nullable: true },
-        order_index: { type: 'integer', minimum: 0 }
+        order_index: { type: 'integer', minimum: 0 },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== PROGRESS LOGS ====================
@@ -337,10 +370,10 @@ const createProgressLogBody = {
         progress_type: progressTypeEnum,
         reference_id: { type: 'string', format: 'uuid' },
         value: { type: 'integer', minimum: 0 },
-        notes: { type: 'string', maxLength: 1000, nullable: true }
+        notes: { type: 'string', maxLength: 1000, nullable: true },
     },
     required: ['progress_type', 'reference_id', 'value'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== RETENTION LOGS ====================
@@ -349,10 +382,10 @@ const createRetentionLogBody = {
     properties: {
         topic_id: { type: 'string', format: 'uuid' },
         retention_level: retentionLevelEnum,
-        confidence_score: { type: 'integer', minimum: 0, maximum: 100, nullable: true }
+        confidence_score: { type: 'integer', minimum: 0, maximum: 100, nullable: true },
     },
     required: ['topic_id', 'retention_level'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== DECKS ====================
@@ -364,10 +397,10 @@ const createDeckBody = {
         topic_id: { type: 'string', format: 'uuid', nullable: true },
         subject_id: { type: 'string', format: 'uuid', nullable: true },
         color: { type: 'string', maxLength: 20, nullable: true },
-        is_public: { type: 'boolean', default: false }
+        is_public: { type: 'boolean', default: false },
     },
     required: ['name'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateDeckBody = {
@@ -378,9 +411,9 @@ const updateDeckBody = {
         topic_id: { type: 'string', format: 'uuid', nullable: true },
         subject_id: { type: 'string', format: 'uuid', nullable: true },
         color: { type: 'string', maxLength: 20, nullable: true },
-        is_public: { type: 'boolean' }
+        is_public: { type: 'boolean' },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== FLASHCARDS ====================
@@ -390,10 +423,10 @@ const createFlashcardBody = {
         deck_id: { type: 'string', format: 'uuid' },
         front: { type: 'string', minLength: 1, maxLength: 5000 },
         back: { type: 'string', minLength: 1, maxLength: 5000 },
-        tags: { type: 'array', items: { type: 'string', maxLength: 50 }, default: [] }
+        tags: { type: 'array', items: { type: 'string', maxLength: 50 }, default: [] },
     },
     required: ['deck_id', 'front', 'back'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateFlashcardBody = {
@@ -402,9 +435,9 @@ const updateFlashcardBody = {
         front: { type: 'string', minLength: 1, maxLength: 5000 },
         back: { type: 'string', minLength: 1, maxLength: 5000 },
         tags: { type: 'array', items: { type: 'string', maxLength: 50 } },
-        is_suspended: { type: 'boolean' }
+        is_suspended: { type: 'boolean' },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== REVIEW SESSIONS ====================
@@ -412,9 +445,9 @@ const createReviewSessionBody = {
     type: 'object',
     properties: {
         deck_id: { type: 'string', format: 'uuid', nullable: true },
-        topic_id: { type: 'string', format: 'uuid', nullable: true }
+        topic_id: { type: 'string', format: 'uuid', nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const completeReviewSessionBody = {
@@ -422,10 +455,10 @@ const completeReviewSessionBody = {
     properties: {
         cards_reviewed: { type: 'integer', minimum: 0 },
         cards_correct: { type: 'integer', minimum: 0 },
-        cards_again: { type: 'integer', minimum: 0 }
+        cards_again: { type: 'integer', minimum: 0 },
     },
     required: ['cards_reviewed'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== REVIEW LOGS ====================
@@ -435,14 +468,17 @@ const createReviewLogBody = {
         session_id: { type: 'string', format: 'uuid' },
         flashcard_id: { type: 'string', format: 'uuid' },
         rating: reviewRatingEnum,
-        time_taken_ms: { type: 'integer', minimum: 0, nullable: true }
+        time_taken_ms: { type: 'integer', minimum: 0, nullable: true },
     },
     required: ['session_id', 'flashcard_id', 'rating'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== PROJECTS ====================
-const projectTypeEnum = { type: 'string', enum: ['CUSTOM', 'CERTIFICATION', 'SKILL', 'CAREER', 'EXAM'] };
+const projectTypeEnum = {
+    type: 'string',
+    enum: ['CUSTOM', 'CERTIFICATION', 'SKILL', 'CAREER', 'EXAM'],
+};
 
 const createProjectBody = {
     type: 'object',
@@ -463,15 +499,15 @@ const createProjectBody = {
                     name: { type: 'string', minLength: 1, maxLength: 200 },
                     description: { type: 'string', maxLength: 2000, nullable: true },
                     target_date: { type: 'string', format: 'date', nullable: true },
-                    order: { type: 'integer', minimum: 0 }
+                    order: { type: 'integer', minimum: 0 },
                 },
-                required: ['name']
+                required: ['name'],
             },
-            nullable: true
-        }
+            nullable: true,
+        },
     },
     required: ['name'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateProjectBody = {
@@ -484,9 +520,9 @@ const updateProjectBody = {
         status: projectStatusEnum,
         target_date: { type: 'string', format: 'date', nullable: true },
         completed_at: { type: 'string', format: 'date-time', nullable: true },
-        color: { type: 'string', maxLength: 20, nullable: true }
+        color: { type: 'string', maxLength: 20, nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== PROJECT RESOURCES ====================
@@ -496,18 +532,18 @@ const createProjectResourceBody = {
         project_id: { type: 'string', format: 'uuid' },
         resource_type: resourceTypeEnum,
         resource_id: { type: 'string', format: 'uuid' },
-        order_index: { type: 'integer', minimum: 0, default: 0 }
+        order_index: { type: 'integer', minimum: 0, default: 0 },
     },
     required: ['project_id', 'resource_type', 'resource_id'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateProjectResourceBody = {
     type: 'object',
     properties: {
-        order_index: { type: 'integer', minimum: 0 }
+        order_index: { type: 'integer', minimum: 0 },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== PROJECT MILESTONES ====================
@@ -518,10 +554,10 @@ const createMilestoneBody = {
         name: { type: 'string', minLength: 1, maxLength: 200 },
         description: { type: 'string', maxLength: 1000, nullable: true },
         target_date: { type: 'string', format: 'date', nullable: true },
-        order_index: { type: 'integer', minimum: 0, default: 0 }
+        order_index: { type: 'integer', minimum: 0, default: 0 },
     },
     required: ['project_id', 'name'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateMilestoneBody = {
@@ -531,9 +567,9 @@ const updateMilestoneBody = {
         description: { type: 'string', maxLength: 1000, nullable: true },
         target_date: { type: 'string', format: 'date', nullable: true },
         completed_at: { type: 'string', format: 'date-time', nullable: true },
-        order_index: { type: 'integer', minimum: 0 }
+        order_index: { type: 'integer', minimum: 0 },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== FOCUS MODE ====================
@@ -546,9 +582,9 @@ const createFocusSessionBody = {
         custom_block_minutes: { type: 'integer', minimum: 1, maximum: 180, nullable: true },
         custom_break_minutes: { type: 'integer', minimum: 1, maximum: 60, nullable: true },
         planned_blocks: { type: 'integer', minimum: 1, maximum: 20, nullable: true },
-        notes: { type: 'string', maxLength: 1000, nullable: true }
+        notes: { type: 'string', maxLength: 1000, nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateFocusSessionBody = {
@@ -559,9 +595,9 @@ const updateFocusSessionBody = {
         total_focus_minutes: { type: 'integer', minimum: 0 },
         total_break_minutes: { type: 'integer', minimum: 0 },
         skipped_breaks: { type: 'integer', minimum: 0 },
-        notes: { type: 'string', maxLength: 1000, nullable: true }
+        notes: { type: 'string', maxLength: 1000, nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const createFocusBlockBody = {
@@ -570,10 +606,10 @@ const createFocusBlockBody = {
         session_id: { type: 'string', format: 'uuid' },
         block_type: focusBlockTypeEnum,
         planned_minutes: { type: 'integer', minimum: 1, maximum: 180 },
-        block_number: { type: 'integer', minimum: 1 }
+        block_number: { type: 'integer', minimum: 1 },
     },
     required: ['session_id', 'block_type', 'planned_minutes', 'block_number'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateFocusBlockBody = {
@@ -581,9 +617,9 @@ const updateFocusBlockBody = {
     properties: {
         actual_minutes: { type: 'integer', minimum: 0 },
         was_skipped: { type: 'boolean' },
-        ended_at: { type: 'string', format: 'date-time' }
+        ended_at: { type: 'string', format: 'date-time' },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // ==================== LEGACY SCHEMAS ====================
@@ -600,10 +636,10 @@ const createLibraryShelfBody = {
         current_page: { type: 'integer', minimum: 0, default: 0 },
         rating: { type: 'integer', minimum: 1, maximum: 5, nullable: true },
         notes: { type: 'string', maxLength: 5000, nullable: true },
-        tags: { type: 'array', items: { type: 'string' }, default: [] }
+        tags: { type: 'array', items: { type: 'string' }, default: [] },
     },
     required: ['title', 'item_type', 'shelf_type'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateLibraryShelfBody = {
@@ -618,9 +654,9 @@ const updateLibraryShelfBody = {
         current_page: { type: 'integer', minimum: 0 },
         rating: { type: 'integer', minimum: 1, maximum: 5, nullable: true },
         notes: { type: 'string', maxLength: 5000, nullable: true },
-        tags: { type: 'array', items: { type: 'string' } }
+        tags: { type: 'array', items: { type: 'string' } },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Study Session schemas (legacy)
@@ -632,10 +668,10 @@ const createStudySessionBody = {
         end_time: { type: 'string', format: 'date-time', nullable: true },
         duration_minutes: { type: 'integer', minimum: 1, nullable: true },
         notes: { type: 'string', maxLength: 5000, nullable: true },
-        tags: { type: 'array', items: { type: 'string' }, default: [] }
+        tags: { type: 'array', items: { type: 'string' }, default: [] },
     },
     required: ['subject', 'start_time'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateStudySessionBody = {
@@ -646,9 +682,9 @@ const updateStudySessionBody = {
         end_time: { type: 'string', format: 'date-time', nullable: true },
         duration_minutes: { type: 'integer', minimum: 1, nullable: true },
         notes: { type: 'string', maxLength: 5000, nullable: true },
-        tags: { type: 'array', items: { type: 'string' } }
+        tags: { type: 'array', items: { type: 'string' } },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Spaced Review schemas (legacy)
@@ -661,10 +697,10 @@ const createSpacedReviewBody = {
         last_review_date: { type: 'string', format: 'date', nullable: true },
         difficulty: reviewDifficultyEnum,
         review_count: { type: 'integer', minimum: 0, default: 0 },
-        tags: { type: 'array', items: { type: 'string' }, default: [] }
+        tags: { type: 'array', items: { type: 'string' }, default: [] },
     },
     required: ['topic', 'next_review_date'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateSpacedReviewBody = {
@@ -676,9 +712,9 @@ const updateSpacedReviewBody = {
         last_review_date: { type: 'string', format: 'date', nullable: true },
         difficulty: reviewDifficultyEnum,
         review_count: { type: 'integer', minimum: 0 },
-        tags: { type: 'array', items: { type: 'string' } }
+        tags: { type: 'array', items: { type: 'string' } },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Note schemas (legacy)
@@ -689,10 +725,10 @@ const createNoteBody = {
         content: { type: 'string', maxLength: 50000 },
         category: { type: 'string', maxLength: 100, nullable: true },
         tags: { type: 'array', items: { type: 'string' }, default: [] },
-        is_pinned: { type: 'boolean', default: false }
+        is_pinned: { type: 'boolean', default: false },
     },
     required: ['title', 'content'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateNoteBody = {
@@ -702,9 +738,9 @@ const updateNoteBody = {
         content: { type: 'string', maxLength: 50000 },
         category: { type: 'string', maxLength: 100, nullable: true },
         tags: { type: 'array', items: { type: 'string' } },
-        is_pinned: { type: 'boolean' }
+        is_pinned: { type: 'boolean' },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 module.exports = {
@@ -816,5 +852,5 @@ module.exports = {
     createSpacedReviewBody,
     updateSpacedReviewBody,
     createNoteBody,
-    updateNoteBody
+    updateNoteBody,
 };

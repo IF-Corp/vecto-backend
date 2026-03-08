@@ -1,4 +1,10 @@
-const { FreezeModeConfig, FreezePeriod, FreezeModule, FreezeOptions, UserModule } = require('../models');
+const {
+    FreezeModeConfig,
+    FreezePeriod,
+    FreezeModule,
+    FreezeOptions,
+    UserModule,
+} = require('../models');
 const { Op } = require('sequelize');
 const { processScheduledFreezePeriods } = require('../jobs/freezeScheduler');
 
@@ -8,13 +14,13 @@ const getFreezeModeConfig = async (request, reply) => {
     try {
         const { userId } = request.params;
         let config = await FreezeModeConfig.findOne({
-            where: { user_id: userId }
+            where: { user_id: userId },
         });
 
         if (!config) {
             config = await FreezeModeConfig.create({
                 user_id: userId,
-                is_active: false
+                is_active: false,
             });
         }
 
@@ -29,13 +35,13 @@ const updateFreezeModeConfig = async (request, reply) => {
     try {
         const { userId } = request.params;
         let config = await FreezeModeConfig.findOne({
-            where: { user_id: userId }
+            where: { user_id: userId },
         });
 
         if (!config) {
             config = await FreezeModeConfig.create({
                 ...request.body,
-                user_id: userId
+                user_id: userId,
             });
             reply.status(201);
             return { success: true, data: config, created: true };
@@ -65,11 +71,11 @@ const getFreezePeriods = async (request, reply) => {
             where,
             include: [
                 { model: FreezeModule, as: 'modules' },
-                { model: FreezeOptions, as: 'options' }
+                { model: FreezeOptions, as: 'options' },
             ],
             order: [['start_date', 'DESC']],
             limit: parseInt(limit),
-            offset: parseInt(offset)
+            offset: parseInt(offset),
         });
 
         return {
@@ -77,7 +83,7 @@ const getFreezePeriods = async (request, reply) => {
             data: periods.rows,
             total: periods.count,
             limit: parseInt(limit),
-            offset: parseInt(offset)
+            offset: parseInt(offset),
         };
     } catch (error) {
         reply.status(500);
@@ -92,8 +98,8 @@ const getFreezePeriod = async (request, reply) => {
         const period = await FreezePeriod.findByPk(id, {
             include: [
                 { model: FreezeModule, as: 'modules' },
-                { model: FreezeOptions, as: 'options' }
-            ]
+                { model: FreezeOptions, as: 'options' },
+            ],
         });
 
         if (!period) {
@@ -115,12 +121,12 @@ const getActiveFreeze = async (request, reply) => {
         const activePeriod = await FreezePeriod.findOne({
             where: {
                 user_id: userId,
-                status: 'ACTIVE'
+                status: 'ACTIVE',
             },
             include: [
                 { model: FreezeModule, as: 'modules' },
-                { model: FreezeOptions, as: 'options' }
-            ]
+                { model: FreezeOptions, as: 'options' },
+            ],
         });
 
         return { success: true, data: activePeriod };
@@ -133,7 +139,15 @@ const getActiveFreeze = async (request, reply) => {
 const createFreezePeriod = async (request, reply) => {
     try {
         const { userId } = request.params;
-        const { start_date, end_date, reason, reason_custom, modules, options, activate_immediately } = request.body;
+        const {
+            start_date,
+            end_date,
+            reason,
+            reason_custom,
+            modules,
+            options,
+            activate_immediately,
+        } = request.body;
 
         // Check for overlapping periods
         const existingActive = await FreezePeriod.findOne({
@@ -143,15 +157,18 @@ const createFreezePeriod = async (request, reply) => {
                 [Op.or]: [
                     {
                         start_date: { [Op.lte]: end_date },
-                        end_date: { [Op.gte]: start_date }
-                    }
-                ]
-            }
+                        end_date: { [Op.gte]: start_date },
+                    },
+                ],
+            },
         });
 
         if (existingActive) {
             reply.status(400);
-            return { success: false, error: 'There is already an active or scheduled freeze period overlapping with these dates' };
+            return {
+                success: false,
+                error: 'There is already an active or scheduled freeze period overlapping with these dates',
+            };
         }
 
         // Determine initial status
@@ -172,14 +189,14 @@ const createFreezePeriod = async (request, reply) => {
             reason,
             reason_custom,
             status,
-            activated_at
+            activated_at,
         });
 
         // Create freeze modules
         if (modules && modules.length > 0) {
-            const moduleRecords = modules.map(moduleType => ({
+            const moduleRecords = modules.map((moduleType) => ({
                 freeze_period_id: period.id,
-                module_type: moduleType
+                module_type: moduleType,
             }));
             await FreezeModule.bulkCreate(moduleRecords);
         }
@@ -191,7 +208,7 @@ const createFreezePeriod = async (request, reply) => {
             hide_non_essential_tasks: options?.hide_non_essential_tasks ?? true,
             pause_general_notifications: options?.pause_general_notifications ?? true,
             pause_goals: options?.pause_goals ?? true,
-            keep_important_events: options?.keep_important_events ?? true
+            keep_important_events: options?.keep_important_events ?? true,
         });
 
         // Update legacy config and clear cache if activated
@@ -204,8 +221,8 @@ const createFreezePeriod = async (request, reply) => {
         const result = await FreezePeriod.findByPk(period.id, {
             include: [
                 { model: FreezeModule, as: 'modules' },
-                { model: FreezeOptions, as: 'options' }
-            ]
+                { model: FreezeOptions, as: 'options' },
+            ],
         });
 
         reply.status(201);
@@ -239,16 +256,16 @@ const updateFreezePeriod = async (request, reply) => {
             start_date: start_date || period.start_date,
             end_date: end_date || period.end_date,
             reason: reason !== undefined ? reason : period.reason,
-            reason_custom: reason_custom !== undefined ? reason_custom : period.reason_custom
+            reason_custom: reason_custom !== undefined ? reason_custom : period.reason_custom,
         });
 
         // Update modules if provided
         if (modules !== undefined) {
             await FreezeModule.destroy({ where: { freeze_period_id: id } });
             if (modules.length > 0) {
-                const moduleRecords = modules.map(moduleType => ({
+                const moduleRecords = modules.map((moduleType) => ({
                     freeze_period_id: id,
-                    module_type: moduleType
+                    module_type: moduleType,
                 }));
                 await FreezeModule.bulkCreate(moduleRecords);
             }
@@ -257,7 +274,7 @@ const updateFreezePeriod = async (request, reply) => {
         // Update options if provided
         if (options) {
             await FreezeOptions.update(options, {
-                where: { freeze_period_id: id }
+                where: { freeze_period_id: id },
             });
         }
 
@@ -265,8 +282,8 @@ const updateFreezePeriod = async (request, reply) => {
         const result = await FreezePeriod.findByPk(id, {
             include: [
                 { model: FreezeModule, as: 'modules' },
-                { model: FreezeOptions, as: 'options' }
-            ]
+                { model: FreezeOptions, as: 'options' },
+            ],
         });
 
         return { success: true, data: result };
@@ -285,8 +302,8 @@ const activateFreezeMode = async (request, reply) => {
         const existingActive = await FreezePeriod.findOne({
             where: {
                 user_id: userId,
-                status: 'ACTIVE'
-            }
+                status: 'ACTIVE',
+            },
         });
 
         if (existingActive) {
@@ -302,23 +319,23 @@ const activateFreezeMode = async (request, reply) => {
             end_date,
             reason,
             status: 'ACTIVE',
-            activated_at: new Date()
+            activated_at: new Date(),
         });
 
         // Create default options
         await FreezeOptions.create({
-            freeze_period_id: period.id
+            freeze_period_id: period.id,
         });
 
         // Get user's active modules and freeze all
         const userModules = await UserModule.findAll({
-            where: { user_id: userId, is_active: true }
+            where: { user_id: userId, is_active: true },
         });
 
         if (userModules.length > 0) {
-            const moduleRecords = userModules.map(m => ({
+            const moduleRecords = userModules.map((m) => ({
                 freeze_period_id: period.id,
-                module_type: m.module_type
+                module_type: m.module_type,
             }));
             await FreezeModule.bulkCreate(moduleRecords);
         }
@@ -332,8 +349,8 @@ const activateFreezeMode = async (request, reply) => {
         const result = await FreezePeriod.findByPk(period.id, {
             include: [
                 { model: FreezeModule, as: 'modules' },
-                { model: FreezeOptions, as: 'options' }
-            ]
+                { model: FreezeOptions, as: 'options' },
+            ],
         });
 
         return { success: true, data: result };
@@ -364,8 +381,8 @@ const activateFreezePeriod = async (request, reply) => {
             where: {
                 user_id: period.user_id,
                 status: 'ACTIVE',
-                id: { [Op.ne]: id }
-            }
+                id: { [Op.ne]: id },
+            },
         });
 
         if (existingActive) {
@@ -375,11 +392,17 @@ const activateFreezePeriod = async (request, reply) => {
 
         await period.update({
             status: 'ACTIVE',
-            activated_at: new Date()
+            activated_at: new Date(),
         });
 
         // Update legacy config
-        await syncLegacyConfig(period.user_id, true, period.start_date, period.end_date, period.reason);
+        await syncLegacyConfig(
+            period.user_id,
+            true,
+            period.start_date,
+            period.end_date,
+            period.reason,
+        );
 
         // Clear freeze guard cache
         if (request.server.clearFreezeCache) request.server.clearFreezeCache(period.user_id);
@@ -387,8 +410,8 @@ const activateFreezePeriod = async (request, reply) => {
         const result = await FreezePeriod.findByPk(id, {
             include: [
                 { model: FreezeModule, as: 'modules' },
-                { model: FreezeOptions, as: 'options' }
-            ]
+                { model: FreezeOptions, as: 'options' },
+            ],
         });
 
         return { success: true, data: result };
@@ -405,8 +428,8 @@ const deactivateFreezeMode = async (request, reply) => {
         const period = await FreezePeriod.findOne({
             where: {
                 user_id: userId,
-                status: 'ACTIVE'
-            }
+                status: 'ACTIVE',
+            },
         });
 
         if (!period) {
@@ -416,7 +439,7 @@ const deactivateFreezeMode = async (request, reply) => {
 
         await period.update({
             status: 'COMPLETED',
-            deactivated_at: new Date()
+            deactivated_at: new Date(),
         });
 
         // Update legacy config
@@ -428,8 +451,8 @@ const deactivateFreezeMode = async (request, reply) => {
         const result = await FreezePeriod.findByPk(period.id, {
             include: [
                 { model: FreezeModule, as: 'modules' },
-                { model: FreezeOptions, as: 'options' }
-            ]
+                { model: FreezeOptions, as: 'options' },
+            ],
         });
 
         return { success: true, data: result };
@@ -459,7 +482,7 @@ const cancelFreezePeriod = async (request, reply) => {
 
         await period.update({
             status: 'CANCELLED',
-            deactivated_at: new Date()
+            deactivated_at: new Date(),
         });
 
         // Update legacy config if was active
@@ -473,8 +496,8 @@ const cancelFreezePeriod = async (request, reply) => {
         const result = await FreezePeriod.findByPk(id, {
             include: [
                 { model: FreezeModule, as: 'modules' },
-                { model: FreezeOptions, as: 'options' }
-            ]
+                { model: FreezeOptions, as: 'options' },
+            ],
         });
 
         return { success: true, data: result };
@@ -497,7 +520,10 @@ const deleteFreezePeriod = async (request, reply) => {
 
         if (period.status === 'ACTIVE') {
             reply.status(400);
-            return { success: false, error: 'Cannot delete an active freeze period. Deactivate it first.' };
+            return {
+                success: false,
+                error: 'Cannot delete an active freeze period. Deactivate it first.',
+            };
         }
 
         await period.destroy();
@@ -516,32 +542,32 @@ const getFreezeStatistics = async (request, reply) => {
         const { userId } = request.params;
 
         const totalPeriods = await FreezePeriod.count({
-            where: { user_id: userId }
+            where: { user_id: userId },
         });
 
         const completedPeriods = await FreezePeriod.count({
-            where: { user_id: userId, status: 'COMPLETED' }
+            where: { user_id: userId, status: 'COMPLETED' },
         });
 
         const activePeriod = await FreezePeriod.findOne({
             where: { user_id: userId, status: 'ACTIVE' },
-            include: [{ model: FreezeOptions, as: 'options' }]
+            include: [{ model: FreezeOptions, as: 'options' }],
         });
 
         const scheduledPeriods = await FreezePeriod.count({
-            where: { user_id: userId, status: 'SCHEDULED' }
+            where: { user_id: userId, status: 'SCHEDULED' },
         });
 
         // Calculate total frozen days
         const allPeriods = await FreezePeriod.findAll({
             where: {
                 user_id: userId,
-                status: { [Op.in]: ['ACTIVE', 'COMPLETED'] }
-            }
+                status: { [Op.in]: ['ACTIVE', 'COMPLETED'] },
+            },
         });
 
         let totalFrozenDays = 0;
-        allPeriods.forEach(p => {
+        allPeriods.forEach((p) => {
             const start = new Date(p.start_date);
             const end = p.deactivated_at ? new Date(p.deactivated_at) : new Date(p.end_date);
             const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
@@ -556,8 +582,8 @@ const getFreezeStatistics = async (request, reply) => {
                 scheduled_periods: scheduledPeriods,
                 total_frozen_days: totalFrozenDays,
                 is_frozen: !!activePeriod,
-                active_period: activePeriod
-            }
+                active_period: activePeriod,
+            },
         };
     } catch (error) {
         reply.status(500);
@@ -588,8 +614,8 @@ const triggerScheduledProcessing = async (request, reply) => {
                 activated: results.activated,
                 completed: results.completed,
                 errors: results.activationErrors.length + results.completionErrors.length,
-                duration_ms: results.duration
-            }
+                duration_ms: results.duration,
+            },
         };
     } catch (error) {
         reply.status(500);
@@ -602,7 +628,7 @@ const triggerScheduledProcessing = async (request, reply) => {
 async function syncLegacyConfig(userId, isActive, startDate, endDate, reason) {
     try {
         let config = await FreezeModeConfig.findOne({
-            where: { user_id: userId }
+            where: { user_id: userId },
         });
 
         if (!config) {
@@ -611,14 +637,14 @@ async function syncLegacyConfig(userId, isActive, startDate, endDate, reason) {
                 is_active: isActive,
                 start_date: startDate ? new Date(startDate) : null,
                 end_date: endDate ? new Date(endDate) : null,
-                reason
+                reason,
             });
         } else {
             await config.update({
                 is_active: isActive,
                 start_date: startDate ? new Date(startDate) : null,
                 end_date: endDate ? new Date(endDate) : null,
-                reason: isActive ? reason : null
+                reason: isActive ? reason : null,
             });
         }
     } catch (error) {
@@ -644,5 +670,5 @@ module.exports = {
     // Statistics
     getFreezeStatistics,
     // Scheduler
-    triggerScheduledProcessing
+    triggerScheduledProcessing,
 };

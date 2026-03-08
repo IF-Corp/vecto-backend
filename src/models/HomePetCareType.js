@@ -14,7 +14,15 @@ const HomePetCareType = sequelize.define(
             allowNull: false,
         },
         care_type: {
-            type: DataTypes.ENUM('VACCINE', 'DEWORMING', 'BATH', 'VET_CHECKUP', 'GROOMING', 'MEDICATION', 'OTHER'),
+            type: DataTypes.ENUM(
+                'VACCINE',
+                'DEWORMING',
+                'BATH',
+                'VET_CHECKUP',
+                'GROOMING',
+                'MEDICATION',
+                'OTHER',
+            ),
             allowNull: false,
         },
         name: {
@@ -46,7 +54,7 @@ const HomePetCareType = sequelize.define(
         tableName: 'home_pet_care_types',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = HomePetCareType;

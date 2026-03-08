@@ -39,7 +39,13 @@ const getScoreColor = (score, inverted = false) => {
 
 // Calculate work strain for a specific date
 const calculateWorkStrain = async (userId, date = new Date()) => {
-    const { WorkTimesheet, WorkMeeting, WorkTask, WorkModeSession, WorkProfile } = require('../models');
+    const {
+        WorkTimesheet,
+        WorkMeeting,
+        WorkTask,
+        WorkModeSession,
+        WorkProfile,
+    } = require('../models');
     const { startDate, endDate } = getDateRange(date);
 
     // Get user's work profile for limits
@@ -88,19 +94,18 @@ const calculateWorkStrain = async (userId, date = new Date()) => {
     const deadlineStrain = Math.min(10, upcomingDeadlines * 1.5); // ~7 at 5 deadlines
 
     // Factor 4: Context switches (unique projects/tasks worked on)
-    const uniqueProjects = new Set(timesheetEntries.map(e => e.projectId).filter(Boolean));
-    const uniqueTasks = new Set(timesheetEntries.map(e => e.taskId).filter(Boolean));
+    const uniqueProjects = new Set(timesheetEntries.map((e) => e.projectId).filter(Boolean));
+    const uniqueTasks = new Set(timesheetEntries.map((e) => e.taskId).filter(Boolean));
     const contextSwitches = Math.max(uniqueProjects.size, uniqueTasks.size);
     const switchStrain = Math.min(10, contextSwitches * 1.2); // ~6 at 5 switches
 
     // Calculate weighted average
     const weights = { hours: 0.35, meetings: 0.25, deadlines: 0.2, switches: 0.2 };
-    const strainScore = (
+    const strainScore =
         hoursStrain * weights.hours +
         meetingStrain * weights.meetings +
         deadlineStrain * weights.deadlines +
-        switchStrain * weights.switches
-    );
+        switchStrain * weights.switches;
 
     return {
         score: Math.round(strainScore * 10) / 10,
@@ -110,7 +115,12 @@ const calculateWorkStrain = async (userId, date = new Date()) => {
                 value: Math.round(hoursWorked * 10) / 10,
                 limit: dailyLimit,
                 strain: Math.round(hoursStrain * 10) / 10,
-                status: hoursWorked > dailyLimit ? 'high' : hoursWorked > dailyLimit * 0.8 ? 'medium' : 'low',
+                status:
+                    hoursWorked > dailyLimit
+                        ? 'high'
+                        : hoursWorked > dailyLimit * 0.8
+                          ? 'medium'
+                          : 'low',
             },
             meetings: {
                 hours: Math.round(meetingHours * 10) / 10,
@@ -154,19 +164,21 @@ const getStrainHistory = async (userId, days = 7) => {
 // Check burnout risk
 const checkBurnoutRisk = async (userId) => {
     const history = await getStrainHistory(userId, 7);
-    const highStrainDays = history.filter(h => h.score >= 7).length;
+    const highStrainDays = history.filter((h) => h.score >= 7).length;
     const consecutiveHighDays = getConsecutiveHighDays(history);
 
     return {
         atRisk: consecutiveHighDays >= 3 || highStrainDays >= 5,
         consecutiveHighDays,
         highStrainDays,
-        averageStrain: Math.round((history.reduce((sum, h) => sum + h.score, 0) / history.length) * 10) / 10,
-        recommendation: consecutiveHighDays >= 3
-            ? 'Strain alto por varios dias consecutivos. Considere tirar uma folga.'
-            : highStrainDays >= 5
-                ? 'Muitos dias de alta carga esta semana. Reduza o ritmo se possivel.'
-                : 'Carga de trabalho dentro do esperado.',
+        averageStrain:
+            Math.round((history.reduce((sum, h) => sum + h.score, 0) / history.length) * 10) / 10,
+        recommendation:
+            consecutiveHighDays >= 3
+                ? 'Strain alto por varios dias consecutivos. Considere tirar uma folga.'
+                : highStrainDays >= 5
+                  ? 'Muitos dias de alta carga esta semana. Reduza o ritmo se possivel.'
+                  : 'Carga de trabalho dentro do esperado.',
     };
 };
 
@@ -236,16 +248,16 @@ const calculateWorkRecovery = async (userId) => {
         weeklySeconds += (end - start) / 1000;
     }
     const weeklyHours = weeklySeconds / 3600;
-    const weeklyScore = weeklyHours <= weeklyTarget ? 10 : weeklyHours <= weeklyTarget * 1.1 ? 7 : 4;
+    const weeklyScore =
+        weeklyHours <= weeklyTarget ? 10 : weeklyHours <= weeklyTarget * 1.1 ? 7 : 4;
 
     // Calculate weighted average
     const weights = { sleep: 0.3, strain: 0.3, rest: 0.2, weekly: 0.2 };
-    const recoveryScore = (
+    const recoveryScore =
         sleepScore * weights.sleep +
         strainRecoveryImpact * weights.strain +
         restScore * weights.rest +
-        weeklyScore * weights.weekly
-    );
+        weeklyScore * weights.weekly;
 
     // Get recommendation based on score
     const recommendation = getWorkRecommendation(recoveryScore);
@@ -364,7 +376,7 @@ const calculateWorkLifeBalance = async (userId) => {
     const hoursScore = hoursRatio <= 1 ? 10 : hoursRatio <= 1.1 ? 8 : hoursRatio <= 1.2 ? 5 : 2;
 
     // Factor 2: Weekend work
-    const weekendEntries = timesheetEntries.filter(e => {
+    const weekendEntries = timesheetEntries.filter((e) => {
         const day = new Date(e.startedAt).getDay();
         return day === 0 || day === 6;
     });
@@ -375,7 +387,8 @@ const calculateWorkLifeBalance = async (userId) => {
         weekendSeconds += (end - start) / 1000;
     }
     const weekendHours = weekendSeconds / 3600;
-    const weekendScore = weekendHours === 0 ? 10 : weekendHours <= 2 ? 7 : weekendHours <= 4 ? 4 : 1;
+    const weekendScore =
+        weekendHours === 0 ? 10 : weekendHours <= 2 ? 7 : weekendHours <= 4 ? 4 : 1;
 
     // Factor 3: Average end time (last 7 days)
     const sevenDaysAgo = new Date(today);
@@ -394,11 +407,13 @@ const calculateWorkLifeBalance = async (userId) => {
     for (const entry of recentEntries) {
         const dateKey = new Date(entry.endedAt).toISOString().split('T')[0];
         if (!endTimesByDay[dateKey]) {
-            endTimesByDay[dateKey] = new Date(entry.endedAt).getHours() + new Date(entry.endedAt).getMinutes() / 60;
+            endTimesByDay[dateKey] =
+                new Date(entry.endedAt).getHours() + new Date(entry.endedAt).getMinutes() / 60;
         }
     }
     const endTimes = Object.values(endTimesByDay);
-    const avgEndTime = endTimes.length > 0 ? endTimes.reduce((a, b) => a + b, 0) / endTimes.length : 18;
+    const avgEndTime =
+        endTimes.length > 0 ? endTimes.reduce((a, b) => a + b, 0) / endTimes.length : 18;
     const endTimeScore = avgEndTime <= 18 ? 10 : avgEndTime <= 19 ? 8 : avgEndTime <= 20 ? 5 : 2;
 
     // Factor 4: Days without break
@@ -407,12 +422,11 @@ const calculateWorkLifeBalance = async (userId) => {
 
     // Calculate weighted average
     const weights = { hours: 0.3, weekend: 0.25, endTime: 0.2, rest: 0.25 };
-    const balanceScore = (
+    const balanceScore =
         hoursScore * weights.hours +
         weekendScore * weights.weekend +
         endTimeScore * weights.endTime +
-        restScore * weights.rest
-    );
+        restScore * weights.rest;
 
     // Generate suggestions
     const suggestions = generateWorkLifeSuggestions({
@@ -453,7 +467,13 @@ const calculateWorkLifeBalance = async (userId) => {
     };
 };
 
-const generateWorkLifeSuggestions = ({ weeklyHours, weeklyTarget, weekendHours, avgEndTime, daysSinceOff }) => {
+const generateWorkLifeSuggestions = ({
+    weeklyHours,
+    weeklyTarget,
+    weekendHours,
+    avgEndTime,
+    daysSinceOff,
+}) => {
     const suggestions = [];
 
     if (daysSinceOff > 7) {

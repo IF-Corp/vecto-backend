@@ -7,7 +7,7 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
@@ -15,41 +15,41 @@ module.exports = {
                 unique: true,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             completed: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false,
-                allowNull: false
+                allowNull: false,
             },
             current_step: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             selected_modules: {
                 type: Sequelize.JSONB,
                 defaultValue: [],
-                allowNull: false
+                allowNull: false,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('onboarding_state', ['user_id'], {
-            name: 'onboarding_state_user_id_idx'
+            name: 'onboarding_state_user_id_idx',
         });
     },
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('onboarding_state');
-    }
+    },
 };

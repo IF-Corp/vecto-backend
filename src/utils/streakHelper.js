@@ -1,11 +1,4 @@
-const {
-    isSameDay,
-    subDays,
-    isSameWeek,
-    subWeeks,
-    parseISO,
-    startOfDay
-} = require('date-fns');
+const { isSameDay, subDays, isSameWeek, subWeeks, parseISO, startOfDay } = require('date-fns');
 
 const parseDate = (d) => {
     if (d instanceof Date) return startOfDay(d);
@@ -18,7 +11,7 @@ const parseDate = (d) => {
 
 /**
  * Calculates the new streak for a habit or routine based on frequency and history.
- * 
+ *
  * @param {Object} item - The Habit or Routine object (must have current_streak, frequency, etc.)
  * @param {Date|String} logDate - The date of the current execution
  * @param {String} status - The status of the execution ('DONE' or 'completed')
@@ -42,18 +35,18 @@ const calculateNewStreak = (item, logDate, status, history = []) => {
     // or just assume history passed doesn't include the record we are currently creating/updating
     // For safety, let's filter history to only include items BEFORE the current executionDate
     const previousLogs = history
-        .map(h => ({ ...h, date: parseDate(h.execution_date || h.date) }))
-        .filter(h => h.status === 'DONE' || h.status === 'completed')
+        .map((h) => ({ ...h, date: parseDate(h.execution_date || h.date) }))
+        .filter((h) => h.status === 'DONE' || h.status === 'completed')
         .sort((a, b) => b.date - a.date);
 
     // Check if there's already a log for the same period (to prevent cheating)
-    const hasLogForSamePeriod = previousLogs.some(log => {
+    const hasLogForSamePeriod = previousLogs.some((log) => {
         if (frequency === 'DAILY') {
             return isSameDay(log.date, executionDate);
         } else if (frequency === 'WEEKLY') {
             return isSameWeek(log.date, executionDate, { weekStartsOn: 1 }); // Assuming Monday start
         }
-        // For CUSTOM, we might need more complex logic, but for now let's treat it like DAILY 
+        // For CUSTOM, we might need more complex logic, but for now let's treat it like DAILY
         // if it's supposed to be marked on specific days.
         return isSameDay(log.date, executionDate);
     });
@@ -90,5 +83,5 @@ const calculateNewStreak = (item, logDate, status, history = []) => {
 };
 
 module.exports = {
-    calculateNewStreak
+    calculateNewStreak,
 };

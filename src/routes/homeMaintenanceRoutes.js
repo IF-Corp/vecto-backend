@@ -26,137 +26,189 @@ async function homeMaintenanceRoutes(fastify, options) {
 
     // ==================== MAINTENANCES ====================
 
-    fastify.get('/users/:userId/home/spaces/:spaceId/maintenances', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get all maintenances for a space',
-            tags: ['Home - Maintenance'],
-            security: [{ bearerAuth: [] }],
-            params: spaceIdParams,
+    fastify.get(
+        '/users/:userId/home/spaces/:spaceId/maintenances',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get all maintenances for a space',
+                tags: ['Home - Maintenance'],
+                security: [{ bearerAuth: [] }],
+                params: spaceIdParams,
+            },
         },
-    }, homeMaintenanceController.getMaintenances);
+        homeMaintenanceController.getMaintenances,
+    );
 
-    fastify.get('/users/:userId/home/spaces/:spaceId/maintenances/upcoming', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get upcoming maintenances',
-            tags: ['Home - Maintenance'],
-            security: [{ bearerAuth: [] }],
-            params: spaceIdParams,
+    fastify.get(
+        '/users/:userId/home/spaces/:spaceId/maintenances/upcoming',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get upcoming maintenances',
+                tags: ['Home - Maintenance'],
+                security: [{ bearerAuth: [] }],
+                params: spaceIdParams,
+            },
         },
-    }, homeMaintenanceController.getUpcomingMaintenances);
+        homeMaintenanceController.getUpcomingMaintenances,
+    );
 
-    fastify.get('/users/:userId/home/spaces/:spaceId/maintenances/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get a specific maintenance',
-            tags: ['Home - Maintenance'],
-            security: [{ bearerAuth: [] }],
-            params: itemIdParams,
+    fastify.get(
+        '/users/:userId/home/spaces/:spaceId/maintenances/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get a specific maintenance',
+                tags: ['Home - Maintenance'],
+                security: [{ bearerAuth: [] }],
+                params: itemIdParams,
+            },
         },
-    }, homeMaintenanceController.getMaintenance);
+        homeMaintenanceController.getMaintenance,
+    );
 
-    fastify.post('/users/:userId/home/spaces/:spaceId/maintenances', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a maintenance',
-            tags: ['Home - Maintenance'],
-            security: [{ bearerAuth: [] }],
-            params: spaceIdParams,
+    fastify.post(
+        '/users/:userId/home/spaces/:spaceId/maintenances',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a maintenance',
+                tags: ['Home - Maintenance'],
+                security: [{ bearerAuth: [] }],
+                params: spaceIdParams,
+            },
         },
-    }, homeMaintenanceController.createMaintenance);
+        homeMaintenanceController.createMaintenance,
+    );
 
-    fastify.put('/users/:userId/home/spaces/:spaceId/maintenances/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Update a maintenance',
-            tags: ['Home - Maintenance'],
-            security: [{ bearerAuth: [] }],
-            params: itemIdParams,
+    fastify.put(
+        '/users/:userId/home/spaces/:spaceId/maintenances/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Update a maintenance',
+                tags: ['Home - Maintenance'],
+                security: [{ bearerAuth: [] }],
+                params: itemIdParams,
+            },
         },
-    }, homeMaintenanceController.updateMaintenance);
+        homeMaintenanceController.updateMaintenance,
+    );
 
-    fastify.post('/users/:userId/home/spaces/:spaceId/maintenances/:id/complete', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Mark maintenance as done',
-            tags: ['Home - Maintenance'],
-            security: [{ bearerAuth: [] }],
-            params: itemIdParams,
+    fastify.post(
+        '/users/:userId/home/spaces/:spaceId/maintenances/:id/complete',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Mark maintenance as done',
+                tags: ['Home - Maintenance'],
+                security: [{ bearerAuth: [] }],
+                params: itemIdParams,
+            },
         },
-    }, homeMaintenanceController.completeMaintenance);
+        homeMaintenanceController.completeMaintenance,
+    );
 
-    fastify.delete('/users/:userId/home/spaces/:spaceId/maintenances/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Delete a maintenance',
-            tags: ['Home - Maintenance'],
-            security: [{ bearerAuth: [] }],
-            params: itemIdParams,
+    fastify.delete(
+        '/users/:userId/home/spaces/:spaceId/maintenances/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Delete a maintenance',
+                tags: ['Home - Maintenance'],
+                security: [{ bearerAuth: [] }],
+                params: itemIdParams,
+            },
         },
-    }, homeMaintenanceController.deleteMaintenance);
+        homeMaintenanceController.deleteMaintenance,
+    );
 
     // ==================== WARRANTIES ====================
 
-    fastify.get('/users/:userId/home/spaces/:spaceId/warranties', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get all warranties for a space',
-            tags: ['Home - Warranty'],
-            security: [{ bearerAuth: [] }],
-            params: spaceIdParams,
+    fastify.get(
+        '/users/:userId/home/spaces/:spaceId/warranties',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get all warranties for a space',
+                tags: ['Home - Warranty'],
+                security: [{ bearerAuth: [] }],
+                params: spaceIdParams,
+            },
         },
-    }, homeMaintenanceController.getWarranties);
+        homeMaintenanceController.getWarranties,
+    );
 
-    fastify.get('/users/:userId/home/spaces/:spaceId/warranties/expiring', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get expiring warranties',
-            tags: ['Home - Warranty'],
-            security: [{ bearerAuth: [] }],
-            params: spaceIdParams,
+    fastify.get(
+        '/users/:userId/home/spaces/:spaceId/warranties/expiring',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get expiring warranties',
+                tags: ['Home - Warranty'],
+                security: [{ bearerAuth: [] }],
+                params: spaceIdParams,
+            },
         },
-    }, homeMaintenanceController.getExpiringWarranties);
+        homeMaintenanceController.getExpiringWarranties,
+    );
 
-    fastify.get('/users/:userId/home/spaces/:spaceId/warranties/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get a specific warranty',
-            tags: ['Home - Warranty'],
-            security: [{ bearerAuth: [] }],
-            params: itemIdParams,
+    fastify.get(
+        '/users/:userId/home/spaces/:spaceId/warranties/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get a specific warranty',
+                tags: ['Home - Warranty'],
+                security: [{ bearerAuth: [] }],
+                params: itemIdParams,
+            },
         },
-    }, homeMaintenanceController.getWarranty);
+        homeMaintenanceController.getWarranty,
+    );
 
-    fastify.post('/users/:userId/home/spaces/:spaceId/warranties', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a warranty',
-            tags: ['Home - Warranty'],
-            security: [{ bearerAuth: [] }],
-            params: spaceIdParams,
+    fastify.post(
+        '/users/:userId/home/spaces/:spaceId/warranties',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a warranty',
+                tags: ['Home - Warranty'],
+                security: [{ bearerAuth: [] }],
+                params: spaceIdParams,
+            },
         },
-    }, homeMaintenanceController.createWarranty);
+        homeMaintenanceController.createWarranty,
+    );
 
-    fastify.put('/users/:userId/home/spaces/:spaceId/warranties/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Update a warranty',
-            tags: ['Home - Warranty'],
-            security: [{ bearerAuth: [] }],
-            params: itemIdParams,
+    fastify.put(
+        '/users/:userId/home/spaces/:spaceId/warranties/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Update a warranty',
+                tags: ['Home - Warranty'],
+                security: [{ bearerAuth: [] }],
+                params: itemIdParams,
+            },
         },
-    }, homeMaintenanceController.updateWarranty);
+        homeMaintenanceController.updateWarranty,
+    );
 
-    fastify.delete('/users/:userId/home/spaces/:spaceId/warranties/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Delete a warranty',
-            tags: ['Home - Warranty'],
-            security: [{ bearerAuth: [] }],
-            params: itemIdParams,
+    fastify.delete(
+        '/users/:userId/home/spaces/:spaceId/warranties/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Delete a warranty',
+                tags: ['Home - Warranty'],
+                security: [{ bearerAuth: [] }],
+                params: itemIdParams,
+            },
         },
-    }, homeMaintenanceController.deleteWarranty);
+        homeMaintenanceController.deleteWarranty,
+    );
 }
 
 module.exports = homeMaintenanceRoutes;

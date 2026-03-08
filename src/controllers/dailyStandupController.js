@@ -48,11 +48,14 @@ const getYesterdayTasks = async (request, reply) => {
                     },
                 ],
             },
-            order: [['completedAt', 'DESC'], ['createdAt', 'ASC']],
+            order: [
+                ['completedAt', 'DESC'],
+                ['createdAt', 'ASC'],
+            ],
         });
 
         // Mark each task with its status
-        const tasksWithStatus = tasks.map(task => ({
+        const tasksWithStatus = tasks.map((task) => ({
             ...task.toJSON(),
             yesterdayStatus: task.completedAt ? 'completed' : 'in_progress',
         }));
@@ -104,14 +107,8 @@ const createDailyStandup = async (request, reply) => {
 
     try {
         const { userId } = request.params;
-        const {
-            energyLevel,
-            hasBlockers,
-            blockerDescription,
-            notes,
-            yesterdayTasks,
-            todayTasks,
-        } = request.body;
+        const { energyLevel, hasBlockers, blockerDescription, notes, yesterdayTasks, todayTasks } =
+            request.body;
 
         const today = format(new Date(), 'yyyy-MM-dd');
 
@@ -126,18 +123,21 @@ const createDailyStandup = async (request, reply) => {
         }
 
         // Create standup
-        const standup = await WorkDailyStandup.create({
-            userId,
-            date: today,
-            energyLevel,
-            hasBlockers,
-            blockerDescription: hasBlockers ? blockerDescription : null,
-            notes,
-        }, { transaction });
+        const standup = await WorkDailyStandup.create(
+            {
+                userId,
+                date: today,
+                energyLevel,
+                hasBlockers,
+                blockerDescription: hasBlockers ? blockerDescription : null,
+                notes,
+            },
+            { transaction },
+        );
 
         // Add yesterday tasks
         if (yesterdayTasks && yesterdayTasks.length > 0) {
-            const yesterdayTasksData = yesterdayTasks.map(t => ({
+            const yesterdayTasksData = yesterdayTasks.map((t) => ({
                 standupId: standup.id,
                 taskId: t.taskId || null,
                 customDescription: t.customDescription || null,
@@ -150,7 +150,7 @@ const createDailyStandup = async (request, reply) => {
 
         // Add today tasks
         if (todayTasks && todayTasks.length > 0) {
-            const todayTasksData = todayTasks.map(t => ({
+            const todayTasksData = todayTasks.map((t) => ({
                 standupId: standup.id,
                 taskId: t.taskId || null,
                 customDescription: t.customDescription || null,
@@ -259,9 +259,10 @@ const getEnergyTrends = async (request, reply) => {
             order: [['date', 'ASC']],
         });
 
-        const averageEnergy = standups.length > 0
-            ? standups.reduce((acc, s) => acc + s.energyLevel, 0) / standups.length
-            : 0;
+        const averageEnergy =
+            standups.length > 0
+                ? standups.reduce((acc, s) => acc + s.energyLevel, 0) / standups.length
+                : 0;
 
         return reply.send({
             data: standups,

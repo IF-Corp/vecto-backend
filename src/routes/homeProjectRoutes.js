@@ -2,60 +2,54 @@ const homeProjectController = require('../controllers/homeProjectController');
 
 async function homeProjectRoutes(fastify, options) {
     // Projects CRUD
-    fastify.get(
-        '/users/:userId/spaces/:spaceId/projects',
-        homeProjectController.getProjects
-    );
+    fastify.get('/users/:userId/spaces/:spaceId/projects', homeProjectController.getProjects);
 
     fastify.get(
         '/users/:userId/spaces/:spaceId/projects/:projectId',
-        homeProjectController.getProject
+        homeProjectController.getProject,
     );
 
-    fastify.post(
-        '/users/:userId/spaces/:spaceId/projects',
-        homeProjectController.createProject
-    );
+    fastify.post('/users/:userId/spaces/:spaceId/projects', homeProjectController.createProject);
 
     fastify.put(
         '/users/:userId/spaces/:spaceId/projects/:projectId',
-        homeProjectController.updateProject
+        homeProjectController.updateProject,
     );
 
     fastify.delete(
         '/users/:userId/spaces/:spaceId/projects/:projectId',
-        homeProjectController.deleteProject
+        homeProjectController.deleteProject,
     );
 
     // Project Tasks
     fastify.get(
         '/users/:userId/spaces/:spaceId/projects/:projectId/tasks',
-        homeProjectController.getProjectTasks
+        homeProjectController.getProjectTasks,
     );
 
     fastify.post(
         '/users/:userId/spaces/:spaceId/projects/:projectId/tasks',
-        homeProjectController.createProjectTask
+        homeProjectController.createProjectTask,
     );
 
     fastify.put(
         '/users/:userId/spaces/:spaceId/projects/:projectId/tasks/:taskId',
-        homeProjectController.updateProjectTask
+        homeProjectController.updateProjectTask,
     );
 
     fastify.post(
         '/users/:userId/spaces/:spaceId/projects/:projectId/tasks/:taskId/complete',
-        homeProjectController.completeProjectTask
+        homeProjectController.completeProjectTask,
     );
 
     fastify.delete(
         '/users/:userId/spaces/:spaceId/projects/:projectId/tasks/:taskId',
-        homeProjectController.deleteProjectTask
+        homeProjectController.deleteProjectTask,
     );
 
     fastify.put(
         '/users/:userId/spaces/:spaceId/projects/:projectId/tasks/reorder',
-        homeProjectController.reorderProjectTasks
+        homeProjectController.reorderProjectTasks,
     );
 }
 

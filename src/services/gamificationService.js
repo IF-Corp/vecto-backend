@@ -11,7 +11,7 @@ const {
     UserXp,
     XpLevel,
     XpLog,
-    UserProfile
+    UserProfile,
 } = require('../models');
 const { Op } = require('sequelize');
 
@@ -34,8 +34,8 @@ class GamificationService {
         const achievements = await Achievement.findAll({
             where: {
                 condition_type: conditionType,
-                condition_value: { [Op.lte]: currentValue }
-            }
+                condition_value: { [Op.lte]: currentValue },
+            },
         });
 
         if (achievements.length === 0) {
@@ -46,15 +46,15 @@ class GamificationService {
         const unlockedIds = await UserAchievement.findAll({
             where: {
                 user_id: userId,
-                achievement_id: { [Op.in]: achievements.map(a => a.id) }
+                achievement_id: { [Op.in]: achievements.map((a) => a.id) },
             },
-            attributes: ['achievement_id']
+            attributes: ['achievement_id'],
         });
 
-        const unlockedSet = new Set(unlockedIds.map(ua => ua.achievement_id));
+        const unlockedSet = new Set(unlockedIds.map((ua) => ua.achievement_id));
 
         // Filter to only new achievements
-        const newAchievements = achievements.filter(a => !unlockedSet.has(a.id));
+        const newAchievements = achievements.filter((a) => !unlockedSet.has(a.id));
 
         if (newAchievements.length === 0) {
             return [];
@@ -67,11 +67,17 @@ class GamificationService {
                 user_id: userId,
                 achievement_id: achievement.id,
                 unlocked_at: new Date(),
-                progress: currentValue
+                progress: currentValue,
             });
 
             // Award XP
-            await this.addXp(userId, achievement.xp_reward, 'ACHIEVEMENT', achievement.id, `Achievement: ${achievement.name}`);
+            await this.addXp(
+                userId,
+                achievement.xp_reward,
+                'ACHIEVEMENT',
+                achievement.id,
+                `Achievement: ${achievement.name}`,
+            );
 
             unlocked.push({
                 id: achievement.id,
@@ -80,14 +86,18 @@ class GamificationService {
                 description: achievement.description,
                 rarity: achievement.rarity,
                 icon: achievement.icon,
-                xpReward: achievement.xp_reward
+                xpReward: achievement.xp_reward,
             });
         }
 
         // Check for milestone achievements (achievement count)
         if (conditionType !== 'ACHIEVEMENT_COUNT') {
             const totalUnlocked = await UserAchievement.count({ where: { user_id: userId } });
-            const milestoneUnlocked = await this.checkAchievements(userId, 'ACHIEVEMENT_COUNT', totalUnlocked);
+            const milestoneUnlocked = await this.checkAchievements(
+                userId,
+                'ACHIEVEMENT_COUNT',
+                totalUnlocked,
+            );
             unlocked.push(...milestoneUnlocked);
         }
 
@@ -105,7 +115,7 @@ class GamificationService {
         if (!achievement) return;
 
         const userAchievement = await UserAchievement.findOne({
-            where: { user_id: userId, achievement_id: achievement.id }
+            where: { user_id: userId, achievement_id: achievement.id },
         });
 
         if (userAchievement && !userAchievement.unlocked_at) {
@@ -114,7 +124,7 @@ class GamificationService {
             await UserAchievement.create({
                 user_id: userId,
                 achievement_id: achievement.id,
-                progress
+                progress,
             });
         }
     }
@@ -147,15 +157,15 @@ class GamificationService {
         const newLevel = await XpLevel.findOne({
             where: {
                 min_xp: { [Op.lte]: newTotalXp },
-                max_xp: { [Op.gte]: newTotalXp }
-            }
+                max_xp: { [Op.gte]: newTotalXp },
+            },
         });
 
         const leveledUp = newLevel && newLevel.level > oldLevel;
 
         await userXp.update({
             total_xp: newTotalXp,
-            current_level: newLevel?.level || oldLevel
+            current_level: newLevel?.level || oldLevel,
         });
 
         // Log XP gain
@@ -164,7 +174,7 @@ class GamificationService {
             xp_amount: amount,
             source,
             source_id: sourceId,
-            description
+            description,
         });
 
         // If leveled up, check for level-based achievements and titles
@@ -178,11 +188,13 @@ class GamificationService {
             totalXp: newTotalXp,
             currentLevel: newLevel?.level || oldLevel,
             leveledUp,
-            newLevel: leveledUp ? {
-                level: newLevel.level,
-                name: newLevel.name,
-                icon: newLevel.icon
-            } : null
+            newLevel: leveledUp
+                ? {
+                      level: newLevel.level,
+                      name: newLevel.name,
+                      icon: newLevel.icon,
+                  }
+                : null,
         };
     }
 
@@ -204,23 +216,23 @@ class GamificationService {
         const levelTitles = await Title.findAll({
             where: {
                 required_level: { [Op.lte]: currentLevel },
-                required_achievement_id: null
-            }
+                required_achievement_id: null,
+            },
         });
 
         // Get already unlocked titles
         const unlockedTitleIds = await UserTitle.findAll({
             where: {
                 user_id: userId,
-                title_id: { [Op.in]: levelTitles.map(t => t.id) }
+                title_id: { [Op.in]: levelTitles.map((t) => t.id) },
             },
-            attributes: ['title_id']
+            attributes: ['title_id'],
         });
 
-        const unlockedSet = new Set(unlockedTitleIds.map(ut => ut.title_id));
+        const unlockedSet = new Set(unlockedTitleIds.map((ut) => ut.title_id));
 
         // Filter to new titles
-        const newTitles = levelTitles.filter(t => !unlockedSet.has(t.id));
+        const newTitles = levelTitles.filter((t) => !unlockedSet.has(t.id));
 
         const unlocked = [];
         for (const title of newTitles) {
@@ -228,14 +240,14 @@ class GamificationService {
                 user_id: userId,
                 title_id: title.id,
                 unlocked_at: new Date(),
-                is_active: false
+                is_active: false,
             });
 
             unlocked.push({
                 id: title.id,
                 code: title.code,
                 name: title.name,
-                rarity: title.rarity
+                rarity: title.rarity,
             });
         }
 
@@ -251,11 +263,11 @@ class GamificationService {
         const [userXp, achievementCount, titleCount] = await Promise.all([
             UserXp.findOne({ where: { user_id: userId } }),
             UserAchievement.count({ where: { user_id: userId } }),
-            UserTitle.count({ where: { user_id: userId } })
+            UserTitle.count({ where: { user_id: userId } }),
         ]);
 
         const currentLevel = await XpLevel.findOne({
-            where: { level: userXp?.current_level || 1 }
+            where: { level: userXp?.current_level || 1 },
         });
 
         return {
@@ -264,7 +276,7 @@ class GamificationService {
             levelName: currentLevel?.name || 'Iniciante',
             levelIcon: currentLevel?.icon || '🌱',
             achievementsUnlocked: achievementCount,
-            titlesUnlocked: titleCount
+            titlesUnlocked: titleCount,
         };
     }
 
@@ -285,7 +297,7 @@ class GamificationService {
         if (!newbieTitle) return;
 
         const existing = await UserTitle.findOne({
-            where: { user_id: userId, title_id: newbieTitle.id }
+            where: { user_id: userId, title_id: newbieTitle.id },
         });
 
         if (!existing) {
@@ -293,7 +305,7 @@ class GamificationService {
                 user_id: userId,
                 title_id: newbieTitle.id,
                 unlocked_at: new Date(),
-                is_active: true // Set as default active title
+                is_active: true, // Set as default active title
             });
         }
     }

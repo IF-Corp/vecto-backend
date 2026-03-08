@@ -8,58 +8,58 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             meal_type: {
                 type: Sequelize.ENUM('BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'),
-                allowNull: false
+                allowNull: false,
             },
             description: {
                 type: Sequelize.TEXT,
-                allowNull: true
+                allowNull: true,
             },
             calories: {
                 type: Sequelize.INTEGER,
-                allowNull: true
+                allowNull: true,
             },
             protein: {
                 type: Sequelize.DECIMAL(10, 2),
-                allowNull: true
+                allowNull: true,
             },
             carbs: {
                 type: Sequelize.DECIMAL(10, 2),
-                allowNull: true
+                allowNull: true,
             },
             fat: {
                 type: Sequelize.DECIMAL(10, 2),
-                allowNull: true
+                allowNull: true,
             },
             meal_date: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             photo_url: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('meal_logs', ['user_id']);
@@ -68,5 +68,5 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('meal_logs');
-    }
+    },
 };

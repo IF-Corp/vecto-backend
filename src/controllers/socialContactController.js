@@ -31,7 +31,10 @@ async function getContacts(request, reply) {
 
         let order = [['name', 'ASC']];
         if (sortBy === 'birthday') {
-            order = [['birthday', 'ASC NULLS LAST'], ['name', 'ASC']];
+            order = [
+                ['birthday', 'ASC NULLS LAST'],
+                ['name', 'ASC'],
+            ];
         }
 
         let contacts = await SocialContact.findAll({
@@ -59,7 +62,7 @@ async function getContacts(request, reply) {
                     where: { id: circleRelations.map((r) => r.circle_id) },
                 });
                 return { ...contact.toJSON(), circles };
-            })
+            }),
         );
 
         return { success: true, data: contactsWithCircles };
@@ -80,7 +83,16 @@ async function getContact(request, reply) {
         }
 
         // Get related data
-        const [circles, networks, tags, preferences, restrictions, specialDates, reminder, professional] = await Promise.all([
+        const [
+            circles,
+            networks,
+            tags,
+            preferences,
+            restrictions,
+            specialDates,
+            reminder,
+            professional,
+        ] = await Promise.all([
             SocialContactCircle.findAll({ where: { contact_id: id } }).then(async (rels) => {
                 const circleIds = rels.map((r) => r.circle_id);
                 return SocialCircle.findAll({ where: { id: circleIds } });
@@ -292,7 +304,9 @@ async function updateContactNotes(request, reply) {
         }
 
         if (professional !== undefined) {
-            const existingPro = await SocialContactProfessional.findOne({ where: { contact_id: id } });
+            const existingPro = await SocialContactProfessional.findOne({
+                where: { contact_id: id },
+            });
             if (existingPro) {
                 await existingPro.update(professional);
             } else {
@@ -350,7 +364,11 @@ async function getUpcomingBirthdays(request, reply) {
         const upcomingBirthdays = contacts
             .map((contact) => {
                 const birthday = new Date(contact.birthday);
-                const thisYearBirthday = new Date(today.getFullYear(), birthday.getMonth(), birthday.getDate());
+                const thisYearBirthday = new Date(
+                    today.getFullYear(),
+                    birthday.getMonth(),
+                    birthday.getDate(),
+                );
 
                 if (thisYearBirthday < today) {
                     thisYearBirthday.setFullYear(today.getFullYear() + 1);

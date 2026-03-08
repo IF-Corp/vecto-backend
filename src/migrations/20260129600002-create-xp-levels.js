@@ -8,37 +8,37 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             level: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
-                unique: true
+                unique: true,
             },
             name: {
                 type: Sequelize.STRING(50),
-                allowNull: false
+                allowNull: false,
             },
             min_xp: {
                 type: Sequelize.INTEGER,
-                allowNull: false
+                allowNull: false,
             },
             max_xp: {
                 type: Sequelize.INTEGER,
-                allowNull: false
+                allowNull: false,
             },
             icon: {
                 type: Sequelize.STRING(10),
-                allowNull: true
+                allowNull: true,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('xp_levels', ['level']);
@@ -47,5 +47,5 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('xp_levels');
-    }
+    },
 };

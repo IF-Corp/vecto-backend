@@ -43,7 +43,7 @@ const HomeProject = sequelize.define(
         tableName: 'home_projects',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = HomeProject;

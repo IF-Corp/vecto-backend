@@ -13,9 +13,9 @@ const routineItemSchema = {
         id: { type: 'string', format: 'uuid' },
         title: { type: 'string', minLength: 1, maxLength: 200 },
         estimated_duration: { type: 'integer', minimum: 0, nullable: true },
-        item_order: { type: 'integer', minimum: 0 }
+        item_order: { type: 'integer', minimum: 0 },
     },
-    required: ['title']
+    required: ['title'],
 };
 
 // Habit schemas
@@ -26,14 +26,22 @@ const createHabitBody = {
         description: { type: 'string', maxLength: 1000, nullable: true },
         category: { type: 'string', maxLength: 100, default: 'Geral' },
         context_tags: { type: 'array', items: { type: 'string' }, default: [] },
-        ideal_time: { type: 'string', pattern: '^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$', nullable: true },
+        ideal_time: {
+            type: 'string',
+            pattern: '^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$',
+            nullable: true,
+        },
         time_period: timePeriodEnum,
         frequency: frequencyEnum,
-        frequency_days: { type: 'array', items: { type: 'integer', minimum: 0, maximum: 6 }, default: [] },
-        estimated_duration: { type: 'integer', minimum: 0, nullable: true }
+        frequency_days: {
+            type: 'array',
+            items: { type: 'integer', minimum: 0, maximum: 6 },
+            default: [],
+        },
+        estimated_duration: { type: 'integer', minimum: 0, nullable: true },
     },
     required: ['name'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateHabitBody = {
@@ -43,32 +51,36 @@ const updateHabitBody = {
         description: { type: 'string', maxLength: 1000, nullable: true },
         category: { type: 'string', maxLength: 100 },
         context_tags: { type: 'array', items: { type: 'string' } },
-        ideal_time: { type: 'string', pattern: '^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$', nullable: true },
+        ideal_time: {
+            type: 'string',
+            pattern: '^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$',
+            nullable: true,
+        },
         time_period: timePeriodEnum,
         frequency: frequencyEnum,
         frequency_days: { type: 'array', items: { type: 'integer', minimum: 0, maximum: 6 } },
         estimated_duration: { type: 'integer', minimum: 0, nullable: true },
-        is_frozen: { type: 'boolean' }
+        is_frozen: { type: 'boolean' },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const logHabitBody = {
     type: 'object',
     properties: {
         status: habitLogStatusEnum,
-        execution_date: { type: 'string', format: 'date-time', nullable: true }
+        execution_date: { type: 'string', format: 'date-time', nullable: true },
     },
     required: ['status'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const reactivateHabitBody = {
     type: 'object',
     properties: {
-        reset_streak: { type: 'boolean', default: false }
+        reset_streak: { type: 'boolean', default: false },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Routine schemas
@@ -76,26 +88,38 @@ const createRoutineBody = {
     type: 'object',
     properties: {
         name: { type: 'string', minLength: 1, maxLength: 200 },
-        start_time: { type: 'string', pattern: '^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$', nullable: true },
+        start_time: {
+            type: 'string',
+            pattern: '^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$',
+            nullable: true,
+        },
         frequency: frequencyEnum,
-        frequency_days: { type: 'array', items: { type: 'integer', minimum: 0, maximum: 6 }, default: [] },
-        items: { type: 'array', items: routineItemSchema, default: [] }
+        frequency_days: {
+            type: 'array',
+            items: { type: 'integer', minimum: 0, maximum: 6 },
+            default: [],
+        },
+        items: { type: 'array', items: routineItemSchema, default: [] },
     },
     required: ['name'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateRoutineBody = {
     type: 'object',
     properties: {
         name: { type: 'string', minLength: 1, maxLength: 200 },
-        start_time: { type: 'string', pattern: '^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$', nullable: true },
+        start_time: {
+            type: 'string',
+            pattern: '^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$',
+            nullable: true,
+        },
         frequency: frequencyEnum,
         frequency_days: { type: 'array', items: { type: 'integer', minimum: 0, maximum: 6 } },
         items: { type: 'array', items: routineItemSchema },
-        is_frozen: { type: 'boolean' }
+        is_frozen: { type: 'boolean' },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Execution item time schema (for focus mode)
@@ -104,9 +128,9 @@ const executionItemTimeSchema = {
     properties: {
         itemId: { type: 'string', format: 'uuid' },
         itemTitle: { type: 'string', minLength: 1, maxLength: 200 },
-        duration: { type: 'integer', minimum: 0 }
+        duration: { type: 'integer', minimum: 0 },
     },
-    required: ['itemId', 'itemTitle', 'duration']
+    required: ['itemId', 'itemTitle', 'duration'],
 };
 
 const logRoutineExecutionBody = {
@@ -117,10 +141,10 @@ const logRoutineExecutionBody = {
         completed_at: { type: 'string', format: 'date-time', nullable: true },
         total_duration: { type: 'integer', minimum: 0, nullable: true },
         completed: { type: 'boolean', default: false },
-        item_times: { type: 'array', items: executionItemTimeSchema, default: [] }
+        item_times: { type: 'array', items: executionItemTimeSchema, default: [] },
     },
     required: ['execution_date', 'started_at'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Focus Mode schemas
@@ -128,10 +152,10 @@ const completeFocusSessionBody = {
     type: 'object',
     properties: {
         total_duration: { type: 'integer', minimum: 0 },
-        item_times: { type: 'array', items: executionItemTimeSchema, default: [] }
+        item_times: { type: 'array', items: executionItemTimeSchema, default: [] },
     },
     required: ['total_duration'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Social Group schemas
@@ -139,19 +163,19 @@ const createSocialGroupBody = {
     type: 'object',
     properties: {
         name: { type: 'string', minLength: 1, maxLength: 200 },
-        ranking_logic: rankingLogicEnum
+        ranking_logic: rankingLogicEnum,
     },
     required: ['name'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const joinGroupBody = {
     type: 'object',
     properties: {
-        user_id: { type: 'string', format: 'uuid' }
+        user_id: { type: 'string', format: 'uuid' },
     },
     required: ['user_id'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 module.exports = {
@@ -169,5 +193,5 @@ module.exports = {
     habitLogStatusEnum,
     rankingLogicEnum,
     timePeriodEnum,
-    statusEnum
+    statusEnum,
 };

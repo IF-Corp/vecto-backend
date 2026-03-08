@@ -65,13 +65,13 @@ const getTaskTypes = async (request, reply) => {
         const { userId } = request.params;
         const types = await WorkTaskType.findAll({
             where: {
-                [Op.or]: [
-                    { user_id: null, is_default: true },
-                    { user_id: userId },
-                ],
+                [Op.or]: [{ user_id: null, is_default: true }, { user_id: userId }],
                 is_active: true,
             },
-            order: [['is_default', 'DESC'], ['name', 'ASC']],
+            order: [
+                ['is_default', 'DESC'],
+                ['name', 'ASC'],
+            ],
         });
         return { success: true, data: types };
     } catch (error) {
@@ -143,10 +143,7 @@ const getTaskStatuses = async (request, reply) => {
         const { userId } = request.params;
         const statuses = await WorkTaskStatus.findAll({
             where: {
-                [Op.or]: [
-                    { user_id: null, is_default: true },
-                    { user_id: userId },
-                ],
+                [Op.or]: [{ user_id: null, is_default: true }, { user_id: userId }],
             },
             order: [['order', 'ASC']],
         });
@@ -164,10 +161,7 @@ const createTaskStatus = async (request, reply) => {
         // Get max order
         const maxOrder = await WorkTaskStatus.max('order', {
             where: {
-                [Op.or]: [
-                    { user_id: null },
-                    { user_id: userId },
-                ],
+                [Op.or]: [{ user_id: null }, { user_id: userId }],
             },
         });
 
@@ -213,16 +207,13 @@ const reorderTaskStatuses = async (request, reply) => {
         for (const item of statusOrders) {
             await WorkTaskStatus.update(
                 { order: item.order },
-                { where: { id: item.id, user_id: userId } }
+                { where: { id: item.id, user_id: userId } },
             );
         }
 
         const statuses = await WorkTaskStatus.findAll({
             where: {
-                [Op.or]: [
-                    { user_id: null, is_default: true },
-                    { user_id: userId },
-                ],
+                [Op.or]: [{ user_id: null, is_default: true }, { user_id: userId }],
             },
             order: [['order', 'ASC']],
         });
@@ -281,9 +272,17 @@ const getProjects = async (request, reply) => {
         const projectsWithStats = projects.map((project) => {
             const tasks = project.tasks || [];
             const totalTasks = tasks.length;
-            const completedTasks = tasks.filter((t) => t.status_id === 'c0000000-0000-0000-0000-000000000004').length;
-            const totalEstimatedHours = tasks.reduce((sum, t) => sum + (parseFloat(t.estimated_hours) || 0), 0);
-            const totalActualHours = tasks.reduce((sum, t) => sum + (parseFloat(t.actual_hours) || 0), 0);
+            const completedTasks = tasks.filter(
+                (t) => t.status_id === 'c0000000-0000-0000-0000-000000000004',
+            ).length;
+            const totalEstimatedHours = tasks.reduce(
+                (sum, t) => sum + (parseFloat(t.estimated_hours) || 0),
+                0,
+            );
+            const totalActualHours = tasks.reduce(
+                (sum, t) => sum + (parseFloat(t.actual_hours) || 0),
+                0,
+            );
 
             return {
                 ...project.toJSON(),
@@ -311,10 +310,7 @@ const getProject = async (request, reply) => {
             include: [
                 {
                     association: 'tasks',
-                    include: [
-                        { association: 'type' },
-                        { association: 'status' },
-                    ],
+                    include: [{ association: 'type' }, { association: 'status' }],
                 },
                 { association: 'timeEntries' },
             ],
@@ -389,7 +385,8 @@ const deleteProject = async (request, reply) => {
 const getTasks = async (request, reply) => {
     try {
         const { userId } = request.params;
-        const { projectId, typeId, statusId, priorityQuadrant, deadline, scheduledDate } = request.query;
+        const { projectId, typeId, statusId, priorityQuadrant, deadline, scheduledDate } =
+            request.query;
 
         const where = { user_id: userId };
 
@@ -584,7 +581,8 @@ const createTimeEntry = async (request, reply) => {
         if (entry.task_id && entry.duration_minutes) {
             const task = await WorkTask.findByPk(entry.task_id);
             if (task) {
-                const newActualHours = (parseFloat(task.actual_hours) || 0) + (entry.duration_minutes / 60);
+                const newActualHours =
+                    (parseFloat(task.actual_hours) || 0) + entry.duration_minutes / 60;
                 await task.update({ actual_hours: newActualHours });
             }
         }
@@ -641,7 +639,10 @@ const deleteTimeEntry = async (request, reply) => {
         if (entry.task_id && entry.duration_minutes) {
             const task = await WorkTask.findByPk(entry.task_id);
             if (task) {
-                const newActualHours = Math.max(0, (parseFloat(task.actual_hours) || 0) - (entry.duration_minutes / 60));
+                const newActualHours = Math.max(
+                    0,
+                    (parseFloat(task.actual_hours) || 0) - entry.duration_minutes / 60,
+                );
                 await task.update({ actual_hours: newActualHours });
             }
         }
@@ -666,7 +667,7 @@ const startTimer = async (request, reply) => {
             },
             {
                 where: { user_id: userId, is_running: true },
-            }
+            },
         );
 
         const entry = await WorkTimeEntry.create({
@@ -710,7 +711,7 @@ const stopTimer = async (request, reply) => {
         if (entry.task_id) {
             const task = await WorkTask.findByPk(entry.task_id);
             if (task) {
-                const newActualHours = (parseFloat(task.actual_hours) || 0) + (durationMinutes / 60);
+                const newActualHours = (parseFloat(task.actual_hours) || 0) + durationMinutes / 60;
                 await task.update({ actual_hours: newActualHours });
             }
         }
@@ -756,9 +757,7 @@ const getEstimationAccuracy = async (request, reply) => {
                 estimated_hours: { [Op.not]: null },
                 actual_hours: { [Op.gt]: 0 },
             },
-            include: [
-                { association: 'type', attributes: ['id', 'name', 'icon', 'color'] },
-            ],
+            include: [{ association: 'type', attributes: ['id', 'name', 'icon', 'color'] }],
             order: [['completed_at', 'DESC']],
             limit: parseInt(limit),
         });
@@ -779,7 +778,10 @@ const getEstimationAccuracy = async (request, reply) => {
         const tasksWithAccuracy = completedTasks.map((task) => {
             const estimated = parseFloat(task.estimated_hours);
             const actual = parseFloat(task.actual_hours);
-            const accuracy = Math.min(100, Math.round((Math.min(estimated, actual) / Math.max(estimated, actual)) * 100));
+            const accuracy = Math.min(
+                100,
+                Math.round((Math.min(estimated, actual) / Math.max(estimated, actual)) * 100),
+            );
             const diff = actual - estimated;
 
             return {
@@ -795,7 +797,7 @@ const getEstimationAccuracy = async (request, reply) => {
 
         // Calculate overall average accuracy
         const averageAccuracy = Math.round(
-            tasksWithAccuracy.reduce((sum, t) => sum + t.accuracy, 0) / tasksWithAccuracy.length
+            tasksWithAccuracy.reduce((sum, t) => sum + t.accuracy, 0) / tasksWithAccuracy.length,
         );
 
         // Calculate tendency (underestimate vs overestimate)
@@ -808,13 +810,21 @@ const getEstimationAccuracy = async (request, reply) => {
             tendency = {
                 type: 'underestimate',
                 message: `Você subestima em ~${Math.round(avgDiff * 60)} minutos`,
-                multiplier: 1 + (avgDiff / (tasksWithAccuracy.reduce((sum, t) => sum + t.estimated, 0) / tasksWithAccuracy.length)),
+                multiplier:
+                    1 +
+                    avgDiff /
+                        (tasksWithAccuracy.reduce((sum, t) => sum + t.estimated, 0) /
+                            tasksWithAccuracy.length),
             };
         } else {
             tendency = {
                 type: 'overestimate',
                 message: `Você superestima em ~${Math.round(Math.abs(avgDiff) * 60)} minutos`,
-                multiplier: 1 + (avgDiff / (tasksWithAccuracy.reduce((sum, t) => sum + t.estimated, 0) / tasksWithAccuracy.length)),
+                multiplier:
+                    1 +
+                    avgDiff /
+                        (tasksWithAccuracy.reduce((sum, t) => sum + t.estimated, 0) /
+                            tasksWithAccuracy.length),
             };
         }
 
@@ -839,7 +849,9 @@ const getEstimationAccuracy = async (request, reply) => {
 
         const byType = Object.values(typeAccuracy).map((data) => ({
             type: data.type,
-            averageAccuracy: Math.round(data.accuracies.reduce((a, b) => a + b, 0) / data.accuracies.length),
+            averageAccuracy: Math.round(
+                data.accuracies.reduce((a, b) => a + b, 0) / data.accuracies.length,
+            ),
             taskCount: data.accuracies.length,
             multiplier: data.totalActual / data.totalEstimated,
         }));
@@ -885,7 +897,9 @@ const suggestEstimate = async (request, reply) => {
             return { success: true, data: { suggestedHours: null } };
         }
 
-        const avgHours = similarTasks.reduce((sum, t) => sum + parseFloat(t.actual_hours), 0) / similarTasks.length;
+        const avgHours =
+            similarTasks.reduce((sum, t) => sum + parseFloat(t.actual_hours), 0) /
+            similarTasks.length;
 
         return {
             success: true,
@@ -924,31 +938,36 @@ const getClients = async (request, reply) => {
         });
 
         // Calculate stats for each client
-        const clientsWithStats = await Promise.all(clients.map(async (client) => {
-            const projects = client.projects || [];
-            const activeProjects = projects.filter(p => p.status === 'ACTIVE').length;
+        const clientsWithStats = await Promise.all(
+            clients.map(async (client) => {
+                const projects = client.projects || [];
+                const activeProjects = projects.filter((p) => p.status === 'ACTIVE').length;
 
-            // Get total hours worked for this client
-            const totalHours = await WorkTimeEntry.sum('duration_minutes', {
-                where: {
-                    user_id: userId,
-                    project_id: { [Op.in]: projects.map(p => p.id) },
-                },
-            });
+                // Get total hours worked for this client
+                const totalHours = await WorkTimeEntry.sum('duration_minutes', {
+                    where: {
+                        user_id: userId,
+                        project_id: { [Op.in]: projects.map((p) => p.id) },
+                    },
+                });
 
-            // Get total budget value
-            const totalBudget = projects.reduce((sum, p) => sum + (parseFloat(p.budget_value) || 0), 0);
+                // Get total budget value
+                const totalBudget = projects.reduce(
+                    (sum, p) => sum + (parseFloat(p.budget_value) || 0),
+                    0,
+                );
 
-            return {
-                ...client.toJSON(),
-                stats: {
-                    totalProjects: projects.length,
-                    activeProjects,
-                    totalHours: Math.round((totalHours || 0) / 60 * 10) / 10,
-                    totalBudget,
-                },
-            };
-        }));
+                return {
+                    ...client.toJSON(),
+                    stats: {
+                        totalProjects: projects.length,
+                        activeProjects,
+                        totalHours: Math.round(((totalHours || 0) / 60) * 10) / 10,
+                        totalBudget,
+                    },
+                };
+            }),
+        );
 
         return { success: true, data: clientsWithStats };
     } catch (error) {
@@ -965,8 +984,14 @@ const getClient = async (request, reply) => {
                 {
                     association: 'projects',
                     include: [
-                        { association: 'tasks', attributes: ['id', 'status_id', 'estimated_hours', 'actual_hours'] },
-                        { association: 'timeEntries', attributes: ['id', 'duration_minutes', 'is_billable'] },
+                        {
+                            association: 'tasks',
+                            attributes: ['id', 'status_id', 'estimated_hours', 'actual_hours'],
+                        },
+                        {
+                            association: 'timeEntries',
+                            attributes: ['id', 'duration_minutes', 'is_billable'],
+                        },
                     ],
                 },
             ],
@@ -992,8 +1017,20 @@ const getClientDetails = async (request, reply) => {
                 {
                     association: 'projects',
                     include: [
-                        { association: 'tasks', attributes: ['id', 'status_id', 'estimated_hours', 'actual_hours', 'completed_at'] },
-                        { association: 'timeEntries', attributes: ['id', 'duration_minutes', 'is_billable', 'started_at'] },
+                        {
+                            association: 'tasks',
+                            attributes: [
+                                'id',
+                                'status_id',
+                                'estimated_hours',
+                                'actual_hours',
+                                'completed_at',
+                            ],
+                        },
+                        {
+                            association: 'timeEntries',
+                            attributes: ['id', 'duration_minutes', 'is_billable', 'started_at'],
+                        },
                     ],
                 },
             ],
@@ -1013,31 +1050,40 @@ const getClientDetails = async (request, reply) => {
         let totalEstimated = 0;
         let totalActual = 0;
 
-        projects.forEach(project => {
+        projects.forEach((project) => {
             const entries = project.timeEntries || [];
-            entries.forEach(entry => {
+            entries.forEach((entry) => {
                 const hours = (entry.duration_minutes || 0) / 60;
                 totalHours += hours;
                 if (entry.is_billable) {
                     billableHours += hours;
-                    const rate = parseFloat(project.hourly_rate) || parseFloat(client.hourly_rate) || 0;
+                    const rate =
+                        parseFloat(project.hourly_rate) || parseFloat(client.hourly_rate) || 0;
                     totalBilled += hours * rate;
                 }
             });
 
             const tasks = project.tasks || [];
-            tasks.forEach(task => {
+            tasks.forEach((task) => {
                 totalEstimated += parseFloat(task.estimated_hours) || 0;
                 totalActual += parseFloat(task.actual_hours) || 0;
             });
         });
 
         // Calculate rentability (actual vs estimated ratio)
-        const rentability = totalEstimated > 0 ? Math.round((totalEstimated / totalActual) * 100) : 100;
+        const rentability =
+            totalEstimated > 0 ? Math.round((totalEstimated / totalActual) * 100) : 100;
 
         // Average rating
-        const ratings = [client.payment_rating, client.communication_rating, client.scope_rating].filter(r => r != null);
-        const averageRating = ratings.length > 0 ? Math.round(ratings.reduce((a, b) => a + b, 0) / ratings.length * 10) / 10 : null;
+        const ratings = [
+            client.payment_rating,
+            client.communication_rating,
+            client.scope_rating,
+        ].filter((r) => r != null);
+        const averageRating =
+            ratings.length > 0
+                ? Math.round((ratings.reduce((a, b) => a + b, 0) / ratings.length) * 10) / 10
+                : null;
 
         return {
             success: true,
@@ -1045,8 +1091,8 @@ const getClientDetails = async (request, reply) => {
                 client: client.toJSON(),
                 stats: {
                     totalProjects: projects.length,
-                    activeProjects: projects.filter(p => p.status === 'ACTIVE').length,
-                    completedProjects: projects.filter(p => p.status === 'COMPLETED').length,
+                    activeProjects: projects.filter((p) => p.status === 'ACTIVE').length,
+                    completedProjects: projects.filter((p) => p.status === 'COMPLETED').length,
                     totalHours: Math.round(totalHours * 10) / 10,
                     billableHours: Math.round(billableHours * 10) / 10,
                     totalBilled: Math.round(totalBilled * 100) / 100,
@@ -1196,7 +1242,10 @@ const getProjectMilestones = async (request, reply) => {
         const { projectId } = request.params;
         const milestones = await WorkProjectMilestone.findAll({
             where: { project_id: projectId },
-            order: [['order', 'ASC'], ['target_date', 'ASC']],
+            order: [
+                ['order', 'ASC'],
+                ['target_date', 'ASC'],
+            ],
         });
         return { success: true, data: milestones };
     } catch (error) {
@@ -1277,7 +1326,7 @@ const reorderProjectMilestones = async (request, reply) => {
         for (const item of milestoneOrders) {
             await WorkProjectMilestone.update(
                 { order: item.order },
-                { where: { id: item.id, project_id: projectId } }
+                { where: { id: item.id, project_id: projectId } },
             );
         }
 
@@ -1305,9 +1354,7 @@ const getProjectAnalysis = async (request, reply) => {
                 { association: 'milestones' },
                 {
                     association: 'tasks',
-                    include: [
-                        { association: 'status' },
-                    ],
+                    include: [{ association: 'status' }],
                 },
                 { association: 'timeEntries' },
             ],
@@ -1324,32 +1371,39 @@ const getProjectAnalysis = async (request, reply) => {
 
         // Task stats
         const totalTasks = tasks.length;
-        const completedTasks = tasks.filter(t => t.status?.is_done_status).length;
+        const completedTasks = tasks.filter((t) => t.status?.is_done_status).length;
         const taskProgress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
         // Hours stats
         const budgetHours = parseFloat(project.budget_hours) || 0;
-        const usedHours = entries.reduce((sum, e) => sum + ((e.duration_minutes || 0) / 60), 0);
+        const usedHours = entries.reduce((sum, e) => sum + (e.duration_minutes || 0) / 60, 0);
         const hoursProgress = budgetHours > 0 ? Math.round((usedHours / budgetHours) * 100) : 0;
         const remainingHours = Math.max(0, budgetHours - usedHours);
 
         // Budget value stats
         const budgetValue = parseFloat(project.budget_value) || 0;
         const hourlyRate = parseFloat(project.hourly_rate) || 0;
-        const billableEntries = entries.filter(e => e.is_billable);
-        const billableHours = billableEntries.reduce((sum, e) => sum + ((e.duration_minutes || 0) / 60), 0);
+        const billableEntries = entries.filter((e) => e.is_billable);
+        const billableHours = billableEntries.reduce(
+            (sum, e) => sum + (e.duration_minutes || 0) / 60,
+            0,
+        );
         const earnedValue = billableHours * hourlyRate;
 
         // Milestone progress
-        const completedMilestones = milestones.filter(m => m.completed_at).length;
-        const milestoneProgress = milestones.length > 0 ? Math.round((completedMilestones / milestones.length) * 100) : 0;
+        const completedMilestones = milestones.filter((m) => m.completed_at).length;
+        const milestoneProgress =
+            milestones.length > 0 ? Math.round((completedMilestones / milestones.length) * 100) : 0;
 
         // Delivery prediction based on last 3 days of work
         const threeDaysAgo = new Date();
         threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
 
-        const recentEntries = entries.filter(e => new Date(e.started_at) >= threeDaysAgo);
-        const recentHours = recentEntries.reduce((sum, e) => sum + ((e.duration_minutes || 0) / 60), 0);
+        const recentEntries = entries.filter((e) => new Date(e.started_at) >= threeDaysAgo);
+        const recentHours = recentEntries.reduce(
+            (sum, e) => sum + (e.duration_minutes || 0) / 60,
+            0,
+        );
         const avgHoursPerDay = recentHours / 3;
 
         let deliveryPrediction = null;
@@ -1362,7 +1416,9 @@ const getProjectAnalysis = async (request, reply) => {
                 predictedDate: predictedDate.toISOString().split('T')[0],
                 daysRemaining: daysToComplete,
                 avgHoursPerDay: Math.round(avgHoursPerDay * 10) / 10,
-                onTrack: project.end_date ? new Date(predictedDate) <= new Date(project.end_date) : true,
+                onTrack: project.end_date
+                    ? new Date(predictedDate) <= new Date(project.end_date)
+                    : true,
             };
         }
 
@@ -1372,7 +1428,8 @@ const getProjectAnalysis = async (request, reply) => {
         if (hoursProgress > 80 && taskProgress < 50) {
             suggestions.push({
                 type: 'warning',
-                message: 'Horas usadas acima de 80%, mas tarefas abaixo de 50%. Revise o escopo ou negocie mais horas.',
+                message:
+                    'Horas usadas acima de 80%, mas tarefas abaixo de 50%. Revise o escopo ou negocie mais horas.',
             });
         }
 
@@ -1390,8 +1447,10 @@ const getProjectAnalysis = async (request, reply) => {
             });
         }
 
-        const pendingMilestones = milestones.filter(m => !m.completed_at && m.target_date);
-        const overdueMilestones = pendingMilestones.filter(m => new Date(m.target_date) < new Date());
+        const pendingMilestones = milestones.filter((m) => !m.completed_at && m.target_date);
+        const overdueMilestones = pendingMilestones.filter(
+            (m) => new Date(m.target_date) < new Date(),
+        );
         if (overdueMilestones.length > 0) {
             suggestions.push({
                 type: 'warning',
@@ -1419,7 +1478,8 @@ const getProjectAnalysis = async (request, reply) => {
                         total: budgetValue,
                         earned: Math.round(earnedValue * 100) / 100,
                         remaining: Math.round((budgetValue - earnedValue) * 100) / 100,
-                        percentage: budgetValue > 0 ? Math.round((earnedValue / budgetValue) * 100) : 0,
+                        percentage:
+                            budgetValue > 0 ? Math.round((earnedValue / budgetValue) * 100) : 0,
                     },
                     milestones: {
                         total: milestones.length,
@@ -1453,10 +1513,7 @@ const getWorkDashboard = async (request, reply) => {
                 user_id: userId,
                 completed_at: null,
             },
-            attributes: [
-                'priority_quadrant',
-                [fn('COUNT', col('id')), 'count'],
-            ],
+            attributes: ['priority_quadrant', [fn('COUNT', col('id')), 'count']],
             group: ['priority_quadrant'],
         });
 
@@ -1523,7 +1580,7 @@ const getWorkDashboard = async (request, reply) => {
                 tasksDueToday,
                 overdueTasks,
                 completedThisWeek,
-                hoursThisWeek: Math.round((hoursThisWeek || 0) / 60 * 10) / 10,
+                hoursThisWeek: Math.round(((hoursThisWeek || 0) / 60) * 10) / 10,
                 runningTimer,
                 activeProjects,
             },

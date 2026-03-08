@@ -12,17 +12,22 @@ const getSkills = async (request, reply) => {
 
     const skills = await WorkSkill.findAll({
         where,
-        include: [{
-            model: WorkSkillEvidence,
-            as: 'evidences',
-            order: [['evidence_date', 'DESC']],
-            limit: 5,
-        }],
-        order: [['category', 'ASC'], ['name', 'ASC']],
+        include: [
+            {
+                model: WorkSkillEvidence,
+                as: 'evidences',
+                order: [['evidence_date', 'DESC']],
+                limit: 5,
+            },
+        ],
+        order: [
+            ['category', 'ASC'],
+            ['name', 'ASC'],
+        ],
     });
 
     // Add progress calculation to each skill
-    const skillsWithProgress = skills.map(skill => {
+    const skillsWithProgress = skills.map((skill) => {
         const progress = WorkSkill.calculateProgress(skill.current_level, skill.target_level);
         return {
             ...skill.toJSON(),
@@ -188,11 +193,13 @@ const getCertifications = async (request, reply) => {
 
     const certifications = await WorkCertification.findAll({
         where,
-        include: [{
-            model: WorkSkill,
-            as: 'skill',
-            attributes: ['id', 'name', 'category'],
-        }],
+        include: [
+            {
+                model: WorkSkill,
+                as: 'skill',
+                attributes: ['id', 'name', 'category'],
+            },
+        ],
         order: [['obtained_at', 'DESC']],
     });
 
@@ -203,11 +210,13 @@ const getCertification = async (request, reply) => {
     const { id } = request.params;
 
     const certification = await WorkCertification.findByPk(id, {
-        include: [{
-            model: WorkSkill,
-            as: 'skill',
-            attributes: ['id', 'name', 'category'],
-        }],
+        include: [
+            {
+                model: WorkSkill,
+                as: 'skill',
+                attributes: ['id', 'name', 'category'],
+            },
+        ],
     });
 
     if (!certification) {
@@ -219,7 +228,8 @@ const getCertification = async (request, reply) => {
 
 const createCertification = async (request, reply) => {
     const { userId } = request.params;
-    const { name, issuer, obtainedAt, expiresAt, credentialId, credentialUrl, skillId } = request.body;
+    const { name, issuer, obtainedAt, expiresAt, credentialId, credentialUrl, skillId } =
+        request.body;
 
     const certification = await WorkCertification.create({
         user_id: userId,
@@ -280,11 +290,13 @@ const getAchievements = async (request, reply) => {
 
     const achievements = await WorkAchievement.findAll({
         where: { user_id: userId },
-        include: [{
-            model: WorkProject,
-            as: 'project',
-            attributes: ['id', 'name', 'color'],
-        }],
+        include: [
+            {
+                model: WorkProject,
+                as: 'project',
+                attributes: ['id', 'name', 'color'],
+            },
+        ],
         order: [['achievement_date', 'DESC']],
     });
 
@@ -295,11 +307,13 @@ const getAchievement = async (request, reply) => {
     const { id } = request.params;
 
     const achievement = await WorkAchievement.findByPk(id, {
-        include: [{
-            model: WorkProject,
-            as: 'project',
-            attributes: ['id', 'name', 'color'],
-        }],
+        include: [
+            {
+                model: WorkProject,
+                as: 'project',
+                attributes: ['id', 'name', 'color'],
+            },
+        ],
     });
 
     if (!achievement) {
@@ -369,31 +383,35 @@ const getCareerTimeline = async (request, reply) => {
     // Get achievements
     const achievements = await WorkAchievement.findAll({
         where: { user_id: userId },
-        include: [{
-            model: WorkProject,
-            as: 'project',
-            attributes: ['id', 'name', 'color'],
-        }],
+        include: [
+            {
+                model: WorkProject,
+                as: 'project',
+                attributes: ['id', 'name', 'color'],
+            },
+        ],
     });
 
     // Get certifications
     const certifications = await WorkCertification.findAll({
         where: { user_id: userId },
-        include: [{
-            model: WorkSkill,
-            as: 'skill',
-            attributes: ['id', 'name'],
-        }],
+        include: [
+            {
+                model: WorkSkill,
+                as: 'skill',
+                attributes: ['id', 'name'],
+            },
+        ],
     });
 
     // Combine and sort by date
     const timeline = [
-        ...achievements.map(a => ({
+        ...achievements.map((a) => ({
             type: 'achievement',
             date: a.achievement_date,
             data: a,
         })),
-        ...certifications.map(c => ({
+        ...certifications.map((c) => ({
             type: 'certification',
             date: c.obtained_at,
             data: c,

@@ -28,7 +28,7 @@ const HomeCostSplitSettings = sequelize.define(
         tableName: 'home_cost_split_settings',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = HomeCostSplitSettings;

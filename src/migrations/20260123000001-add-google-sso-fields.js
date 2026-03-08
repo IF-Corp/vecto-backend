@@ -7,20 +7,20 @@ module.exports = {
         await queryInterface.addColumn('users', 'google_id', {
             type: Sequelize.STRING,
             allowNull: true,
-            unique: true
+            unique: true,
         });
 
         await queryInterface.addColumn('users', 'auth_provider', {
             type: Sequelize.ENUM('email', 'google'),
             defaultValue: 'email',
-            allowNull: false
+            allowNull: false,
         });
 
         // Add enabled_modules field to user_preferences table
         await queryInterface.addColumn('user_preferences', 'enabled_modules', {
             type: Sequelize.JSONB,
             defaultValue: ['habits', 'projects', 'finance', 'health', 'study', 'home'],
-            allowNull: false
+            allowNull: false,
         });
 
         // Create index for google_id for faster lookups
@@ -28,9 +28,9 @@ module.exports = {
             name: 'users_google_id_idx',
             where: {
                 google_id: {
-                    [Sequelize.Op.ne]: null
-                }
-            }
+                    [Sequelize.Op.ne]: null,
+                },
+            },
         });
     },
 
@@ -42,5 +42,5 @@ module.exports = {
 
         // Drop the ENUM type
         await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_users_auth_provider";');
-    }
+    },
 };

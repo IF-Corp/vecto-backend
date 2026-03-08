@@ -34,7 +34,7 @@ const SocialSettings = sequelize.define(
         tableName: 'social_settings',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = SocialSettings;

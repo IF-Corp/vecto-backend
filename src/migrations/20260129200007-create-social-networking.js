@@ -57,7 +57,9 @@ module.exports = {
             },
         });
 
-        await queryInterface.addIndex('social_contact_professional', ['contact_id'], { unique: true });
+        await queryInterface.addIndex('social_contact_professional', ['contact_id'], {
+            unique: true,
+        });
 
         // Social Battery Log (for tracking energy levels)
         await queryInterface.createTable('social_battery_log', {

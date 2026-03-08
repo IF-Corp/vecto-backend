@@ -8,30 +8,30 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             freeze_period_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'freeze_periods',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             module_type: {
                 type: 'module_type',
-                allowNull: false
+                allowNull: false,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('freeze_modules', ['freeze_period_id']);
@@ -41,11 +41,11 @@ module.exports = {
         await queryInterface.addConstraint('freeze_modules', {
             fields: ['freeze_period_id', 'module_type'],
             type: 'unique',
-            name: 'unique_freeze_module_type'
+            name: 'unique_freeze_module_type',
         });
     },
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('freeze_modules');
-    }
+    },
 };

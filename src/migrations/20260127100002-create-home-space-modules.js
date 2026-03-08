@@ -21,7 +21,16 @@ module.exports = {
                 onDelete: 'CASCADE',
             },
             module_type: {
-                type: Sequelize.ENUM('ROUTINE', 'MAINTENANCE', 'SHOPPING', 'STOCK', 'PLANTS', 'PETS', 'MEALS', 'PROJECTS'),
+                type: Sequelize.ENUM(
+                    'ROUTINE',
+                    'MAINTENANCE',
+                    'SHOPPING',
+                    'STOCK',
+                    'PLANTS',
+                    'PETS',
+                    'MEALS',
+                    'PROJECTS',
+                ),
                 allowNull: false,
             },
             is_enabled: {
@@ -46,7 +55,9 @@ module.exports = {
         });
 
         await queryInterface.addIndex('home_space_modules', ['space_id']);
-        await queryInterface.addIndex('home_space_modules', ['space_id', 'module_type'], { unique: true });
+        await queryInterface.addIndex('home_space_modules', ['space_id', 'module_type'], {
+            unique: true,
+        });
     },
 
     async down(queryInterface, Sequelize) {

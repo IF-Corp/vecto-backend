@@ -20,7 +20,7 @@ class GoogleAuthService {
         try {
             const ticket = await this.client.verifyIdToken({
                 idToken,
-                audience: GOOGLE_CLIENT_ID
+                audience: GOOGLE_CLIENT_ID,
             });
 
             const payload = ticket.getPayload();
@@ -37,11 +37,13 @@ class GoogleAuthService {
                 googleId: payload.sub,
                 email: payload.email,
                 name: payload.name || null,
-                picture: payload.picture || null
+                picture: payload.picture || null,
             };
         } catch (error) {
-            if (error.message.includes('Token used too late') ||
-                error.message.includes('Token used too early')) {
+            if (
+                error.message.includes('Token used too late') ||
+                error.message.includes('Token used too early')
+            ) {
                 throw new Error('Token expired');
             }
             if (error.message.includes('Wrong recipient')) {

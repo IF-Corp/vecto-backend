@@ -22,8 +22,7 @@ const getStockItems = async (request, reply) => {
         // Filter low stock items
         if (lowStock === 'true') {
             items = items.filter(
-                (item) =>
-                    parseFloat(item.current_quantity) <= parseFloat(item.min_quantity)
+                (item) => parseFloat(item.current_quantity) <= parseFloat(item.min_quantity),
             );
         }
 
@@ -174,8 +173,7 @@ const getLowStockItems = async (request, reply) => {
         });
 
         const lowStockItems = items.filter(
-            (item) =>
-                parseFloat(item.current_quantity) <= parseFloat(item.min_quantity)
+            (item) => parseFloat(item.current_quantity) <= parseFloat(item.min_quantity),
         );
 
         return reply.send({ success: true, data: lowStockItems });

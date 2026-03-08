@@ -103,13 +103,26 @@ async function getContactsNeedingAttention(request, reply) {
 
                 let frequencyDays;
                 switch (reminder.frequency_type) {
-                    case 'WEEKLY': frequencyDays = 7; break;
-                    case 'BIWEEKLY': frequencyDays = 14; break;
-                    case 'MONTHLY': frequencyDays = 30; break;
-                    case 'QUARTERLY': frequencyDays = 90; break;
-                    case 'YEARLY': frequencyDays = 365; break;
-                    case 'CUSTOM': frequencyDays = reminder.frequency_days || 30; break;
-                    default: frequencyDays = 30;
+                    case 'WEEKLY':
+                        frequencyDays = 7;
+                        break;
+                    case 'BIWEEKLY':
+                        frequencyDays = 14;
+                        break;
+                    case 'MONTHLY':
+                        frequencyDays = 30;
+                        break;
+                    case 'QUARTERLY':
+                        frequencyDays = 90;
+                        break;
+                    case 'YEARLY':
+                        frequencyDays = 365;
+                        break;
+                    case 'CUSTOM':
+                        frequencyDays = reminder.frequency_days || 30;
+                        break;
+                    default:
+                        frequencyDays = 30;
                 }
 
                 const daysSinceContact = lastInteraction

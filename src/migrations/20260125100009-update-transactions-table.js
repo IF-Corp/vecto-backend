@@ -26,7 +26,7 @@ module.exports = {
                 allowNull: true,
                 references: { model: 'users', key: 'id' },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             });
         }
 
@@ -37,7 +37,7 @@ module.exports = {
                 allowNull: true,
                 references: { model: 'finance_categories', key: 'id' },
                 onUpdate: 'CASCADE',
-                onDelete: 'SET NULL'
+                onDelete: 'SET NULL',
             });
         }
 
@@ -48,7 +48,7 @@ module.exports = {
                 allowNull: true,
                 references: { model: 'cards', key: 'id' },
                 onUpdate: 'CASCADE',
-                onDelete: 'SET NULL'
+                onDelete: 'SET NULL',
             });
         }
 
@@ -59,7 +59,7 @@ module.exports = {
                 allowNull: true,
                 references: { model: 'invoices', key: 'id' },
                 onUpdate: 'CASCADE',
-                onDelete: 'SET NULL'
+                onDelete: 'SET NULL',
             });
         }
 
@@ -68,28 +68,28 @@ module.exports = {
             await queryInterface.addColumn('transactions', 'is_installment', {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false,
-                allowNull: false
+                allowNull: false,
             });
         }
 
         if (!(await columnExists('transactions', 'installment_id'))) {
             await queryInterface.addColumn('transactions', 'installment_id', {
                 type: Sequelize.UUID,
-                allowNull: true
+                allowNull: true,
             });
         }
 
         if (!(await columnExists('transactions', 'current_installment'))) {
             await queryInterface.addColumn('transactions', 'current_installment', {
                 type: Sequelize.INTEGER,
-                allowNull: true
+                allowNull: true,
             });
         }
 
         if (!(await columnExists('transactions', 'total_installments'))) {
             await queryInterface.addColumn('transactions', 'total_installments', {
                 type: Sequelize.INTEGER,
-                allowNull: true
+                allowNull: true,
             });
         }
 
@@ -98,14 +98,14 @@ module.exports = {
             await queryInterface.addColumn('transactions', 'is_recurring', {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false,
-                allowNull: false
+                allowNull: false,
             });
         }
 
         if (!(await columnExists('transactions', 'recurring_id'))) {
             await queryInterface.addColumn('transactions', 'recurring_id', {
                 type: Sequelize.UUID,
-                allowNull: true
+                allowNull: true,
             });
         }
 
@@ -113,32 +113,40 @@ module.exports = {
         if (!(await columnExists('transactions', 'notes'))) {
             await queryInterface.addColumn('transactions', 'notes', {
                 type: Sequelize.STRING(500),
-                allowNull: true
+                allowNull: true,
             });
         }
 
         if (!(await columnExists('transactions', 'attachment_url'))) {
             await queryInterface.addColumn('transactions', 'attachment_url', {
                 type: Sequelize.STRING(500),
-                allowNull: true
+                allowNull: true,
             });
         }
 
         // Add indexes (check if they exist first)
         if (!(await indexExists('transactions_user_id_idx'))) {
-            await queryInterface.addIndex('transactions', ['user_id'], { name: 'transactions_user_id_idx' });
+            await queryInterface.addIndex('transactions', ['user_id'], {
+                name: 'transactions_user_id_idx',
+            });
         }
 
         if (!(await indexExists('transactions_user_date_idx'))) {
-            await queryInterface.addIndex('transactions', ['user_id', 'transaction_date'], { name: 'transactions_user_date_idx' });
+            await queryInterface.addIndex('transactions', ['user_id', 'transaction_date'], {
+                name: 'transactions_user_date_idx',
+            });
         }
 
         if (!(await indexExists('transactions_installment_id_idx'))) {
-            await queryInterface.addIndex('transactions', ['installment_id'], { name: 'transactions_installment_id_idx' });
+            await queryInterface.addIndex('transactions', ['installment_id'], {
+                name: 'transactions_installment_id_idx',
+            });
         }
 
         if (!(await indexExists('transactions_recurring_id_idx'))) {
-            await queryInterface.addIndex('transactions', ['recurring_id'], { name: 'transactions_recurring_id_idx' });
+            await queryInterface.addIndex('transactions', ['recurring_id'], {
+                name: 'transactions_recurring_id_idx',
+            });
         }
 
         // Update status enum to include new values (PostgreSQL requires special handling)
@@ -174,5 +182,5 @@ module.exports = {
         await queryInterface.removeColumn('transactions', 'recurring_id');
         await queryInterface.removeColumn('transactions', 'notes');
         await queryInterface.removeColumn('transactions', 'attachment_url');
-    }
+    },
 };

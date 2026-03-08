@@ -236,7 +236,11 @@ const getSubject = async (request, reply) => {
                     as: 'evaluations',
                     include: [{ model: StudyEvaluationFeedback, as: 'feedback' }],
                 },
-                { model: StudyPeriod, as: 'period', include: [{ model: StudyCourse, as: 'course' }] },
+                {
+                    model: StudyPeriod,
+                    as: 'period',
+                    include: [{ model: StudyCourse, as: 'course' }],
+                },
             ],
         });
         if (!subject) {
@@ -258,7 +262,7 @@ const createSubject = async (request, reply) => {
 
         if (weights && weights.length > 0) {
             await StudySubjectWeight.bulkCreate(
-                weights.map((w) => ({ ...w, subject_id: subject.id }))
+                weights.map((w) => ({ ...w, subject_id: subject.id })),
             );
         }
 
@@ -287,9 +291,7 @@ const updateSubject = async (request, reply) => {
         if (weights) {
             await StudySubjectWeight.destroy({ where: { subject_id: id } });
             if (weights.length > 0) {
-                await StudySubjectWeight.bulkCreate(
-                    weights.map((w) => ({ ...w, subject_id: id }))
-                );
+                await StudySubjectWeight.bulkCreate(weights.map((w) => ({ ...w, subject_id: id })));
             }
         }
 
@@ -349,7 +351,7 @@ const createEvaluation = async (request, reply) => {
                 topic_ids.map((topicId) => ({
                     evaluation_id: evaluation.id,
                     topic_id: topicId,
-                }))
+                })),
             );
         }
 
@@ -376,7 +378,7 @@ const updateEvaluation = async (request, reply) => {
             await StudyEvaluationTopic.destroy({ where: { evaluation_id: id } });
             if (topic_ids.length > 0) {
                 await StudyEvaluationTopic.bulkCreate(
-                    topic_ids.map((topicId) => ({ evaluation_id: id, topic_id: topicId }))
+                    topic_ids.map((topicId) => ({ evaluation_id: id, topic_id: topicId })),
                 );
             }
         }
@@ -440,8 +442,18 @@ const getTopics = async (request, reply) => {
 
         const topics = await StudyTopic.findAll({
             where,
-            include: [{ model: StudyRetentionLog, as: 'retentionLogs', limit: 5, order: [['evaluated_at', 'DESC']] }],
-            order: [['retention_rating', 'ASC NULLS FIRST'], ['name', 'ASC']],
+            include: [
+                {
+                    model: StudyRetentionLog,
+                    as: 'retentionLogs',
+                    limit: 5,
+                    order: [['evaluated_at', 'DESC']],
+                },
+            ],
+            order: [
+                ['retention_rating', 'ASC NULLS FIRST'],
+                ['name', 'ASC'],
+            ],
         });
         return { success: true, data: topics };
     } catch (error) {
@@ -500,7 +512,7 @@ const logRetention = async (request, reply) => {
 
         await StudyTopic.update(
             { retention_rating: rating, last_reviewed_at: new Date() },
-            { where: { id: topicId } }
+            { where: { id: topicId } },
         );
 
         const log = await StudyRetentionLog.create({
@@ -941,7 +953,7 @@ const logReview = async (request, reply) => {
                 cards_reviewed: 1,
                 cards_correct: isCorrect ? 1 : 0,
             },
-            { where: { id: sessionId } }
+            { where: { id: sessionId } },
         );
 
         return { success: true, data: log };
@@ -961,9 +973,7 @@ const finishReviewSession = async (request, reply) => {
         }
 
         const score =
-            session.cards_reviewed > 0
-                ? (session.cards_correct / session.cards_reviewed) * 10
-                : 0;
+            session.cards_reviewed > 0 ? (session.cards_correct / session.cards_reviewed) * 10 : 0;
 
         await session.update({
             finished_at: new Date(),
@@ -1109,7 +1119,7 @@ const createProject = async (request, reply) => {
                     description: m.description,
                     target_date: m.target_date,
                     order_index: m.order || i,
-                }))
+                })),
             );
         }
 
@@ -1187,7 +1197,10 @@ const updateMilestone = async (request, reply) => {
 const getFocusPresets = async (request, reply) => {
     try {
         const presets = await StudyFocusPreset.findAll({
-            order: [['is_system', 'DESC'], ['name', 'ASC']],
+            order: [
+                ['is_system', 'DESC'],
+                ['name', 'ASC'],
+            ],
         });
         return { success: true, data: presets };
     } catch (error) {
@@ -1249,7 +1262,7 @@ const startFocusSession = async (request, reply) => {
         // Cancel any existing active session
         await StudyFocusSession.update(
             { status: 'CANCELLED', finished_at: new Date() },
-            { where: { user_id: userId, status: { [Op.in]: ['IN_PROGRESS', 'PAUSED'] } } }
+            { where: { user_id: userId, status: { [Op.in]: ['IN_PROGRESS', 'PAUSED'] } } },
         );
 
         const session = await StudyFocusSession.create({
@@ -1261,7 +1274,8 @@ const startFocusSession = async (request, reply) => {
         const preset = request.body.preset_id
             ? await StudyFocusPreset.findByPk(request.body.preset_id)
             : null;
-        const blockMinutes = request.body.custom_block_minutes || (preset ? preset.block_minutes : 25);
+        const blockMinutes =
+            request.body.custom_block_minutes || (preset ? preset.block_minutes : 25);
 
         await StudyFocusBlock.create({
             session_id: session.id,
@@ -1292,7 +1306,12 @@ const completeFocusBlock = async (request, reply) => {
         const session = await StudyFocusSession.findByPk(sessionId, {
             include: [
                 { model: StudyFocusPreset, as: 'preset' },
-                { model: StudyFocusBlock, as: 'blocks', order: [['block_number', 'DESC']], limit: 1 },
+                {
+                    model: StudyFocusBlock,
+                    as: 'blocks',
+                    order: [['block_number', 'DESC']],
+                    limit: 1,
+                },
             ],
         });
 
@@ -1349,10 +1368,12 @@ const completeFocusBlock = async (request, reply) => {
             const blocksUntilLong = preset ? preset.blocks_until_long_break : 4;
             if (completedBlocks % blocksUntilLong === 0) {
                 nextType = 'LONG_BREAK';
-                nextDuration = session.custom_break_minutes || (preset ? preset.long_break_minutes : 15);
+                nextDuration =
+                    session.custom_break_minutes || (preset ? preset.long_break_minutes : 15);
             } else {
                 nextType = 'SHORT_BREAK';
-                nextDuration = session.custom_break_minutes || (preset ? preset.short_break_minutes : 5);
+                nextDuration =
+                    session.custom_break_minutes || (preset ? preset.short_break_minutes : 5);
             }
         } else {
             // After break, study
@@ -1377,10 +1398,7 @@ const completeFocusBlock = async (request, reply) => {
 const pauseFocusSession = async (request, reply) => {
     try {
         const { id } = request.params;
-        const [updated] = await StudyFocusSession.update(
-            { status: 'PAUSED' },
-            { where: { id } }
-        );
+        const [updated] = await StudyFocusSession.update({ status: 'PAUSED' }, { where: { id } });
         if (!updated) {
             reply.status(404);
             return { success: false, error: 'Session not found' };
@@ -1398,7 +1416,7 @@ const resumeFocusSession = async (request, reply) => {
         const { id } = request.params;
         const [updated] = await StudyFocusSession.update(
             { status: 'IN_PROGRESS' },
-            { where: { id } }
+            { where: { id } },
         );
         if (!updated) {
             reply.status(404);
@@ -1417,7 +1435,7 @@ const cancelFocusSession = async (request, reply) => {
         const { id } = request.params;
         const [updated] = await StudyFocusSession.update(
             { status: 'CANCELLED', finished_at: new Date() },
-            { where: { id } }
+            { where: { id } },
         );
         if (!updated) {
             reply.status(404);
@@ -1463,14 +1481,22 @@ const getStudyStats = async (request, reply) => {
 
         // Focus stats
         const focusSessions = await StudyFocusSession.findAll({ where: focusWhere });
-        const totalFocusMinutes = focusSessions.reduce((sum, s) => sum + (s.total_focus_minutes || 0), 0);
+        const totalFocusMinutes = focusSessions.reduce(
+            (sum, s) => sum + (s.total_focus_minutes || 0),
+            0,
+        );
 
         // Review stats
         const reviewSessions = await StudyReviewSession.findAll({ where: reviewWhere });
-        const totalCardsReviewed = reviewSessions.reduce((sum, s) => sum + (s.cards_reviewed || 0), 0);
-        const avgScore = reviewSessions.length > 0
-            ? reviewSessions.reduce((sum, s) => sum + (parseFloat(s.score) || 0), 0) / reviewSessions.length
-            : 0;
+        const totalCardsReviewed = reviewSessions.reduce(
+            (sum, s) => sum + (s.cards_reviewed || 0),
+            0,
+        );
+        const avgScore =
+            reviewSessions.length > 0
+                ? reviewSessions.reduce((sum, s) => sum + (parseFloat(s.score) || 0), 0) /
+                  reviewSessions.length
+                : 0;
 
         // Pages read from progress logs (BOOK type)
         const bookProgressLogs = await StudyProgressLog.findAll({
@@ -1830,15 +1856,19 @@ const getAllUserSubjects = async (request, reply) => {
     try {
         const { userId } = request.params;
         const subjects = await StudySubject.findAll({
-            include: [{
-                model: StudyPeriod,
-                as: 'period',
-                include: [{
-                    model: StudyCourse,
-                    as: 'course',
-                    where: { user_id: userId },
-                }],
-            }],
+            include: [
+                {
+                    model: StudyPeriod,
+                    as: 'period',
+                    include: [
+                        {
+                            model: StudyCourse,
+                            as: 'course',
+                            where: { user_id: userId },
+                        },
+                    ],
+                },
+            ],
         });
         return { success: true, data: subjects };
     } catch (error) {
@@ -1912,19 +1942,25 @@ const getUpcomingEvaluations = async (request, reply) => {
             where: {
                 date: { [Op.gte]: new Date() },
             },
-            include: [{
-                model: StudySubject,
-                as: 'subject',
-                include: [{
-                    model: StudyPeriod,
-                    as: 'period',
-                    include: [{
-                        model: StudyCourse,
-                        as: 'course',
-                        where: { user_id: userId },
-                    }],
-                }],
-            }],
+            include: [
+                {
+                    model: StudySubject,
+                    as: 'subject',
+                    include: [
+                        {
+                            model: StudyPeriod,
+                            as: 'period',
+                            include: [
+                                {
+                                    model: StudyCourse,
+                                    as: 'course',
+                                    where: { user_id: userId },
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
             order: [['date', 'ASC']],
             limit: 10,
         });
@@ -2080,7 +2116,7 @@ const createFlashcardsBulk = async (request, reply) => {
     try {
         const { deck_id, cards } = request.body;
         const createdCards = await StudyFlashcard.bulkCreate(
-            cards.map(card => ({ ...card, deck_id }))
+            cards.map((card) => ({ ...card, deck_id })),
         );
 
         // Update deck card count
@@ -2291,7 +2327,7 @@ const getStudyStreak = async (request, reply) => {
             data: {
                 currentStreak: settings?.current_streak || 0,
                 longestStreak: settings?.longest_streak || 0,
-            }
+            },
         };
     } catch (error) {
         reply.status(500);
@@ -2312,11 +2348,13 @@ const getDueToday = async (request, reply) => {
             where: {
                 due_date: { [Op.lt]: tomorrow },
             },
-            include: [{
-                model: StudyDeck,
-                as: 'deck',
-                where: { user_id: userId },
-            }],
+            include: [
+                {
+                    model: StudyDeck,
+                    as: 'deck',
+                    where: { user_id: userId },
+                },
+            ],
         });
 
         // Get upcoming evaluations
@@ -2324,19 +2362,25 @@ const getDueToday = async (request, reply) => {
             where: {
                 date: { [Op.between]: [today, tomorrow] },
             },
-            include: [{
-                model: StudySubject,
-                as: 'subject',
-                include: [{
-                    model: StudyPeriod,
-                    as: 'period',
-                    include: [{
-                        model: StudyCourse,
-                        as: 'course',
-                        where: { user_id: userId },
-                    }],
-                }],
-            }],
+            include: [
+                {
+                    model: StudySubject,
+                    as: 'subject',
+                    include: [
+                        {
+                            model: StudyPeriod,
+                            as: 'period',
+                            include: [
+                                {
+                                    model: StudyCourse,
+                                    as: 'course',
+                                    where: { user_id: userId },
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
         });
 
         return {
@@ -2344,7 +2388,7 @@ const getDueToday = async (request, reply) => {
             data: {
                 dueCards: dueCards.length,
                 evaluationsToday: evaluations.length,
-            }
+            },
         };
     } catch (error) {
         reply.status(500);

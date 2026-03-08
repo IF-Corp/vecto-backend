@@ -18,15 +18,15 @@ function getRefreshSecret() {
 function generateTokens(user) {
     const payload = {
         id: user.id,
-        email: user.email
+        email: user.email,
     };
 
     const accessToken = jwt.sign(payload, getJwtSecret(), {
-        expiresIn: ACCESS_TOKEN_EXPIRY
+        expiresIn: ACCESS_TOKEN_EXPIRY,
     });
 
     const refreshToken = jwt.sign(payload, getRefreshSecret(), {
-        expiresIn: REFRESH_TOKEN_EXPIRY
+        expiresIn: REFRESH_TOKEN_EXPIRY,
     });
 
     return { accessToken, refreshToken };
@@ -50,5 +50,5 @@ module.exports = {
     verifyRefreshToken,
     decodeToken,
     ACCESS_TOKEN_EXPIRY,
-    REFRESH_TOKEN_EXPIRY
+    REFRESH_TOKEN_EXPIRY,
 };

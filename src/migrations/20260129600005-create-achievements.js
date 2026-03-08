@@ -30,60 +30,60 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             code: {
                 type: Sequelize.STRING(50),
                 allowNull: false,
-                unique: true
+                unique: true,
             },
             name: {
                 type: Sequelize.STRING(100),
-                allowNull: false
+                allowNull: false,
             },
             description: {
                 type: Sequelize.TEXT,
-                allowNull: false
+                allowNull: false,
             },
             category: {
                 type: 'achievement_category',
-                allowNull: false
+                allowNull: false,
             },
             rarity: {
                 type: 'achievement_rarity',
                 allowNull: false,
-                defaultValue: 'COMMON'
+                defaultValue: 'COMMON',
             },
             icon: {
                 type: Sequelize.STRING(10),
-                allowNull: true
+                allowNull: true,
             },
             xp_reward: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
-                defaultValue: 50
+                defaultValue: 50,
             },
             condition_type: {
                 type: Sequelize.STRING(50),
-                allowNull: false
+                allowNull: false,
             },
             condition_value: {
                 type: Sequelize.INTEGER,
-                allowNull: false
+                allowNull: false,
             },
             is_hidden: {
                 type: Sequelize.BOOLEAN,
                 allowNull: false,
-                defaultValue: false
+                defaultValue: false,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('achievements', ['code']);
@@ -95,5 +95,5 @@ module.exports = {
         await queryInterface.dropTable('achievements');
         await queryInterface.sequelize.query('DROP TYPE IF EXISTS achievement_rarity;');
         await queryInterface.sequelize.query('DROP TYPE IF EXISTS achievement_category;');
-    }
+    },
 };

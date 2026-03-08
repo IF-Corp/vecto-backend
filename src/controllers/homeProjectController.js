@@ -32,7 +32,7 @@ const getProjects = async (request, reply) => {
 
                 const totalSpent = tasks.reduce(
                     (sum, t) => sum + parseFloat(t.actual_cost || 0),
-                    0
+                    0,
                 );
 
                 return {
@@ -42,7 +42,7 @@ const getProjects = async (request, reply) => {
                     completedTasks,
                     totalSpent,
                 };
-            })
+            }),
         );
 
         return reply.send({ success: true, data: projectsWithProgress });
@@ -74,14 +74,8 @@ const getProject = async (request, reply) => {
         const completedTasks = tasks.filter((t) => t.is_completed).length;
         const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
-        const totalSpent = tasks.reduce(
-            (sum, t) => sum + parseFloat(t.actual_cost || 0),
-            0
-        );
-        const totalEstimated = tasks.reduce(
-            (sum, t) => sum + parseFloat(t.estimated_cost || 0),
-            0
-        );
+        const totalSpent = tasks.reduce((sum, t) => sum + parseFloat(t.actual_cost || 0), 0);
+        const totalEstimated = tasks.reduce((sum, t) => sum + parseFloat(t.estimated_cost || 0), 0);
 
         return reply.send({
             success: true,
@@ -288,9 +282,9 @@ const reorderProjectTasks = async (request, reply) => {
             taskIds.map((taskId, index) =>
                 HomeProjectTask.update(
                     { sort_order: index },
-                    { where: { id: taskId, project_id: projectId } }
-                )
-            )
+                    { where: { id: taskId, project_id: projectId } },
+                ),
+            ),
         );
 
         return reply.send({ success: true, message: 'Tasks reordered successfully' });

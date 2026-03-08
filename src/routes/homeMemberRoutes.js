@@ -8,69 +8,93 @@ async function homeMemberRoutes(fastify, options) {
 
     // ==================== MEMBERS BY USER ====================
 
-    fastify.get('/users/:userId/home/members', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get all members across all spaces for a user',
-            tags: ['Home - Members'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.get(
+        '/users/:userId/home/members',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get all members across all spaces for a user',
+                tags: ['Home - Members'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, homeMemberController.getMembersByUser);
+        homeMemberController.getMembersByUser,
+    );
 
     // ==================== MEMBERS BY SPACE ====================
 
-    fastify.get('/users/:userId/home/spaces/:spaceId/members', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get all members for a specific space',
-            tags: ['Home - Members'],
-            security: [{ bearerAuth: [] }],
-            params: homeMemberSchema.spaceIdParams,
+    fastify.get(
+        '/users/:userId/home/spaces/:spaceId/members',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get all members for a specific space',
+                tags: ['Home - Members'],
+                security: [{ bearerAuth: [] }],
+                params: homeMemberSchema.spaceIdParams,
+            },
         },
-    }, homeMemberController.getMembers);
+        homeMemberController.getMembers,
+    );
 
-    fastify.get('/users/:userId/home/spaces/:spaceId/members/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get a specific member',
-            tags: ['Home - Members'],
-            security: [{ bearerAuth: [] }],
-            params: homeMemberSchema.memberIdParams,
+    fastify.get(
+        '/users/:userId/home/spaces/:spaceId/members/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get a specific member',
+                tags: ['Home - Members'],
+                security: [{ bearerAuth: [] }],
+                params: homeMemberSchema.memberIdParams,
+            },
         },
-    }, homeMemberController.getMember);
+        homeMemberController.getMember,
+    );
 
-    fastify.post('/users/:userId/home/spaces/:spaceId/members', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Add a new member to a space',
-            tags: ['Home - Members'],
-            security: [{ bearerAuth: [] }],
-            params: homeMemberSchema.spaceIdParams,
-            body: homeMemberSchema.createMemberBody,
+    fastify.post(
+        '/users/:userId/home/spaces/:spaceId/members',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Add a new member to a space',
+                tags: ['Home - Members'],
+                security: [{ bearerAuth: [] }],
+                params: homeMemberSchema.spaceIdParams,
+                body: homeMemberSchema.createMemberBody,
+            },
         },
-    }, homeMemberController.createMember);
+        homeMemberController.createMember,
+    );
 
-    fastify.put('/users/:userId/home/spaces/:spaceId/members/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Update a member',
-            tags: ['Home - Members'],
-            security: [{ bearerAuth: [] }],
-            params: homeMemberSchema.memberIdParams,
-            body: homeMemberSchema.updateMemberBody,
+    fastify.put(
+        '/users/:userId/home/spaces/:spaceId/members/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Update a member',
+                tags: ['Home - Members'],
+                security: [{ bearerAuth: [] }],
+                params: homeMemberSchema.memberIdParams,
+                body: homeMemberSchema.updateMemberBody,
+            },
         },
-    }, homeMemberController.updateMember);
+        homeMemberController.updateMember,
+    );
 
-    fastify.delete('/users/:userId/home/spaces/:spaceId/members/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Remove a member from a space',
-            tags: ['Home - Members'],
-            security: [{ bearerAuth: [] }],
-            params: homeMemberSchema.memberIdParams,
+    fastify.delete(
+        '/users/:userId/home/spaces/:spaceId/members/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Remove a member from a space',
+                tags: ['Home - Members'],
+                security: [{ bearerAuth: [] }],
+                params: homeMemberSchema.memberIdParams,
+            },
         },
-    }, homeMemberController.deleteMember);
+        homeMemberController.deleteMember,
+    );
 }
 
 module.exports = homeMemberRoutes;

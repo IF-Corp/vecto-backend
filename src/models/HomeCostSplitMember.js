@@ -35,7 +35,7 @@ const HomeCostSplitMember = sequelize.define(
         tableName: 'home_cost_split_members',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = HomeCostSplitMember;

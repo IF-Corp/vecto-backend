@@ -36,7 +36,7 @@ const SocialInteraction = sequelize.define(
         createdAt: 'created_at',
         updatedAt: false,
         underscored: true,
-    }
+    },
 );
 
 module.exports = SocialInteraction;

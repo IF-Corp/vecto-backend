@@ -37,127 +37,171 @@ async function homeTaskRoutes(fastify, options) {
 
     // ==================== TASKS ====================
 
-    fastify.get('/users/:userId/home/spaces/:spaceId/tasks', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get all tasks for a space',
-            tags: ['Home - Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: spaceIdParams,
+    fastify.get(
+        '/users/:userId/home/spaces/:spaceId/tasks',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get all tasks for a space',
+                tags: ['Home - Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: spaceIdParams,
+            },
         },
-    }, homeTaskController.getTasks);
+        homeTaskController.getTasks,
+    );
 
-    fastify.get('/users/:userId/home/spaces/:spaceId/tasks/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get a specific task',
-            tags: ['Home - Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: taskIdParams,
+    fastify.get(
+        '/users/:userId/home/spaces/:spaceId/tasks/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get a specific task',
+                tags: ['Home - Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: taskIdParams,
+            },
         },
-    }, homeTaskController.getTask);
+        homeTaskController.getTask,
+    );
 
-    fastify.post('/users/:userId/home/spaces/:spaceId/tasks', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a new task',
-            tags: ['Home - Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: spaceIdParams,
+    fastify.post(
+        '/users/:userId/home/spaces/:spaceId/tasks',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a new task',
+                tags: ['Home - Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: spaceIdParams,
+            },
         },
-    }, homeTaskController.createTask);
+        homeTaskController.createTask,
+    );
 
-    fastify.put('/users/:userId/home/spaces/:spaceId/tasks/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Update a task',
-            tags: ['Home - Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: taskIdParams,
+    fastify.put(
+        '/users/:userId/home/spaces/:spaceId/tasks/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Update a task',
+                tags: ['Home - Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: taskIdParams,
+            },
         },
-    }, homeTaskController.updateTask);
+        homeTaskController.updateTask,
+    );
 
-    fastify.delete('/users/:userId/home/spaces/:spaceId/tasks/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Delete a task',
-            tags: ['Home - Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: taskIdParams,
+    fastify.delete(
+        '/users/:userId/home/spaces/:spaceId/tasks/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Delete a task',
+                tags: ['Home - Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: taskIdParams,
+            },
         },
-    }, homeTaskController.deleteTask);
+        homeTaskController.deleteTask,
+    );
 
     // ==================== OCCURRENCES ====================
 
-    fastify.get('/users/:userId/home/spaces/:spaceId/tasks/today', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get today\'s task occurrences',
-            tags: ['Home - Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: spaceIdParams,
-        },
-    }, homeTaskController.getTodayOccurrences);
-
-    fastify.get('/users/:userId/home/spaces/:spaceId/tasks/occurrences', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get task occurrences by date range',
-            tags: ['Home - Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: spaceIdParams,
-            querystring: {
-                type: 'object',
-                properties: {
-                    startDate: { type: 'string', format: 'date' },
-                    endDate: { type: 'string', format: 'date' },
-                },
-                required: ['startDate', 'endDate'],
+    fastify.get(
+        '/users/:userId/home/spaces/:spaceId/tasks/today',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: "Get today's task occurrences",
+                tags: ['Home - Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: spaceIdParams,
             },
         },
-    }, homeTaskController.getOccurrencesByDateRange);
+        homeTaskController.getTodayOccurrences,
+    );
 
-    fastify.post('/users/:userId/home/spaces/:spaceId/occurrences/:id/complete', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Mark an occurrence as completed',
-            tags: ['Home - Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: occurrenceIdParams,
+    fastify.get(
+        '/users/:userId/home/spaces/:spaceId/tasks/occurrences',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get task occurrences by date range',
+                tags: ['Home - Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: spaceIdParams,
+                querystring: {
+                    type: 'object',
+                    properties: {
+                        startDate: { type: 'string', format: 'date' },
+                        endDate: { type: 'string', format: 'date' },
+                    },
+                    required: ['startDate', 'endDate'],
+                },
+            },
         },
-    }, homeTaskController.completeOccurrence);
+        homeTaskController.getOccurrencesByDateRange,
+    );
 
-    fastify.post('/users/:userId/home/spaces/:spaceId/occurrences/:id/skip', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Skip an occurrence',
-            tags: ['Home - Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: occurrenceIdParams,
+    fastify.post(
+        '/users/:userId/home/spaces/:spaceId/occurrences/:id/complete',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Mark an occurrence as completed',
+                tags: ['Home - Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: occurrenceIdParams,
+            },
         },
-    }, homeTaskController.skipOccurrence);
+        homeTaskController.completeOccurrence,
+    );
 
-    fastify.post('/users/:userId/home/spaces/:spaceId/occurrences/:id/undo', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Undo a completed/skipped occurrence',
-            tags: ['Home - Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: occurrenceIdParams,
+    fastify.post(
+        '/users/:userId/home/spaces/:spaceId/occurrences/:id/skip',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Skip an occurrence',
+                tags: ['Home - Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: occurrenceIdParams,
+            },
         },
-    }, homeTaskController.undoOccurrence);
+        homeTaskController.skipOccurrence,
+    );
+
+    fastify.post(
+        '/users/:userId/home/spaces/:spaceId/occurrences/:id/undo',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Undo a completed/skipped occurrence',
+                tags: ['Home - Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: occurrenceIdParams,
+            },
+        },
+        homeTaskController.undoOccurrence,
+    );
 
     // ==================== STATS ====================
 
-    fastify.get('/users/:userId/home/spaces/:spaceId/tasks/stats', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get task statistics',
-            tags: ['Home - Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: spaceIdParams,
+    fastify.get(
+        '/users/:userId/home/spaces/:spaceId/tasks/stats',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get task statistics',
+                tags: ['Home - Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: spaceIdParams,
+            },
         },
-    }, homeTaskController.getTaskStats);
+        homeTaskController.getTaskStats,
+    );
 }
 
 module.exports = homeTaskRoutes;

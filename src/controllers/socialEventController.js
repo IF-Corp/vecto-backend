@@ -39,7 +39,7 @@ async function getEvents(request, reply) {
                     declined: guests.filter((g) => g.status === 'DECLINED').length,
                 };
                 return { ...event.toJSON(), guestCounts };
-            })
+            }),
         );
 
         return { success: true, data: eventsWithCounts };

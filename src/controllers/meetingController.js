@@ -31,7 +31,10 @@ const getMeetings = async (request, reply) => {
             where,
             include: [
                 { association: 'project', attributes: ['id', 'name', 'color'] },
-                { association: 'participants', attributes: ['id', 'name', 'email', 'is_organizer'] },
+                {
+                    association: 'participants',
+                    attributes: ['id', 'name', 'email', 'is_organizer'],
+                },
             ],
             order: [['start_time', 'DESC']],
         });
@@ -90,8 +93,8 @@ const createMeeting = async (request, reply) => {
                         name: p.name,
                         email: p.email,
                         is_organizer: p.isOrganizer || false,
-                    })
-                )
+                    }),
+                ),
             );
         }
 
@@ -135,8 +138,8 @@ const updateMeeting = async (request, reply) => {
                             name: p.name,
                             email: p.email,
                             is_organizer: p.isOrganizer || false,
-                        })
-                    )
+                        }),
+                    ),
                 );
             }
         }
@@ -338,7 +341,9 @@ const convertActionToTask = async (request, reply) => {
             title: action.description.substring(0, 200),
             description: `Acao de reuniao: ${action.meeting.title}\n\n${action.description}`,
             deadline: action.due_date,
-            is_urgent: action.due_date && new Date(action.due_date) <= new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+            is_urgent:
+                action.due_date &&
+                new Date(action.due_date) <= new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
             is_important: true,
         });
 
@@ -392,7 +397,8 @@ const getMeetingAnalysis = async (request, reply) => {
 
         // Calculate meeting load percentage
         const totalHours = totalMeetingHours + totalWorkHours;
-        const meetingLoadPercentage = totalHours > 0 ? Math.round((totalMeetingHours / totalHours) * 100) : 0;
+        const meetingLoadPercentage =
+            totalHours > 0 ? Math.round((totalMeetingHours / totalHours) * 100) : 0;
 
         // Meetings by category
         const byCategory = {};
@@ -415,7 +421,12 @@ const getMeetingAnalysis = async (request, reply) => {
         const adminHours = totalWorkHours * 0.1;
 
         const timeDistribution = [
-            { type: 'meetings', label: 'Reunioes', hours: totalMeetingHours, percentage: meetingLoadPercentage },
+            {
+                type: 'meetings',
+                label: 'Reunioes',
+                hours: totalMeetingHours,
+                percentage: meetingLoadPercentage,
+            },
             {
                 type: 'deepWork',
                 label: 'Deep Work',
@@ -426,7 +437,12 @@ const getMeetingAnalysis = async (request, reply) => {
                 type: 'tasks',
                 label: 'Tarefas',
                 hours: Math.round((totalWorkHours - deepWorkHours - adminHours) * 10) / 10,
-                percentage: totalHours > 0 ? Math.round(((totalWorkHours - deepWorkHours - adminHours) / totalHours) * 100) : 0,
+                percentage:
+                    totalHours > 0
+                        ? Math.round(
+                              ((totalWorkHours - deepWorkHours - adminHours) / totalHours) * 100,
+                          )
+                        : 0,
             },
             {
                 type: 'admin',

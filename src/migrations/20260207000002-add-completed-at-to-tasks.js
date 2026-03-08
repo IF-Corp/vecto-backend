@@ -9,7 +9,7 @@ module.exports = {
 
         // Backfill: set completed_at for existing DONE tasks using updated_at as approximation
         await queryInterface.sequelize.query(
-            `UPDATE tasks SET completed_at = DATE(updated_at) WHERE status = 'DONE'`
+            `UPDATE tasks SET completed_at = DATE(updated_at) WHERE status = 'DONE'`,
         );
     },
 

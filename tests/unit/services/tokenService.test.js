@@ -18,28 +18,26 @@ describe('TokenService', () => {
         it('should generate access and refresh tokens', () => {
             const user = { id: 'user-uuid', email: 'test@example.com' };
 
-            jwt.sign
-                .mockReturnValueOnce('access-token')
-                .mockReturnValueOnce('refresh-token');
+            jwt.sign.mockReturnValueOnce('access-token').mockReturnValueOnce('refresh-token');
 
             const tokens = tokenService.generateTokens(user);
 
             expect(tokens).toEqual({
                 accessToken: 'access-token',
-                refreshToken: 'refresh-token'
+                refreshToken: 'refresh-token',
             });
             expect(jwt.sign).toHaveBeenCalledTimes(2);
             expect(jwt.sign).toHaveBeenNthCalledWith(
                 1,
                 { id: 'user-uuid', email: 'test@example.com' },
                 expect.any(String),
-                { expiresIn: '15m' }
+                { expiresIn: '15m' },
             );
             expect(jwt.sign).toHaveBeenNthCalledWith(
                 2,
                 { id: 'user-uuid', email: 'test@example.com' },
                 expect.any(String),
-                { expiresIn: '7d' }
+                { expiresIn: '7d' },
             );
         });
     });

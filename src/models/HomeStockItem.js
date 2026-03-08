@@ -61,7 +61,7 @@ const HomeStockItem = sequelize.define(
         tableName: 'home_stock_items',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = HomeStockItem;

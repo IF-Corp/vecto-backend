@@ -53,7 +53,9 @@ module.exports = {
         });
 
         await queryInterface.addIndex('dashboard_widgets', ['user_id']);
-        await queryInterface.addIndex('dashboard_widgets', ['user_id', 'widget_type'], { unique: true });
+        await queryInterface.addIndex('dashboard_widgets', ['user_id', 'widget_type'], {
+            unique: true,
+        });
     },
 
     async down(queryInterface) {

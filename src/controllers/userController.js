@@ -12,7 +12,7 @@ class UserController {
                 return reply.status(400).send({
                     success: false,
                     error: 'Bad Request',
-                    message: 'Username must be at least 3 characters'
+                    message: 'Username must be at least 3 characters',
                 });
             }
 
@@ -21,27 +21,27 @@ class UserController {
                 return reply.status(400).send({
                     success: false,
                     error: 'Bad Request',
-                    message: 'Username must contain only lowercase letters, numbers and dots'
+                    message: 'Username must contain only lowercase letters, numbers and dots',
                 });
             }
 
             const existingUser = await User.findOne({
-                where: { nickname: username }
+                where: { nickname: username },
             });
 
             return reply.send({
                 success: true,
                 data: {
                     username,
-                    available: !existingUser
-                }
+                    available: !existingUser,
+                },
             });
         } catch (error) {
             console.error('Check username error:', error);
             return reply.status(500).send({
                 success: false,
                 error: 'Internal Server Error',
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -58,19 +58,19 @@ class UserController {
             if (!user) {
                 return reply.status(404).send({
                     error: 'User not found',
-                    message: `User with ID ${id} does not exist`
+                    message: `User with ID ${id} does not exist`,
                 });
             }
 
             return reply.send({
                 success: true,
-                data: user
+                data: user,
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 error: 'Internal server error',
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -85,7 +85,7 @@ class UserController {
             if (!email) {
                 return reply.status(400).send({
                     error: 'Bad request',
-                    message: 'Email query parameter is required'
+                    message: 'Email query parameter is required',
                 });
             }
 
@@ -94,19 +94,19 @@ class UserController {
             if (!user) {
                 return reply.status(404).send({
                     error: 'User not found',
-                    message: `User with email ${email} does not exist`
+                    message: `User with email ${email} does not exist`,
                 });
             }
 
             return reply.send({
                 success: true,
-                data: user
+                data: user,
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 error: 'Internal server error',
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -122,7 +122,7 @@ class UserController {
             if (!email) {
                 return reply.status(400).send({
                     error: 'Bad request',
-                    message: 'Email is required'
+                    message: 'Email is required',
                 });
             }
 
@@ -131,8 +131,8 @@ class UserController {
                 defaults: {
                     email,
                     name: name || null,
-                    is_onboarded: false
-                }
+                    is_onboarded: false,
+                },
             });
 
             // If user exists and name is provided, update it
@@ -144,13 +144,13 @@ class UserController {
             return reply.status(created ? 201 : 200).send({
                 success: true,
                 data: user,
-                created
+                created,
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 error: 'Internal server error',
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -166,7 +166,7 @@ class UserController {
             if (typeof is_onboarded !== 'boolean') {
                 return reply.status(400).send({
                     error: 'Bad request',
-                    message: 'is_onboarded must be a boolean value'
+                    message: 'is_onboarded must be a boolean value',
                 });
             }
 
@@ -175,7 +175,7 @@ class UserController {
             if (!user) {
                 return reply.status(404).send({
                     error: 'User not found',
-                    message: `User with ID ${id} does not exist`
+                    message: `User with ID ${id} does not exist`,
                 });
             }
 
@@ -184,13 +184,13 @@ class UserController {
 
             return reply.send({
                 success: true,
-                data: user
+                data: user,
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 error: 'Internal server error',
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -208,7 +208,7 @@ class UserController {
             if (!user) {
                 return reply.status(404).send({
                     error: 'User not found',
-                    message: `User with ID ${id} does not exist`
+                    message: `User with ID ${id} does not exist`,
                 });
             }
 
@@ -224,13 +224,13 @@ class UserController {
 
             return reply.send({
                 success: true,
-                data: user
+                data: user,
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 error: 'Internal server error',
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -243,25 +243,25 @@ class UserController {
             const userId = request.user.id;
 
             let preferences = await UserPreferences.findOne({
-                where: { user_id: userId }
+                where: { user_id: userId },
             });
 
             if (!preferences) {
                 // Create default preferences if none exist
                 preferences = await UserPreferences.create({
-                    user_id: userId
+                    user_id: userId,
                 });
             }
 
             return reply.send({
                 success: true,
-                data: preferences
+                data: preferences,
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 error: 'Internal server error',
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -281,11 +281,11 @@ class UserController {
                 theme,
                 sounds_enabled,
                 compact_mode,
-                enabled_modules
+                enabled_modules,
             } = request.body;
 
             let preferences = await UserPreferences.findOne({
-                where: { user_id: userId }
+                where: { user_id: userId },
             });
 
             const updateData = {};
@@ -304,19 +304,19 @@ class UserController {
             } else {
                 preferences = await UserPreferences.create({
                     user_id: userId,
-                    ...updateData
+                    ...updateData,
                 });
             }
 
             return reply.send({
                 success: true,
-                data: preferences
+                data: preferences,
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 error: 'Internal server error',
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -333,7 +333,7 @@ class UserController {
                 return reply.status(400).send({
                     success: false,
                     error: 'Bad Request',
-                    message: 'Username is required'
+                    message: 'Username is required',
                 });
             }
 
@@ -342,19 +342,20 @@ class UserController {
                 return reply.status(400).send({
                     success: false,
                     error: 'Bad Request',
-                    message: 'Username must be 3-30 characters, lowercase letters, numbers and dots only'
+                    message:
+                        'Username must be 3-30 characters, lowercase letters, numbers and dots only',
                 });
             }
 
             const existingUser = await User.findOne({
-                where: { nickname: username }
+                where: { nickname: username },
             });
 
             if (existingUser && existingUser.id !== userId) {
                 return reply.status(409).send({
                     success: false,
                     error: 'Conflict',
-                    message: 'Username already taken'
+                    message: 'Username already taken',
                 });
             }
 
@@ -363,7 +364,7 @@ class UserController {
                 return reply.status(404).send({
                     success: false,
                     error: 'Not Found',
-                    message: 'User not found'
+                    message: 'User not found',
                 });
             }
 
@@ -377,13 +378,13 @@ class UserController {
                 .map(([key]) => key);
 
             let preferences = await UserPreferences.findOne({
-                where: { user_id: userId }
+                where: { user_id: userId },
             });
 
             const preferencesData = {
                 timezone: 'America/Sao_Paulo',
                 default_currency: 'BRL',
-                enabled_modules: enabledModules
+                enabled_modules: enabledModules,
             };
 
             if (preferences) {
@@ -391,7 +392,7 @@ class UserController {
             } else {
                 preferences = await UserPreferences.create({
                     user_id: userId,
-                    ...preferencesData
+                    ...preferencesData,
                 });
             }
 
@@ -404,21 +405,21 @@ class UserController {
                         name: user.name,
                         nickname: user.nickname,
                         avatar_url: user.avatar_url,
-                        is_onboarded: user.is_onboarded
+                        is_onboarded: user.is_onboarded,
                     },
                     preferences: {
                         timezone: preferences.timezone,
                         default_currency: preferences.default_currency,
-                        enabled_modules: preferences.enabled_modules
-                    }
-                }
+                        enabled_modules: preferences.enabled_modules,
+                    },
+                },
             });
         } catch (error) {
             console.error('Complete onboarding error:', error);
             return reply.status(500).send({
                 success: false,
                 error: 'Internal Server Error',
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -434,23 +435,23 @@ class UserController {
             if (!Array.isArray(modules)) {
                 return reply.status(400).send({
                     error: 'Bad request',
-                    message: 'modules must be an array'
+                    message: 'modules must be an array',
                 });
             }
 
             // Validate module names
             const validModules = ['habits', 'projects', 'finance', 'health', 'study', 'home'];
-            const invalidModules = modules.filter(m => !validModules.includes(m));
+            const invalidModules = modules.filter((m) => !validModules.includes(m));
 
             if (invalidModules.length > 0) {
                 return reply.status(400).send({
                     error: 'Bad request',
-                    message: `Invalid modules: ${invalidModules.join(', ')}. Valid modules: ${validModules.join(', ')}`
+                    message: `Invalid modules: ${invalidModules.join(', ')}. Valid modules: ${validModules.join(', ')}`,
                 });
             }
 
             let preferences = await UserPreferences.findOne({
-                where: { user_id: userId }
+                where: { user_id: userId },
             });
 
             if (preferences) {
@@ -458,21 +459,21 @@ class UserController {
             } else {
                 preferences = await UserPreferences.create({
                     user_id: userId,
-                    enabled_modules: modules
+                    enabled_modules: modules,
                 });
             }
 
             return reply.send({
                 success: true,
                 data: {
-                    enabled_modules: preferences.enabled_modules
-                }
+                    enabled_modules: preferences.enabled_modules,
+                },
             });
         } catch (error) {
             console.error(error);
             return reply.status(500).send({
                 error: 'Internal server error',
-                message: error.message
+                message: error.message,
             });
         }
     }

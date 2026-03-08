@@ -8,57 +8,57 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             title: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: false,
             },
             content: {
                 type: Sequelize.TEXT,
-                allowNull: true
+                allowNull: true,
             },
             category: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             tags: {
                 type: Sequelize.ARRAY(Sequelize.STRING),
                 defaultValue: [],
-                allowNull: false
+                allowNull: false,
             },
             is_pinned: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false,
-                allowNull: false
+                allowNull: false,
             },
             is_archived: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false,
-                allowNull: false
+                allowNull: false,
             },
             color: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('notes', ['user_id']);
@@ -68,5 +68,5 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('notes');
-    }
+    },
 };

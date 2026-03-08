@@ -6,430 +6,590 @@ async function healthRoutes(fastify, options) {
     fastify.addHook('preHandler', fastify.authenticate);
 
     // ==================== HEALTH PROFILE ====================
-    fastify.get('/users/:userId/health-profile', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get health profile for a user',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams
-        }
-    }, healthController.getHealthProfile);
+    fastify.get(
+        '/users/:userId/health-profile',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get health profile for a user',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
+        },
+        healthController.getHealthProfile,
+    );
 
-    fastify.put('/users/:userId/health-profile', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Update health profile',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
-            body: health.updateHealthProfileBody
-        }
-    }, healthController.updateHealthProfile);
+    fastify.put(
+        '/users/:userId/health-profile',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Update health profile',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+                body: health.updateHealthProfileBody,
+            },
+        },
+        healthController.updateHealthProfile,
+    );
 
     // ==================== WEIGHT LOGS ====================
-    fastify.get('/users/:userId/weight', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get weight logs for a user',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams
-        }
-    }, healthController.getWeightLogs);
+    fastify.get(
+        '/users/:userId/weight',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get weight logs for a user',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
+        },
+        healthController.getWeightLogs,
+    );
 
-    fastify.get('/users/:userId/weight/latest', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get latest weight log for a user',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams
-        }
-    }, healthController.getLatestWeight);
+    fastify.get(
+        '/users/:userId/weight/latest',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get latest weight log for a user',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
+        },
+        healthController.getLatestWeight,
+    );
 
-    fastify.post('/users/:userId/weight', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a weight log',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
-            body: health.createWeightLogBody
-        }
-    }, healthController.createWeightLog);
+    fastify.post(
+        '/users/:userId/weight',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a weight log',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+                body: health.createWeightLogBody,
+            },
+        },
+        healthController.createWeightLog,
+    );
 
-    fastify.put('/weight/:id', {
-        schema: {
-            description: 'Update a weight log',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
-            body: health.updateWeightLogBody
-        }
-    }, healthController.updateWeightLog);
+    fastify.put(
+        '/weight/:id',
+        {
+            schema: {
+                description: 'Update a weight log',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+                body: health.updateWeightLogBody,
+            },
+        },
+        healthController.updateWeightLog,
+    );
 
-    fastify.delete('/weight/:id', {
-        schema: {
-            description: 'Delete a weight log',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams
-        }
-    }, healthController.deleteWeightLog);
+    fastify.delete(
+        '/weight/:id',
+        {
+            schema: {
+                description: 'Delete a weight log',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
+        },
+        healthController.deleteWeightLog,
+    );
 
     // ==================== MEAL LOGS ====================
-    fastify.get('/users/:userId/meals', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get meal logs for a user',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams
-        }
-    }, healthController.getMealLogs);
+    fastify.get(
+        '/users/:userId/meals',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get meal logs for a user',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
+        },
+        healthController.getMealLogs,
+    );
 
-    fastify.post('/users/:userId/meals', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a meal log',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
-            body: health.createMealLogBody
-        }
-    }, healthController.createMealLog);
+    fastify.post(
+        '/users/:userId/meals',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a meal log',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+                body: health.createMealLogBody,
+            },
+        },
+        healthController.createMealLog,
+    );
 
-    fastify.put('/meals/:id', {
-        schema: {
-            description: 'Update a meal log',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
-            body: health.updateMealLogBody
-        }
-    }, healthController.updateMealLog);
+    fastify.put(
+        '/meals/:id',
+        {
+            schema: {
+                description: 'Update a meal log',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+                body: health.updateMealLogBody,
+            },
+        },
+        healthController.updateMealLog,
+    );
 
-    fastify.delete('/meals/:id', {
-        schema: {
-            description: 'Delete a meal log',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams
-        }
-    }, healthController.deleteMealLog);
+    fastify.delete(
+        '/meals/:id',
+        {
+            schema: {
+                description: 'Delete a meal log',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
+        },
+        healthController.deleteMealLog,
+    );
 
     // ==================== WORKOUTS ====================
-    fastify.get('/users/:userId/workouts', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get workouts for a user',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams
-        }
-    }, healthController.getWorkouts);
+    fastify.get(
+        '/users/:userId/workouts',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get workouts for a user',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
+        },
+        healthController.getWorkouts,
+    );
 
-    fastify.post('/users/:userId/workouts', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a workout',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
-            body: health.createWorkoutBody
-        }
-    }, healthController.createWorkout);
+    fastify.post(
+        '/users/:userId/workouts',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a workout',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+                body: health.createWorkoutBody,
+            },
+        },
+        healthController.createWorkout,
+    );
 
-    fastify.put('/workouts/:id', {
-        schema: {
-            description: 'Update a workout',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
-            body: health.updateWorkoutBody
-        }
-    }, healthController.updateWorkout);
+    fastify.put(
+        '/workouts/:id',
+        {
+            schema: {
+                description: 'Update a workout',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+                body: health.updateWorkoutBody,
+            },
+        },
+        healthController.updateWorkout,
+    );
 
-    fastify.delete('/workouts/:id', {
-        schema: {
-            description: 'Delete a workout',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams
-        }
-    }, healthController.deleteWorkout);
+    fastify.delete(
+        '/workouts/:id',
+        {
+            schema: {
+                description: 'Delete a workout',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
+        },
+        healthController.deleteWorkout,
+    );
 
     // ==================== WORKOUT DETAILS ====================
-    fastify.post('/workouts/:workoutId/details', {
-        schema: {
-            description: 'Add workout detail',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: {
-                type: 'object',
-                properties: {
-                    workoutId: { type: 'string', pattern: common.uuidPattern }
+    fastify.post(
+        '/workouts/:workoutId/details',
+        {
+            schema: {
+                description: 'Add workout detail',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: {
+                    type: 'object',
+                    properties: {
+                        workoutId: { type: 'string', pattern: common.uuidPattern },
+                    },
+                    required: ['workoutId'],
                 },
-                required: ['workoutId']
+                body: health.createWorkoutDetailBody,
             },
-            body: health.createWorkoutDetailBody
-        }
-    }, healthController.addWorkoutDetail);
+        },
+        healthController.addWorkoutDetail,
+    );
 
-    fastify.put('/workout-details/:id', {
-        schema: {
-            description: 'Update workout detail',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams
-        }
-    }, healthController.updateWorkoutDetail);
+    fastify.put(
+        '/workout-details/:id',
+        {
+            schema: {
+                description: 'Update workout detail',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
+        },
+        healthController.updateWorkoutDetail,
+    );
 
-    fastify.delete('/workout-details/:id', {
-        schema: {
-            description: 'Delete workout detail',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams
-        }
-    }, healthController.deleteWorkoutDetail);
+    fastify.delete(
+        '/workout-details/:id',
+        {
+            schema: {
+                description: 'Delete workout detail',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
+        },
+        healthController.deleteWorkoutDetail,
+    );
 
     // ==================== WORKOUT SCHEDULES ====================
-    fastify.get('/users/:userId/workout-schedules', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get workout schedules for a user',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams
-        }
-    }, healthController.getWorkoutSchedules);
+    fastify.get(
+        '/users/:userId/workout-schedules',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get workout schedules for a user',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
+        },
+        healthController.getWorkoutSchedules,
+    );
 
-    fastify.post('/users/:userId/workout-schedules', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a workout schedule',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
-            body: health.createWorkoutScheduleBody
-        }
-    }, healthController.createWorkoutSchedule);
+    fastify.post(
+        '/users/:userId/workout-schedules',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a workout schedule',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+                body: health.createWorkoutScheduleBody,
+            },
+        },
+        healthController.createWorkoutSchedule,
+    );
 
-    fastify.put('/workout-schedules/:id', {
-        schema: {
-            description: 'Update a workout schedule',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
-            body: health.updateWorkoutScheduleBody
-        }
-    }, healthController.updateWorkoutSchedule);
+    fastify.put(
+        '/workout-schedules/:id',
+        {
+            schema: {
+                description: 'Update a workout schedule',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+                body: health.updateWorkoutScheduleBody,
+            },
+        },
+        healthController.updateWorkoutSchedule,
+    );
 
-    fastify.delete('/workout-schedules/:id', {
-        schema: {
-            description: 'Delete a workout schedule',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams
-        }
-    }, healthController.deleteWorkoutSchedule);
+    fastify.delete(
+        '/workout-schedules/:id',
+        {
+            schema: {
+                description: 'Delete a workout schedule',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
+        },
+        healthController.deleteWorkoutSchedule,
+    );
 
     // ==================== MEDICATIONS ====================
-    fastify.get('/users/:userId/medications', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get medications for a user',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams
-        }
-    }, healthController.getMedications);
+    fastify.get(
+        '/users/:userId/medications',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get medications for a user',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
+        },
+        healthController.getMedications,
+    );
 
-    fastify.post('/users/:userId/medications', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a medication',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
-            body: health.createMedicationBody
-        }
-    }, healthController.createMedication);
+    fastify.post(
+        '/users/:userId/medications',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a medication',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+                body: health.createMedicationBody,
+            },
+        },
+        healthController.createMedication,
+    );
 
-    fastify.put('/medications/:id', {
-        schema: {
-            description: 'Update a medication',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
-            body: health.updateMedicationBody
-        }
-    }, healthController.updateMedication);
+    fastify.put(
+        '/medications/:id',
+        {
+            schema: {
+                description: 'Update a medication',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+                body: health.updateMedicationBody,
+            },
+        },
+        healthController.updateMedication,
+    );
 
-    fastify.delete('/medications/:id', {
-        schema: {
-            description: 'Delete a medication',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams
-        }
-    }, healthController.deleteMedication);
+    fastify.delete(
+        '/medications/:id',
+        {
+            schema: {
+                description: 'Delete a medication',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
+        },
+        healthController.deleteMedication,
+    );
 
     // ==================== MEDICATION LOGS ====================
-    fastify.post('/medications/:medicationId/log', {
-        schema: {
-            description: 'Log medication intake',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: {
-                type: 'object',
-                properties: {
-                    medicationId: { type: 'string', pattern: common.uuidPattern }
+    fastify.post(
+        '/medications/:medicationId/log',
+        {
+            schema: {
+                description: 'Log medication intake',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: {
+                    type: 'object',
+                    properties: {
+                        medicationId: { type: 'string', pattern: common.uuidPattern },
+                    },
+                    required: ['medicationId'],
                 },
-                required: ['medicationId']
+                body: health.createMedicationLogBody,
             },
-            body: health.createMedicationLogBody
-        }
-    }, healthController.logMedication);
+        },
+        healthController.logMedication,
+    );
 
-    fastify.delete('/medication-logs/:id', {
-        schema: {
-            description: 'Delete medication log',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams
-        }
-    }, healthController.deleteMedicationLog);
+    fastify.delete(
+        '/medication-logs/:id',
+        {
+            schema: {
+                description: 'Delete medication log',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
+        },
+        healthController.deleteMedicationLog,
+    );
 
     // ==================== SLEEP METRICS ====================
-    fastify.get('/users/:userId/sleep', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get sleep metrics for a user',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams
-        }
-    }, healthController.getSleepMetrics);
+    fastify.get(
+        '/users/:userId/sleep',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get sleep metrics for a user',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
+        },
+        healthController.getSleepMetrics,
+    );
 
-    fastify.post('/users/:userId/sleep', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a sleep metric',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
-            body: health.createSleepMetricBody
-        }
-    }, healthController.createSleepMetric);
+    fastify.post(
+        '/users/:userId/sleep',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a sleep metric',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+                body: health.createSleepMetricBody,
+            },
+        },
+        healthController.createSleepMetric,
+    );
 
-    fastify.put('/sleep/:id', {
-        schema: {
-            description: 'Update a sleep metric',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
-            body: health.updateSleepMetricBody
-        }
-    }, healthController.updateSleepMetric);
+    fastify.put(
+        '/sleep/:id',
+        {
+            schema: {
+                description: 'Update a sleep metric',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+                body: health.updateSleepMetricBody,
+            },
+        },
+        healthController.updateSleepMetric,
+    );
 
-    fastify.delete('/sleep/:id', {
-        schema: {
-            description: 'Delete a sleep metric',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams
-        }
-    }, healthController.deleteSleepMetric);
+    fastify.delete(
+        '/sleep/:id',
+        {
+            schema: {
+                description: 'Delete a sleep metric',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
+        },
+        healthController.deleteSleepMetric,
+    );
 
     // ==================== DIETS ====================
-    fastify.get('/users/:userId/diets', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get all diets for a user',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams
-        }
-    }, healthController.getDiets);
+    fastify.get(
+        '/users/:userId/diets',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get all diets for a user',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
+        },
+        healthController.getDiets,
+    );
 
-    fastify.get('/users/:userId/diets/active', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get active diet for a user',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams
-        }
-    }, healthController.getActiveDiet);
+    fastify.get(
+        '/users/:userId/diets/active',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get active diet for a user',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
+        },
+        healthController.getActiveDiet,
+    );
 
-    fastify.post('/users/:userId/diets', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a diet',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
-            body: health.createDietBody
-        }
-    }, healthController.createDiet);
+    fastify.post(
+        '/users/:userId/diets',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a diet',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+                body: health.createDietBody,
+            },
+        },
+        healthController.createDiet,
+    );
 
-    fastify.put('/diets/:id', {
-        schema: {
-            description: 'Update a diet',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
-            body: health.updateDietBody
-        }
-    }, healthController.updateDiet);
+    fastify.put(
+        '/diets/:id',
+        {
+            schema: {
+                description: 'Update a diet',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+                body: health.updateDietBody,
+            },
+        },
+        healthController.updateDiet,
+    );
 
-    fastify.delete('/diets/:id', {
-        schema: {
-            description: 'Delete a diet',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams
-        }
-    }, healthController.deleteDiet);
+    fastify.delete(
+        '/diets/:id',
+        {
+            schema: {
+                description: 'Delete a diet',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
+        },
+        healthController.deleteDiet,
+    );
 
     // ==================== DIET MEALS ====================
-    fastify.post('/diets/:dietId/meals', {
-        schema: {
-            description: 'Add meal to diet',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: {
-                type: 'object',
-                properties: {
-                    dietId: { type: 'string', format: 'uuid' }
+    fastify.post(
+        '/diets/:dietId/meals',
+        {
+            schema: {
+                description: 'Add meal to diet',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: {
+                    type: 'object',
+                    properties: {
+                        dietId: { type: 'string', format: 'uuid' },
+                    },
+                    required: ['dietId'],
                 },
-                required: ['dietId']
+                body: health.createDietMealBody,
             },
-            body: health.createDietMealBody
-        }
-    }, healthController.addDietMeal);
+        },
+        healthController.addDietMeal,
+    );
 
-    fastify.put('/diet-meals/:id', {
-        schema: {
-            description: 'Update diet meal',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
-            body: health.updateDietMealBody
-        }
-    }, healthController.updateDietMeal);
+    fastify.put(
+        '/diet-meals/:id',
+        {
+            schema: {
+                description: 'Update diet meal',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+                body: health.updateDietMealBody,
+            },
+        },
+        healthController.updateDietMeal,
+    );
 
-    fastify.delete('/diet-meals/:id', {
-        schema: {
-            description: 'Delete diet meal',
-            tags: ['Health'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams
-        }
-    }, healthController.deleteDietMeal);
+    fastify.delete(
+        '/diet-meals/:id',
+        {
+            schema: {
+                description: 'Delete diet meal',
+                tags: ['Health'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
+        },
+        healthController.deleteDietMeal,
+    );
 }
 
 module.exports = healthRoutes;

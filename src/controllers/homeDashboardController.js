@@ -75,20 +75,15 @@ const calculateHomeScore = async (request, reply) => {
         });
 
         const lowStockItems = stockItems.filter(
-            (item) => parseFloat(item.current_quantity) <= parseFloat(item.min_quantity)
+            (item) => parseFloat(item.current_quantity) <= parseFloat(item.min_quantity),
         ).length;
         const totalStockItems = stockItems.length;
         const stockScore =
-            totalStockItems > 0
-                ? ((totalStockItems - lowStockItems) / totalStockItems) * 10
-                : 10;
+            totalStockItems > 0 ? ((totalStockItems - lowStockItems) / totalStockItems) * 10 : 10;
 
         // Calculate weighted average
         const homeScore =
-            tasksScore * 0.4 +
-            maintenancesScore * 0.2 +
-            billsScore * 0.25 +
-            stockScore * 0.15;
+            tasksScore * 0.4 + maintenancesScore * 0.2 + billsScore * 0.25 + stockScore * 0.15;
 
         // Determine status
         let status = 'excellent';
@@ -268,7 +263,7 @@ const getDashboard = async (request, reply) => {
         });
 
         const actualLowStock = lowStockItems.filter(
-            (item) => parseFloat(item.current_quantity) <= parseFloat(item.min_quantity)
+            (item) => parseFloat(item.current_quantity) <= parseFloat(item.min_quantity),
         );
 
         actualLowStock.slice(0, 3).forEach((item) => {
@@ -323,10 +318,7 @@ const getDashboard = async (request, reply) => {
         });
 
         // Calculate pending bills amount
-        const pendingAmount = pendingPayments.reduce(
-            (sum, p) => sum + parseFloat(p.amount),
-            0
-        );
+        const pendingAmount = pendingPayments.reduce((sum, p) => sum + parseFloat(p.amount), 0);
 
         return reply.send({
             success: true,

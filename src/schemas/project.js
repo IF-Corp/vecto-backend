@@ -9,9 +9,9 @@ const subtaskSchema = {
         id: { type: 'string', format: 'uuid' },
         title: { type: 'string', minLength: 1, maxLength: 500 },
         completed: { type: 'boolean' },
-        order: { type: 'integer' }
+        order: { type: 'integer' },
     },
-    required: ['title']
+    required: ['title'],
 };
 
 // Project schemas
@@ -21,10 +21,10 @@ const createProjectBody = {
         name: { type: 'string', minLength: 1, maxLength: 200 },
         deadline: { type: 'string', format: 'date-time', nullable: true },
         status: projectStatusEnum,
-        life_area: { type: 'string', maxLength: 100, nullable: true }
+        life_area: { type: 'string', maxLength: 100, nullable: true },
     },
     required: ['name'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateProjectBody = {
@@ -33,9 +33,9 @@ const updateProjectBody = {
         name: { type: 'string', minLength: 1, maxLength: 200 },
         deadline: { type: 'string', format: 'date-time', nullable: true },
         status: projectStatusEnum,
-        life_area: { type: 'string', maxLength: 100, nullable: true }
+        life_area: { type: 'string', maxLength: 100, nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Task schemas
@@ -48,15 +48,19 @@ const createTaskBody = {
         status: taskStatusEnum,
         priority: taskPriorityEnum,
         scheduled_date: { type: 'string', format: 'date', nullable: true },
-        scheduled_time: { type: 'string', pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$', nullable: true },
+        scheduled_time: {
+            type: 'string',
+            pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$',
+            nullable: true,
+        },
         estimated_duration: { type: 'integer', minimum: 0, nullable: true },
         category_name: { type: 'string', maxLength: 100, nullable: true },
         tags: { type: 'array', items: { type: 'string' }, default: [] },
         assignees: { type: 'array', items: { type: 'string', format: 'uuid' }, default: [] },
-        subtasks: { type: 'array', items: subtaskSchema, default: [] }
+        subtasks: { type: 'array', items: subtaskSchema, default: [] },
     },
     required: ['name'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateTaskBody = {
@@ -68,14 +72,18 @@ const updateTaskBody = {
         status: taskStatusEnum,
         priority: taskPriorityEnum,
         scheduled_date: { type: 'string', format: 'date', nullable: true },
-        scheduled_time: { type: 'string', pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$', nullable: true },
+        scheduled_time: {
+            type: 'string',
+            pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$',
+            nullable: true,
+        },
         estimated_duration: { type: 'integer', minimum: 0, nullable: true },
         category_name: { type: 'string', maxLength: 100, nullable: true },
         tags: { type: 'array', items: { type: 'string' } },
         assignees: { type: 'array', items: { type: 'string', format: 'uuid' } },
-        subtasks: { type: 'array', items: subtaskSchema }
+        subtasks: { type: 'array', items: subtaskSchema },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 // Meeting schemas
@@ -85,10 +93,10 @@ const createMeetingBody = {
         project_id: { type: 'string', format: 'uuid' },
         meeting_date: { type: 'string', format: 'date-time' },
         summary: { type: 'string', maxLength: 5000, nullable: true },
-        action_items: { type: 'array', items: { type: 'string' }, default: [] }
+        action_items: { type: 'array', items: { type: 'string' }, default: [] },
     },
     required: ['project_id', 'meeting_date'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateMeetingBody = {
@@ -96,9 +104,9 @@ const updateMeetingBody = {
     properties: {
         meeting_date: { type: 'string', format: 'date-time' },
         summary: { type: 'string', maxLength: 5000, nullable: true },
-        action_items: { type: 'array', items: { type: 'string' } }
+        action_items: { type: 'array', items: { type: 'string' } },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 module.exports = {
@@ -110,5 +118,5 @@ module.exports = {
     updateMeetingBody,
     projectStatusEnum,
     taskStatusEnum,
-    taskPriorityEnum
+    taskPriorityEnum,
 };

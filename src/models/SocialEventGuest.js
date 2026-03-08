@@ -31,7 +31,7 @@ const SocialEventGuest = sequelize.define(
         tableName: 'social_event_guests',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = SocialEventGuest;

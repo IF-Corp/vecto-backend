@@ -58,7 +58,7 @@ const HomeBillPayment = sequelize.define(
         tableName: 'home_bill_payments',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = HomeBillPayment;

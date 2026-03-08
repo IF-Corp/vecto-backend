@@ -84,7 +84,9 @@ module.exports = {
             },
         });
 
-        await queryInterface.addIndex('work_weekly_plans', ['user_id', 'week_start'], { unique: true });
+        await queryInterface.addIndex('work_weekly_plans', ['user_id', 'week_start'], {
+            unique: true,
+        });
         await queryInterface.addIndex('work_weekly_plans', ['week_start']);
         await queryInterface.addIndex('work_weekly_plans', ['status']);
     },

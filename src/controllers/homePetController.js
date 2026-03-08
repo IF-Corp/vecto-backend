@@ -23,7 +23,7 @@ const getPets = async (request, reply) => {
                     ...pet.toJSON(),
                     careTypes,
                 };
-            })
+            }),
         );
 
         return reply.send({ success: true, data: petsWithCare });
@@ -87,8 +87,8 @@ const createPet = async (request, reply) => {
                     HomePetCareType.create({
                         ...care,
                         pet_id: pet.id,
-                    })
-                )
+                    }),
+                ),
             );
         }
 

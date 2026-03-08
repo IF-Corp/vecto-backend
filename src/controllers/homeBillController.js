@@ -148,7 +148,7 @@ const getBillPayments = async (request, reply) => {
                     ...payment.toJSON(),
                     bill,
                 };
-            })
+            }),
         );
 
         return reply.send({ success: true, data: payments });
@@ -265,8 +265,8 @@ const updateCostSplitSettings = async (request, reply) => {
                         split_settings_id: settings.id,
                         member_id: split.memberId,
                         percentage: split.percentage,
-                    })
-                )
+                    }),
+                ),
             );
         }
 
@@ -301,10 +301,7 @@ const calculateCostSplit = async (request, reply) => {
         });
 
         // Calculate totals
-        const totalAmount = payments.reduce(
-            (sum, p) => sum + parseFloat(p.amount),
-            0
-        );
+        const totalAmount = payments.reduce((sum, p) => sum + parseFloat(p.amount), 0);
         const totalPaid = payments
             .filter((p) => p.paid_at)
             .reduce((sum, p) => sum + parseFloat(p.amount), 0);
@@ -315,7 +312,7 @@ const calculateCostSplit = async (request, reply) => {
         });
 
         // Get split settings
-        let settings = await HomeCostSplitSettings.findOne({
+        const settings = await HomeCostSplitSettings.findOne({
             where: { space_id: spaceId },
         });
 
@@ -337,7 +334,7 @@ const calculateCostSplit = async (request, reply) => {
                         paid: paidByMember,
                         balance: paidByMember - perPerson,
                     };
-                })
+                }),
             );
         } else {
             const memberSplits = await HomeCostSplitMember.findAll({
@@ -346,12 +343,8 @@ const calculateCostSplit = async (request, reply) => {
 
             memberBalances = await Promise.all(
                 members.map(async (member) => {
-                    const splitConfig = memberSplits.find(
-                        (s) => s.member_id === member.id
-                    );
-                    const percentage = splitConfig
-                        ? parseFloat(splitConfig.percentage)
-                        : 0;
+                    const splitConfig = memberSplits.find((s) => s.member_id === member.id);
+                    const percentage = splitConfig ? parseFloat(splitConfig.percentage) : 0;
                     const owes = (totalAmount * percentage) / 100;
 
                     const paidByMember = payments
@@ -365,7 +358,7 @@ const calculateCostSplit = async (request, reply) => {
                         paid: paidByMember,
                         balance: paidByMember - owes,
                     };
-                })
+                }),
             );
         }
 
@@ -396,11 +389,7 @@ const getCostHistory = async (request, reply) => {
         const currentDate = new Date();
 
         for (let i = 0; i < parseInt(months); i++) {
-            const targetDate = new Date(
-                currentDate.getFullYear(),
-                currentDate.getMonth() - i,
-                1
-            );
+            const targetDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
             const month = targetDate.getMonth() + 1;
             const year = targetDate.getFullYear();
 
@@ -416,10 +405,7 @@ const getCostHistory = async (request, reply) => {
                 },
             });
 
-            const totalAmount = payments.reduce(
-                (sum, p) => sum + parseFloat(p.amount),
-                0
-            );
+            const totalAmount = payments.reduce((sum, p) => sum + parseFloat(p.amount), 0);
 
             history.push({
                 month,

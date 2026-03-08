@@ -116,6 +116,8 @@ module.exports = {
         await queryInterface.removeColumn('study_settings', 'longest_streak');
         await queryInterface.removeColumn('study_settings', 'last_study_date');
 
-        await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_study_settings_grade_scale";');
+        await queryInterface.sequelize.query(
+            'DROP TYPE IF EXISTS "enum_study_settings_grade_scale";',
+        );
     },
 };

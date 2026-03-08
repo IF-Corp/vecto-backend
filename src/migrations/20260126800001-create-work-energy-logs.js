@@ -32,7 +32,14 @@ module.exports = {
                 },
             },
             activity_type: {
-                type: Sequelize.ENUM('deep_work', 'meetings', 'admin', 'creative', 'break', 'other'),
+                type: Sequelize.ENUM(
+                    'deep_work',
+                    'meetings',
+                    'admin',
+                    'creative',
+                    'break',
+                    'other',
+                ),
                 allowNull: true,
             },
             source: {

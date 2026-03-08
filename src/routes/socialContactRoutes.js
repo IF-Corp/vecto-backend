@@ -3,7 +3,10 @@ const socialContactController = require('../controllers/socialContactController'
 async function routes(fastify) {
     fastify.get('/users/:userId/social/contacts', socialContactController.getContacts);
     fastify.post('/users/:userId/social/contacts', socialContactController.createContact);
-    fastify.get('/users/:userId/social/contacts/birthdays', socialContactController.getUpcomingBirthdays);
+    fastify.get(
+        '/users/:userId/social/contacts/birthdays',
+        socialContactController.getUpcomingBirthdays,
+    );
     fastify.get('/social/contacts/:id', socialContactController.getContact);
     fastify.put('/social/contacts/:id', socialContactController.updateContact);
     fastify.delete('/social/contacts/:id', socialContactController.deleteContact);

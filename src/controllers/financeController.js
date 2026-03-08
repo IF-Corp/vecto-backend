@@ -10,7 +10,7 @@ const {
     GoalContribution,
     Investment,
     InvestmentHistory,
-    FinanceProfile
+    FinanceProfile,
 } = require('../models');
 const { Op } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
@@ -23,7 +23,7 @@ const getAccounts = async (request, reply) => {
         const accounts = await Account.findAll({
             where: { user_id: userId },
             include: [{ association: 'transactions' }],
-            order: [['created_at', 'DESC']]
+            order: [['created_at', 'DESC']],
         });
         return { success: true, data: accounts };
     } catch (error) {
@@ -37,7 +37,7 @@ const createAccount = async (request, reply) => {
         const { userId } = request.params;
         const account = await Account.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: account, created: true };
@@ -51,7 +51,7 @@ const updateAccount = async (request, reply) => {
     try {
         const { id } = request.params;
         const [updated] = await Account.update(request.body, {
-            where: { id }
+            where: { id },
         });
         if (!updated) {
             reply.status(404);
@@ -87,7 +87,7 @@ const getCards = async (request, reply) => {
         const { userId } = request.params;
         const cards = await Card.findAll({
             where: { user_id: userId, is_active: true },
-            order: [['created_at', 'DESC']]
+            order: [['created_at', 'DESC']],
         });
 
         // Calculate current invoice amount for each card
@@ -100,16 +100,19 @@ const getCards = async (request, reply) => {
                     where: {
                         card_id: card.id,
                         status: { [Op.in]: ['OPEN', 'CLOSED'] },
-                        reference_month: { [Op.gte]: currentMonth }
-                    }
+                        reference_month: { [Op.gte]: currentMonth },
+                    },
                 });
 
                 return {
                     ...card.toJSON(),
                     current_invoice_amount: openInvoice ? parseFloat(openInvoice.total_amount) : 0,
-                    available_limit: card.card_limit ? parseFloat(card.card_limit) - (openInvoice ? parseFloat(openInvoice.total_amount) : 0) : null
+                    available_limit: card.card_limit
+                        ? parseFloat(card.card_limit) -
+                          (openInvoice ? parseFloat(openInvoice.total_amount) : 0)
+                        : null,
                 };
-            })
+            }),
         );
 
         return { success: true, data: cardsWithUsage };
@@ -124,7 +127,7 @@ const createCard = async (request, reply) => {
         const { userId } = request.params;
         const card = await Card.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: card, created: true };
@@ -138,7 +141,7 @@ const updateCard = async (request, reply) => {
     try {
         const { id } = request.params;
         const [updated] = await Card.update(request.body, {
-            where: { id }
+            where: { id },
         });
         if (!updated) {
             reply.status(404);
@@ -156,9 +159,12 @@ const deleteCard = async (request, reply) => {
     try {
         const { id } = request.params;
         // Soft delete
-        const [updated] = await Card.update({ is_active: false }, {
-            where: { id }
-        });
+        const [updated] = await Card.update(
+            { is_active: false },
+            {
+                where: { id },
+            },
+        );
         if (!updated) {
             reply.status(404);
             return { success: false, error: 'Card not found' };
@@ -175,13 +181,21 @@ const deleteCard = async (request, reply) => {
 const getTransactions = async (request, reply) => {
     try {
         const { userId } = request.params;
-        const { startDate, endDate, categoryId, cardId, type, page = 1, limit = 20 } = request.query;
+        const {
+            startDate,
+            endDate,
+            categoryId,
+            cardId,
+            type,
+            page = 1,
+            limit = 20,
+        } = request.query;
 
         const where = { user_id: userId };
 
         if (startDate && endDate) {
             where.transaction_date = {
-                [Op.between]: [new Date(startDate), new Date(endDate)]
+                [Op.between]: [new Date(startDate), new Date(endDate)],
             };
         }
         if (categoryId) where.category_id = categoryId;
@@ -190,13 +204,10 @@ const getTransactions = async (request, reply) => {
 
         const { count, rows } = await Transaction.findAndCountAll({
             where,
-            include: [
-                { association: 'category' },
-                { association: 'card' }
-            ],
+            include: [{ association: 'category' }, { association: 'card' }],
             order: [['transaction_date', 'DESC']],
             offset: (page - 1) * limit,
-            limit: parseInt(limit)
+            limit: parseInt(limit),
         });
 
         return {
@@ -207,9 +218,9 @@ const getTransactions = async (request, reply) => {
                     page: parseInt(page),
                     limit: parseInt(limit),
                     total: count,
-                    totalPages: Math.ceil(count / limit)
-                }
-            }
+                    totalPages: Math.ceil(count / limit),
+                },
+            },
         };
     } catch (error) {
         reply.status(500);
@@ -222,7 +233,7 @@ const getTransactionsByAccount = async (request, reply) => {
         const { accountId } = request.params;
         const transactions = await Transaction.findAll({
             where: { account_id: accountId },
-            order: [['transaction_date', 'DESC']]
+            order: [['transaction_date', 'DESC']],
         });
         return { success: true, data: transactions };
     } catch (error) {
@@ -241,7 +252,8 @@ const normalizeTransactionData = (data) => {
     if (data.cardId !== undefined) normalized.card_id = data.cardId || null;
     if (data.accountId !== undefined) normalized.account_id = data.accountId || null;
     if (data.isInstallment !== undefined) normalized.is_installment = data.isInstallment;
-    if (data.totalInstallments !== undefined) normalized.total_installments = data.totalInstallments;
+    if (data.totalInstallments !== undefined)
+        normalized.total_installments = data.totalInstallments;
     if (data.isRecurring !== undefined) normalized.is_recurring = data.isRecurring;
     if (data.recurrenceDay !== undefined) normalized.recurrence_day = data.recurrenceDay;
     if (data.recurrenceType !== undefined) normalized.recurrence_type = data.recurrenceType;
@@ -296,7 +308,7 @@ const createTransaction = async (request, reply) => {
                     total_installments: data.total_installments,
                     primary_category: data.primary_category,
                     secondary_category: data.secondary_category,
-                    notes: data.notes
+                    notes: data.notes,
                 });
             }
 
@@ -304,7 +316,7 @@ const createTransaction = async (request, reply) => {
             const createdTransactions = await Transaction.findAll({
                 where: { installment_id: installmentId },
                 include: [{ association: 'category' }, { association: 'card' }],
-                order: [['current_installment', 'ASC']]
+                order: [['current_installment', 'ASC']],
             });
 
             reply.status(201);
@@ -314,11 +326,11 @@ const createTransaction = async (request, reply) => {
         // Single transaction
         const transaction = await Transaction.create({
             ...data,
-            user_id: userId
+            user_id: userId,
         });
 
         const created = await Transaction.findByPk(transaction.id, {
-            include: [{ association: 'category' }, { association: 'card' }]
+            include: [{ association: 'category' }, { association: 'card' }],
         });
 
         reply.status(201);
@@ -334,7 +346,7 @@ const createTransactionForAccount = async (request, reply) => {
         const { accountId } = request.params;
         const transaction = await Transaction.create({
             ...request.body,
-            account_id: accountId
+            account_id: accountId,
         });
         reply.status(201);
         return { success: true, data: transaction, created: true };
@@ -350,14 +362,14 @@ const updateTransaction = async (request, reply) => {
         const data = normalizeTransactionData(request.body);
 
         const [updated] = await Transaction.update(data, {
-            where: { id }
+            where: { id },
         });
         if (!updated) {
             reply.status(404);
             return { success: false, error: 'Transaction not found' };
         }
         const transaction = await Transaction.findByPk(id, {
-            include: [{ association: 'category' }, { association: 'card' }]
+            include: [{ association: 'category' }, { association: 'card' }],
         });
         return { success: true, data: transaction };
     } catch (error) {
@@ -380,7 +392,7 @@ const deleteTransaction = async (request, reply) => {
         // Delete all installments if requested
         if (transaction.installment_id && deleteAll === 'true') {
             await Transaction.destroy({
-                where: { installment_id: transaction.installment_id }
+                where: { installment_id: transaction.installment_id },
             });
             return { success: true, data: { deleted: true, message: 'All installments deleted' } };
         }
@@ -417,10 +429,10 @@ const getInvoices = async (request, reply) => {
                 { association: 'card' },
                 {
                     association: 'transactions',
-                    include: [{ association: 'category' }]
-                }
+                    include: [{ association: 'category' }],
+                },
             ],
-            order: [['reference_month', 'DESC']]
+            order: [['reference_month', 'DESC']],
         });
 
         return { success: true, data: invoices };
@@ -435,7 +447,7 @@ const createInvoice = async (request, reply) => {
         const { userId } = request.params;
         const invoice = await Invoice.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: invoice, created: true };
@@ -449,14 +461,14 @@ const updateInvoice = async (request, reply) => {
     try {
         const { id } = request.params;
         const [updated] = await Invoice.update(request.body, {
-            where: { id }
+            where: { id },
         });
         if (!updated) {
             reply.status(404);
             return { success: false, error: 'Invoice not found' };
         }
         const invoice = await Invoice.findByPk(id, {
-            include: [{ association: 'card' }]
+            include: [{ association: 'card' }],
         });
         return { success: true, data: invoice };
     } catch (error) {
@@ -473,18 +485,18 @@ const getCategories = async (request, reply) => {
         const { type } = request.query;
 
         const where = {
-            [Op.or]: [
-                { user_id: userId },
-                { is_default: true }
-            ],
-            is_active: true
+            [Op.or]: [{ user_id: userId }, { is_default: true }],
+            is_active: true,
         };
 
         if (type) where.type = type;
 
         const categories = await FinanceCategory.findAll({
             where,
-            order: [['is_default', 'DESC'], ['name', 'ASC']]
+            order: [
+                ['is_default', 'DESC'],
+                ['name', 'ASC'],
+            ],
         });
 
         return { success: true, data: categories };
@@ -499,7 +511,7 @@ const createCategory = async (request, reply) => {
         const { userId } = request.params;
         const category = await FinanceCategory.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: category, created: true };
@@ -513,7 +525,7 @@ const updateCategory = async (request, reply) => {
     try {
         const { id } = request.params;
         const [updated] = await FinanceCategory.update(request.body, {
-            where: { id }
+            where: { id },
         });
         if (!updated) {
             reply.status(404);
@@ -531,9 +543,12 @@ const deleteCategory = async (request, reply) => {
     try {
         const { id } = request.params;
         // Soft delete
-        const [updated] = await FinanceCategory.update({ is_active: false }, {
-            where: { id, is_default: false }
-        });
+        const [updated] = await FinanceCategory.update(
+            { is_active: false },
+            {
+                where: { id, is_default: false },
+            },
+        );
         if (!updated) {
             reply.status(404);
             return { success: false, error: 'Category not found or is a default category' };
@@ -552,7 +567,7 @@ const getRecurringExpenses = async (request, reply) => {
         const { userId } = request.params;
         const expenses = await RecurringExpense.findAll({
             where: { user_id: userId },
-            order: [['created_at', 'DESC']]
+            order: [['created_at', 'DESC']],
         });
         return { success: true, data: expenses };
     } catch (error) {
@@ -566,7 +581,7 @@ const createRecurringExpense = async (request, reply) => {
         const { userId } = request.params;
         const expense = await RecurringExpense.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: expense, created: true };
@@ -580,7 +595,7 @@ const updateRecurringExpense = async (request, reply) => {
     try {
         const { id } = request.params;
         const [updated] = await RecurringExpense.update(request.body, {
-            where: { id }
+            where: { id },
         });
         if (!updated) {
             reply.status(404);
@@ -626,17 +641,24 @@ const getBudgets = async (request, reply) => {
         const budgets = await Budget.findAll({
             where,
             include: [{ association: 'categoryRef' }],
-            order: [['created_at', 'DESC']]
+            order: [['created_at', 'DESC']],
         });
 
         // Calculate spent amount for each budget
         const budgetsWithSpent = await Promise.all(
             budgets.map(async (budget) => {
-                let spentWhere = { user_id: userId, type: 'EXPENSE' };
+                const spentWhere = { user_id: userId, type: 'EXPENSE' };
 
                 if (budget.month) {
                     const startOfMonth = new Date(budget.month);
-                    const endOfMonth = new Date(startOfMonth.getFullYear(), startOfMonth.getMonth() + 1, 0, 23, 59, 59);
+                    const endOfMonth = new Date(
+                        startOfMonth.getFullYear(),
+                        startOfMonth.getMonth() + 1,
+                        0,
+                        23,
+                        59,
+                        59,
+                    );
                     spentWhere.transaction_date = { [Op.between]: [startOfMonth, endOfMonth] };
                 }
 
@@ -646,7 +668,7 @@ const getBudgets = async (request, reply) => {
                     spentWhere.primary_category = budget.category;
                 }
 
-                const spent = await Transaction.sum('amount', { where: spentWhere }) || 0;
+                const spent = (await Transaction.sum('amount', { where: spentWhere })) || 0;
                 const percentage = Math.round((spent / parseFloat(budget.limit_amount)) * 100);
 
                 return {
@@ -655,9 +677,9 @@ const getBudgets = async (request, reply) => {
                     remaining: parseFloat(budget.limit_amount) - spent,
                     percentage,
                     is_over_budget: spent > parseFloat(budget.limit_amount),
-                    is_near_limit: percentage >= budget.alert_threshold
+                    is_near_limit: percentage >= budget.alert_threshold,
                 };
-            })
+            }),
         );
 
         return { success: true, data: budgetsWithSpent };
@@ -672,7 +694,7 @@ const createBudget = async (request, reply) => {
         const { userId } = request.params;
         const budget = await Budget.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: budget, created: true };
@@ -695,7 +717,7 @@ const updateBudget = async (request, reply) => {
     try {
         const { id } = request.params;
         const [updated] = await Budget.update(request.body, {
-            where: { id }
+            where: { id },
         });
         if (!updated) {
             reply.status(404);
@@ -731,18 +753,26 @@ const getGoals = async (request, reply) => {
         const { userId } = request.params;
         const goals = await FinanceGoal.findAll({
             where: { user_id: userId },
-            include: [{
-                association: 'contributions',
-                order: [['date', 'DESC']],
-                limit: 5
-            }],
-            order: [['status', 'ASC'], ['priority', 'DESC'], ['created_at', 'DESC']]
+            include: [
+                {
+                    association: 'contributions',
+                    order: [['date', 'DESC']],
+                    limit: 5,
+                },
+            ],
+            order: [
+                ['status', 'ASC'],
+                ['priority', 'DESC'],
+                ['created_at', 'DESC'],
+            ],
         });
 
         const goalsWithProgress = goals.map((goal) => ({
             ...goal.toJSON(),
-            progress: Math.round((parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100),
-            remaining: parseFloat(goal.target_amount) - parseFloat(goal.current_amount)
+            progress: Math.round(
+                (parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100,
+            ),
+            remaining: parseFloat(goal.target_amount) - parseFloat(goal.current_amount),
         }));
 
         return { success: true, data: goalsWithProgress };
@@ -757,7 +787,7 @@ const createGoal = async (request, reply) => {
         const { userId } = request.params;
         const goal = await FinanceGoal.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
         reply.status(201);
         return { success: true, data: goal, created: true };
@@ -771,7 +801,7 @@ const updateGoal = async (request, reply) => {
     try {
         const { id } = request.params;
         const [updated] = await FinanceGoal.update(request.body, {
-            where: { id }
+            where: { id },
         });
         if (!updated) {
             reply.status(404);
@@ -815,14 +845,14 @@ const addGoalContribution = async (request, reply) => {
             goal_id: goalId,
             amount,
             date: date || new Date(),
-            notes
+            notes,
         });
 
         // Update goal current amount
         const newAmount = parseFloat(goal.current_amount) + parseFloat(amount);
         await goal.update({
             current_amount: newAmount,
-            status: newAmount >= parseFloat(goal.target_amount) ? 'COMPLETED' : goal.status
+            status: newAmount >= parseFloat(goal.target_amount) ? 'COMPLETED' : goal.status,
         });
 
         reply.status(201);
@@ -840,19 +870,28 @@ const getInvestments = async (request, reply) => {
         const { userId } = request.params;
         const investments = await Investment.findAll({
             where: { user_id: userId, is_active: true },
-            include: [{
-                association: 'history',
-                order: [['date', 'DESC']],
-                limit: 30
-            }],
-            order: [['current_amount', 'DESC']]
+            include: [
+                {
+                    association: 'history',
+                    order: [['date', 'DESC']],
+                    limit: 30,
+                },
+            ],
+            order: [['current_amount', 'DESC']],
         });
 
         // Calculate totals
-        const totalInvested = investments.reduce((sum, inv) => sum + parseFloat(inv.initial_amount), 0);
-        const totalCurrent = investments.reduce((sum, inv) => sum + parseFloat(inv.current_amount), 0);
+        const totalInvested = investments.reduce(
+            (sum, inv) => sum + parseFloat(inv.initial_amount),
+            0,
+        );
+        const totalCurrent = investments.reduce(
+            (sum, inv) => sum + parseFloat(inv.current_amount),
+            0,
+        );
         const totalReturn = totalCurrent - totalInvested;
-        const returnPercentage = totalInvested > 0 ? ((totalReturn / totalInvested) * 100).toFixed(2) : 0;
+        const returnPercentage =
+            totalInvested > 0 ? ((totalReturn / totalInvested) * 100).toFixed(2) : 0;
 
         return {
             success: true,
@@ -862,9 +901,9 @@ const getInvestments = async (request, reply) => {
                     total_invested: totalInvested,
                     total_current: totalCurrent,
                     total_return: totalReturn,
-                    return_percentage: returnPercentage
-                }
-            }
+                    return_percentage: returnPercentage,
+                },
+            },
         };
     } catch (error) {
         reply.status(500);
@@ -877,14 +916,14 @@ const createInvestment = async (request, reply) => {
         const { userId } = request.params;
         const investment = await Investment.create({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
 
         // Create initial history record
         await InvestmentHistory.create({
             investment_id: investment.id,
             date: request.body.start_date,
-            value: request.body.initial_amount
+            value: request.body.initial_amount,
         });
 
         reply.status(201);
@@ -899,7 +938,7 @@ const updateInvestment = async (request, reply) => {
     try {
         const { id } = request.params;
         const [updated] = await Investment.update(request.body, {
-            where: { id }
+            where: { id },
         });
         if (!updated) {
             reply.status(404);
@@ -911,7 +950,7 @@ const updateInvestment = async (request, reply) => {
             await InvestmentHistory.upsert({
                 investment_id: id,
                 date: new Date().toISOString().split('T')[0],
-                value: request.body.current_amount
+                value: request.body.current_amount,
             });
         }
 
@@ -927,9 +966,12 @@ const deleteInvestment = async (request, reply) => {
     try {
         const { id } = request.params;
         // Soft delete
-        const [updated] = await Investment.update({ is_active: false }, {
-            where: { id }
-        });
+        const [updated] = await Investment.update(
+            { is_active: false },
+            {
+                where: { id },
+            },
+        );
         if (!updated) {
             reply.status(404);
             return { success: false, error: 'Investment not found' };
@@ -947,13 +989,13 @@ const getFinanceProfile = async (request, reply) => {
     try {
         const { userId } = request.params;
         let profile = await FinanceProfile.findOne({
-            where: { user_id: userId }
+            where: { user_id: userId },
         });
 
         // Create default profile if not exists
         if (!profile) {
             profile = await FinanceProfile.create({
-                user_id: userId
+                user_id: userId,
             });
         }
 
@@ -969,7 +1011,7 @@ const updateFinanceProfile = async (request, reply) => {
         const { userId } = request.params;
         const [profile, created] = await FinanceProfile.upsert({
             ...request.body,
-            user_id: userId
+            user_id: userId,
         });
 
         return { success: true, data: profile, created };
@@ -986,7 +1028,9 @@ const getFinanceSummary = async (request, reply) => {
         const { userId } = request.params;
         const { month } = request.query;
 
-        const [year, monthNum] = (month || new Date().toISOString().slice(0, 7)).split('-').map(Number);
+        const [year, monthNum] = (month || new Date().toISOString().slice(0, 7))
+            .split('-')
+            .map(Number);
         const startOfMonth = new Date(year, monthNum - 1, 1);
         const endOfMonth = new Date(year, monthNum, 0, 23, 59, 59);
 
@@ -994,23 +1038,23 @@ const getFinanceSummary = async (request, reply) => {
         const transactions = await Transaction.findAll({
             where: {
                 user_id: userId,
-                transaction_date: { [Op.between]: [startOfMonth, endOfMonth] }
-            }
+                transaction_date: { [Op.between]: [startOfMonth, endOfMonth] },
+            },
         });
 
         const totalIncome = transactions
-            .filter(t => t.type === 'INCOME')
+            .filter((t) => t.type === 'INCOME')
             .reduce((sum, t) => sum + parseFloat(t.amount), 0);
 
         const totalExpenses = transactions
-            .filter(t => t.type === 'EXPENSE')
+            .filter((t) => t.type === 'EXPENSE')
             .reduce((sum, t) => sum + parseFloat(t.amount), 0);
 
         const balance = totalIncome - totalExpenses;
 
         // Get budgets with progress
         const budgets = await Budget.findAll({
-            where: { user_id: userId, is_active: true, month: startOfMonth }
+            where: { user_id: userId, is_active: true, month: startOfMonth },
         });
 
         return {
@@ -1021,8 +1065,8 @@ const getFinanceSummary = async (request, reply) => {
                 total_expenses: totalExpenses,
                 balance,
                 transaction_count: transactions.length,
-                budget_count: budgets.length
-            }
+                budget_count: budgets.length,
+            },
         };
     } catch (error) {
         reply.status(500);
@@ -1082,5 +1126,5 @@ module.exports = {
     getFinanceProfile,
     updateFinanceProfile,
     // Summary
-    getFinanceSummary
+    getFinanceSummary,
 };

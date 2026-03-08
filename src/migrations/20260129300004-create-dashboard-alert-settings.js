@@ -49,7 +49,9 @@ module.exports = {
         });
 
         await queryInterface.addIndex('dashboard_alert_settings', ['user_id']);
-        await queryInterface.addIndex('dashboard_alert_settings', ['user_id', 'alert_type'], { unique: true });
+        await queryInterface.addIndex('dashboard_alert_settings', ['user_id', 'alert_type'], {
+            unique: true,
+        });
     },
 
     async down(queryInterface) {

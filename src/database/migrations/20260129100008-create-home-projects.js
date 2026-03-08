@@ -36,7 +36,13 @@ module.exports = {
                 allowNull: true,
             },
             status: {
-                type: Sequelize.ENUM('PLANNING', 'IN_PROGRESS', 'ON_HOLD', 'COMPLETED', 'CANCELLED'),
+                type: Sequelize.ENUM(
+                    'PLANNING',
+                    'IN_PROGRESS',
+                    'ON_HOLD',
+                    'COMPLETED',
+                    'CANCELLED',
+                ),
                 allowNull: false,
                 defaultValue: 'PLANNING',
             },

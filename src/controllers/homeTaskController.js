@@ -1,6 +1,14 @@
 const { HomeTask, HomeTaskOccurrence, HomeSpace, HomeMember, sequelize } = require('../models');
 const { Op } = require('sequelize');
-const { addDays, startOfDay, endOfDay, format, parseISO, addWeeks, addMonths } = require('date-fns');
+const {
+    addDays,
+    startOfDay,
+    endOfDay,
+    format,
+    parseISO,
+    addWeeks,
+    addMonths,
+} = require('date-fns');
 
 // ==================== TASKS ====================
 
@@ -9,9 +17,7 @@ const getTasks = async (request, reply) => {
         const { spaceId } = request.params;
         const tasks = await HomeTask.findAll({
             where: { space_id: spaceId },
-            include: [
-                { model: HomeMember, as: 'assignedMember', attributes: ['id', 'name'] },
-            ],
+            include: [{ model: HomeMember, as: 'assignedMember', attributes: ['id', 'name'] }],
             order: [['name', 'ASC']],
         });
         return { success: true, data: tasks };
@@ -25,9 +31,7 @@ const getTask = async (request, reply) => {
     try {
         const { id } = request.params;
         const task = await HomeTask.findByPk(id, {
-            include: [
-                { model: HomeMember, as: 'assignedMember', attributes: ['id', 'name'] },
-            ],
+            include: [{ model: HomeMember, as: 'assignedMember', attributes: ['id', 'name'] }],
         });
         if (!task) {
             reply.status(404);
@@ -52,9 +56,7 @@ const createTask = async (request, reply) => {
         await generateOccurrencesForTask(task, 30);
 
         const taskWithRelations = await HomeTask.findByPk(task.id, {
-            include: [
-                { model: HomeMember, as: 'assignedMember', attributes: ['id', 'name'] },
-            ],
+            include: [{ model: HomeMember, as: 'assignedMember', attributes: ['id', 'name'] }],
         });
 
         reply.status(201);
@@ -88,9 +90,7 @@ const updateTask = async (request, reply) => {
         }
 
         const task = await HomeTask.findByPk(id, {
-            include: [
-                { model: HomeMember, as: 'assignedMember', attributes: ['id', 'name'] },
-            ],
+            include: [{ model: HomeMember, as: 'assignedMember', attributes: ['id', 'name'] }],
         });
         return { success: true, data: task };
     } catch (error) {
@@ -166,7 +166,10 @@ const getOccurrencesByDateRange = async (request, reply) => {
                     [Op.between]: [startDate, endDate],
                 },
             },
-            order: [['due_date', 'ASC'], [{ model: HomeTask, as: 'task' }, 'name', 'ASC']],
+            order: [
+                ['due_date', 'ASC'],
+                [{ model: HomeTask, as: 'task' }, 'name', 'ASC'],
+            ],
         });
 
         return { success: true, data: occurrences };
@@ -188,7 +191,7 @@ const completeOccurrence = async (request, reply) => {
                 completed_by_member_id,
                 notes,
             },
-            { where: { id } }
+            { where: { id } },
         );
 
         if (!updated) {
@@ -217,7 +220,7 @@ const skipOccurrence = async (request, reply) => {
 
         const [updated] = await HomeTaskOccurrence.update(
             { status: 'SKIPPED', notes },
-            { where: { id } }
+            { where: { id } },
         );
 
         if (!updated) {
@@ -243,7 +246,7 @@ const undoOccurrence = async (request, reply) => {
                 completed_at: null,
                 completed_by_member_id: null,
             },
-            { where: { id } }
+            { where: { id } },
         );
 
         if (!updated) {
@@ -295,10 +298,16 @@ function shouldCreateOccurrence(task, date) {
             return true;
         case 'WEEKLY':
             return task.frequency_days?.includes(dayOfWeek) ?? dayOfWeek === 1;
-        case 'BIWEEKLY':
+        case 'BIWEEKLY': {
             // Every other week on specified days
-            const weekNumber = Math.floor((date - new Date(date.getFullYear(), 0, 1)) / (7 * 24 * 60 * 60 * 1000));
-            return weekNumber % 2 === 0 && (task.frequency_days?.includes(dayOfWeek) ?? dayOfWeek === 1);
+            const weekNumber = Math.floor(
+                (date - new Date(date.getFullYear(), 0, 1)) / (7 * 24 * 60 * 60 * 1000),
+            );
+            return (
+                weekNumber % 2 === 0 &&
+                (task.frequency_days?.includes(dayOfWeek) ?? dayOfWeek === 1)
+            );
+        }
         case 'MONTHLY':
             return task.frequency_days?.includes(dayOfMonth) ?? dayOfMonth === 1;
         case 'CUSTOM':
@@ -323,12 +332,14 @@ const getTaskStats = async (request, reply) => {
                     'status',
                     [sequelize.fn('COUNT', sequelize.col('HomeTaskOccurrence.id')), 'count'],
                 ],
-                include: [{
-                    model: HomeTask,
-                    as: 'task',
-                    where: { space_id: spaceId },
-                    attributes: [],
-                }],
+                include: [
+                    {
+                        model: HomeTask,
+                        as: 'task',
+                        where: { space_id: spaceId },
+                        attributes: [],
+                    },
+                ],
                 where: { due_date: today },
                 group: ['status'],
                 raw: true,
@@ -338,12 +349,14 @@ const getTaskStats = async (request, reply) => {
                     'status',
                     [sequelize.fn('COUNT', sequelize.col('HomeTaskOccurrence.id')), 'count'],
                 ],
-                include: [{
-                    model: HomeTask,
-                    as: 'task',
-                    where: { space_id: spaceId },
-                    attributes: [],
-                }],
+                include: [
+                    {
+                        model: HomeTask,
+                        as: 'task',
+                        where: { space_id: spaceId },
+                        attributes: [],
+                    },
+                ],
                 where: {
                     due_date: { [Op.between]: [weekStart, today] },
                 },
@@ -355,7 +368,10 @@ const getTaskStats = async (request, reply) => {
         return {
             success: true,
             data: {
-                today: todayStats.reduce((acc, s) => ({ ...acc, [s.status]: parseInt(s.count) }), {}),
+                today: todayStats.reduce(
+                    (acc, s) => ({ ...acc, [s.status]: parseInt(s.count) }),
+                    {},
+                ),
                 week: weekStats.reduce((acc, s) => ({ ...acc, [s.status]: parseInt(s.count) }), {}),
             },
         };

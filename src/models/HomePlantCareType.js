@@ -43,7 +43,7 @@ const HomePlantCareType = sequelize.define(
         tableName: 'home_plant_care_types',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = HomePlantCareType;

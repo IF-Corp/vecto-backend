@@ -44,7 +44,7 @@ const SocialContactReminder = sequelize.define(
         tableName: 'social_contact_reminders',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = SocialContactReminder;

@@ -15,7 +15,10 @@ async function routes(fastify) {
 
     // Checklist
     fastify.post('/social/events/:eventId/checklist', socialEventController.addChecklistItem);
-    fastify.post('/social/event-checklist/:itemId/toggle', socialEventController.toggleChecklistItem);
+    fastify.post(
+        '/social/event-checklist/:itemId/toggle',
+        socialEventController.toggleChecklistItem,
+    );
 }
 
 module.exports = routes;

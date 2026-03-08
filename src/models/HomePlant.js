@@ -42,7 +42,7 @@ const HomePlant = sequelize.define(
         tableName: 'home_plants',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = HomePlant;

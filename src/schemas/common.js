@@ -5,43 +5,43 @@ const uuidPattern = '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{1
 const idParams = {
     type: 'object',
     properties: {
-        id: { type: 'string', pattern: uuidPattern }
+        id: { type: 'string', pattern: uuidPattern },
     },
-    required: ['id']
+    required: ['id'],
 };
 
 const userIdParams = {
     type: 'object',
     properties: {
-        userId: { type: 'string', pattern: uuidPattern }
+        userId: { type: 'string', pattern: uuidPattern },
     },
-    required: ['userId']
+    required: ['userId'],
 };
 
 const userIdAndIdParams = {
     type: 'object',
     properties: {
         userId: { type: 'string', pattern: uuidPattern },
-        id: { type: 'string', pattern: uuidPattern }
+        id: { type: 'string', pattern: uuidPattern },
     },
-    required: ['userId', 'id']
+    required: ['userId', 'id'],
 };
 
 const paginationQuery = {
     type: 'object',
     properties: {
         page: { type: 'integer', minimum: 1, default: 1 },
-        limit: { type: 'integer', minimum: 1, maximum: 100, default: 20 }
-    }
+        limit: { type: 'integer', minimum: 1, maximum: 100, default: 20 },
+    },
 };
 
 const successResponse = {
     type: 'object',
     properties: {
         success: { type: 'boolean', const: true },
-        data: {}
+        data: {},
     },
-    required: ['success']
+    required: ['success'],
 };
 
 const errorResponse = {
@@ -50,13 +50,13 @@ const errorResponse = {
         success: { type: 'boolean', const: false },
         error: { type: 'string' },
         message: { type: 'string' },
-        details: { type: 'array', items: { type: 'object' } }
-    }
+        details: { type: 'array', items: { type: 'object' } },
+    },
 };
 
 const timestamps = {
     created_at: { type: 'string', format: 'date-time' },
-    updated_at: { type: 'string', format: 'date-time' }
+    updated_at: { type: 'string', format: 'date-time' },
 };
 
 module.exports = {
@@ -67,5 +67,5 @@ module.exports = {
     paginationQuery,
     successResponse,
     errorResponse,
-    timestamps
+    timestamps,
 };

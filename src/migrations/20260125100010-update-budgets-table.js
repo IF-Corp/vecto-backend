@@ -8,21 +8,21 @@ module.exports = {
             allowNull: true,
             references: {
                 model: 'finance_categories',
-                key: 'id'
+                key: 'id',
             },
             onUpdate: 'CASCADE',
-            onDelete: 'SET NULL'
+            onDelete: 'SET NULL',
         });
 
         // Add month column
         await queryInterface.addColumn('budgets', 'month', {
             type: Sequelize.DATEONLY,
-            allowNull: true
+            allowNull: true,
         });
 
         // Add index
         await queryInterface.addIndex('budgets', ['user_id', 'month'], {
-            name: 'budgets_user_month_idx'
+            name: 'budgets_user_month_idx',
         });
     },
 
@@ -30,5 +30,5 @@ module.exports = {
         await queryInterface.removeIndex('budgets', 'budgets_user_month_idx');
         await queryInterface.removeColumn('budgets', 'category_id');
         await queryInterface.removeColumn('budgets', 'month');
-    }
+    },
 };

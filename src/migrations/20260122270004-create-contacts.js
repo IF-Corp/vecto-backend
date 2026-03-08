@@ -8,67 +8,67 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             user_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'users',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             name: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: false,
             },
             email: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             phone: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             relationship: {
                 type: Sequelize.ENUM('FAMILY', 'FRIEND', 'WORK', 'ACQUAINTANCE', 'OTHER'),
-                allowNull: true
+                allowNull: true,
             },
             birthday: {
                 type: Sequelize.DATEONLY,
-                allowNull: true
+                allowNull: true,
             },
             address: {
                 type: Sequelize.TEXT,
-                allowNull: true
+                allowNull: true,
             },
             company: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             notes: {
                 type: Sequelize.TEXT,
-                allowNull: true
+                allowNull: true,
             },
             photo_url: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             is_favorite: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false,
-                allowNull: false
+                allowNull: false,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('contacts', ['user_id']);
@@ -77,5 +77,5 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('contacts');
-    }
+    },
 };

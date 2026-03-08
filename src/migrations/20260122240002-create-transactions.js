@@ -7,67 +7,67 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true,
-                allowNull: false
+                allowNull: false,
             },
             account_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'accounts',
-                    key: 'id'
+                    key: 'id',
                 },
                 onUpdate: 'CASCADE',
-                onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             },
             primary_category: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             secondary_category: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             description: {
                 type: Sequelize.STRING,
-                allowNull: true
+                allowNull: true,
             },
             amount: {
                 type: Sequelize.DECIMAL(10, 2),
-                allowNull: false
+                allowNull: false,
             },
             type: {
                 type: Sequelize.ENUM('INCOME', 'EXPENSE'),
-                allowNull: false
+                allowNull: false,
             },
             transaction_date: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             status: {
                 type: Sequelize.ENUM('PENDING', 'CONSOLIDATED'),
                 defaultValue: 'PENDING',
-                allowNull: false
+                allowNull: false,
             },
             created_at: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             updated_at: {
                 type: Sequelize.DATE,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         });
 
         await queryInterface.addIndex('transactions', ['account_id'], {
-            name: 'transactions_account_id_idx'
+            name: 'transactions_account_id_idx',
         });
 
         await queryInterface.addIndex('transactions', ['transaction_date'], {
-            name: 'transactions_date_idx'
+            name: 'transactions_date_idx',
         });
     },
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('transactions');
-    }
+    },
 };

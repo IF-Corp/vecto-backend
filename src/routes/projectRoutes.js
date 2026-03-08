@@ -6,177 +6,237 @@ async function projectRoutes(fastify, options) {
     fastify.addHook('preHandler', fastify.authenticate);
 
     // ==================== PROJECTS ====================
-    fastify.get('/users/:userId/projects', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get all projects for a user',
-            tags: ['Projects'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams
-        }
-    }, projectController.getProjects);
+    fastify.get(
+        '/users/:userId/projects',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get all projects for a user',
+                tags: ['Projects'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
+        },
+        projectController.getProjects,
+    );
 
-    fastify.post('/users/:userId/projects', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a new project',
-            tags: ['Projects'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
-            body: project.createProjectBody
-        }
-    }, projectController.createProject);
+    fastify.post(
+        '/users/:userId/projects',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a new project',
+                tags: ['Projects'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+                body: project.createProjectBody,
+            },
+        },
+        projectController.createProject,
+    );
 
-    fastify.put('/projects/:id', {
-        schema: {
-            description: 'Update a project',
-            tags: ['Projects'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
-            body: project.updateProjectBody
-        }
-    }, projectController.updateProject);
+    fastify.put(
+        '/projects/:id',
+        {
+            schema: {
+                description: 'Update a project',
+                tags: ['Projects'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+                body: project.updateProjectBody,
+            },
+        },
+        projectController.updateProject,
+    );
 
-    fastify.delete('/projects/:id', {
-        schema: {
-            description: 'Delete a project',
-            tags: ['Projects'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams
-        }
-    }, projectController.deleteProject);
+    fastify.delete(
+        '/projects/:id',
+        {
+            schema: {
+                description: 'Delete a project',
+                tags: ['Projects'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
+        },
+        projectController.deleteProject,
+    );
 
     // ==================== TASKS ====================
-    fastify.get('/users/:userId/tasks', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get all tasks for a user',
-            tags: ['Projects'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams
-        }
-    }, projectController.getTasks);
+    fastify.get(
+        '/users/:userId/tasks',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get all tasks for a user',
+                tags: ['Projects'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
+        },
+        projectController.getTasks,
+    );
 
-    fastify.post('/users/:userId/tasks', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a new task',
-            tags: ['Projects'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
-            body: project.createTaskBody
-        }
-    }, projectController.createTask);
+    fastify.post(
+        '/users/:userId/tasks',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a new task',
+                tags: ['Projects'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+                body: project.createTaskBody,
+            },
+        },
+        projectController.createTask,
+    );
 
-    fastify.put('/tasks/:id', {
-        schema: {
-            description: 'Update a task',
-            tags: ['Projects'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
-            body: project.updateTaskBody
-        }
-    }, projectController.updateTask);
+    fastify.put(
+        '/tasks/:id',
+        {
+            schema: {
+                description: 'Update a task',
+                tags: ['Projects'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+                body: project.updateTaskBody,
+            },
+        },
+        projectController.updateTask,
+    );
 
-    fastify.delete('/tasks/:id', {
-        schema: {
-            description: 'Delete a task',
-            tags: ['Projects'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams
-        }
-    }, projectController.deleteTask);
+    fastify.delete(
+        '/tasks/:id',
+        {
+            schema: {
+                description: 'Delete a task',
+                tags: ['Projects'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
+        },
+        projectController.deleteTask,
+    );
 
-    fastify.get('/tasks/:id', {
-        schema: {
-            description: 'Get a single task by ID',
-            tags: ['Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams
-        }
-    }, projectController.getTaskById);
+    fastify.get(
+        '/tasks/:id',
+        {
+            schema: {
+                description: 'Get a single task by ID',
+                tags: ['Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
+        },
+        projectController.getTaskById,
+    );
 
-    fastify.patch('/tasks/:id/status', {
-        schema: {
-            description: 'Update task status (optimized for drag & drop)',
-            tags: ['Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
-            body: {
-                type: 'object',
-                properties: {
-                    status: { type: 'string', enum: ['BACKLOG', 'TODO', 'DOING', 'DONE'] }
+    fastify.patch(
+        '/tasks/:id/status',
+        {
+            schema: {
+                description: 'Update task status (optimized for drag & drop)',
+                tags: ['Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+                body: {
+                    type: 'object',
+                    properties: {
+                        status: { type: 'string', enum: ['BACKLOG', 'TODO', 'DOING', 'DONE'] },
+                    },
+                    required: ['status'],
                 },
-                required: ['status']
-            }
-        }
-    }, projectController.updateTaskStatus);
+            },
+        },
+        projectController.updateTaskStatus,
+    );
 
     // ==================== SUBTASKS ====================
-    fastify.patch('/subtasks/:id/toggle', {
-        schema: {
-            description: 'Toggle subtask completion status',
-            tags: ['Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
-            body: {
-                type: 'object',
-                properties: {
-                    completed: { type: 'boolean' }
-                }
-            }
-        }
-    }, projectController.toggleSubtask);
+    fastify.patch(
+        '/subtasks/:id/toggle',
+        {
+            schema: {
+                description: 'Toggle subtask completion status',
+                tags: ['Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+                body: {
+                    type: 'object',
+                    properties: {
+                        completed: { type: 'boolean' },
+                    },
+                },
+            },
+        },
+        projectController.toggleSubtask,
+    );
 
-    fastify.delete('/subtasks/:id', {
-        schema: {
-            description: 'Delete a subtask',
-            tags: ['Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams
-        }
-    }, projectController.deleteSubtask);
+    fastify.delete(
+        '/subtasks/:id',
+        {
+            schema: {
+                description: 'Delete a subtask',
+                tags: ['Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
+        },
+        projectController.deleteSubtask,
+    );
 
     // ==================== MEETINGS ====================
-    fastify.get('/projects/:projectId/meetings', {
-        schema: {
-            description: 'Get meetings for a project',
-            tags: ['Projects'],
-            security: [{ bearerAuth: [] }],
-            params: {
-                type: 'object',
-                properties: {
-                    projectId: { type: 'string', pattern: common.uuidPattern }
+    fastify.get(
+        '/projects/:projectId/meetings',
+        {
+            schema: {
+                description: 'Get meetings for a project',
+                tags: ['Projects'],
+                security: [{ bearerAuth: [] }],
+                params: {
+                    type: 'object',
+                    properties: {
+                        projectId: { type: 'string', pattern: common.uuidPattern },
+                    },
+                    required: ['projectId'],
                 },
-                required: ['projectId']
-            }
-        }
-    }, projectController.getMeetings);
-
-    fastify.post('/projects/:projectId/meetings', {
-        schema: {
-            description: 'Create a meeting for a project',
-            tags: ['Projects'],
-            security: [{ bearerAuth: [] }],
-            params: {
-                type: 'object',
-                properties: {
-                    projectId: { type: 'string', pattern: common.uuidPattern }
-                },
-                required: ['projectId']
             },
-            body: project.createMeetingBody
-        }
-    }, projectController.createMeeting);
+        },
+        projectController.getMeetings,
+    );
 
-    fastify.delete('/meetings/:id', {
-        schema: {
-            description: 'Delete a meeting',
-            tags: ['Projects'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams
-        }
-    }, projectController.deleteMeeting);
+    fastify.post(
+        '/projects/:projectId/meetings',
+        {
+            schema: {
+                description: 'Create a meeting for a project',
+                tags: ['Projects'],
+                security: [{ bearerAuth: [] }],
+                params: {
+                    type: 'object',
+                    properties: {
+                        projectId: { type: 'string', pattern: common.uuidPattern },
+                    },
+                    required: ['projectId'],
+                },
+                body: project.createMeetingBody,
+            },
+        },
+        projectController.createMeeting,
+    );
+
+    fastify.delete(
+        '/meetings/:id',
+        {
+            schema: {
+                description: 'Delete a meeting',
+                tags: ['Projects'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
+        },
+        projectController.deleteMeeting,
+    );
 }
 
 module.exports = projectRoutes;

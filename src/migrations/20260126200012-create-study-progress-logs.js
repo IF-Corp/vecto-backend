@@ -61,6 +61,8 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('study_progress_logs');
-        await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_study_progress_logs_resource_type";');
+        await queryInterface.sequelize.query(
+            'DROP TYPE IF EXISTS "enum_study_progress_logs_resource_type";',
+        );
     },
 };

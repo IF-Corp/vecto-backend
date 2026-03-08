@@ -5,8 +5,14 @@ async function dailyStandupRoutes(fastify, options) {
     fastify.get('/users/:userId/daily-standup/today', dailyStandupController.getTodayStandup);
 
     // Get tasks for standup
-    fastify.get('/users/:userId/daily-standup/yesterday-tasks', dailyStandupController.getYesterdayTasks);
-    fastify.get('/users/:userId/daily-standup/today-tasks', dailyStandupController.getTodayPendingTasks);
+    fastify.get(
+        '/users/:userId/daily-standup/yesterday-tasks',
+        dailyStandupController.getYesterdayTasks,
+    );
+    fastify.get(
+        '/users/:userId/daily-standup/today-tasks',
+        dailyStandupController.getTodayPendingTasks,
+    );
 
     // Create/update standup
     fastify.post('/users/:userId/daily-standup', dailyStandupController.createDailyStandup);
@@ -14,7 +20,10 @@ async function dailyStandupRoutes(fastify, options) {
 
     // History and trends
     fastify.get('/users/:userId/daily-standups', dailyStandupController.getStandupHistory);
-    fastify.get('/users/:userId/daily-standups/energy-trends', dailyStandupController.getEnergyTrends);
+    fastify.get(
+        '/users/:userId/daily-standups/energy-trends',
+        dailyStandupController.getEnergyTrends,
+    );
 }
 
 module.exports = dailyStandupRoutes;

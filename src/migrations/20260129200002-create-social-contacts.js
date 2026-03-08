@@ -95,7 +95,9 @@ module.exports = {
             },
         });
 
-        await queryInterface.addIndex('social_contact_circles', ['contact_id', 'circle_id'], { unique: true });
+        await queryInterface.addIndex('social_contact_circles', ['contact_id', 'circle_id'], {
+            unique: true,
+        });
 
         // Contact Social Networks
         await queryInterface.createTable('social_contact_networks', {
@@ -112,7 +114,16 @@ module.exports = {
                 onDelete: 'CASCADE',
             },
             network_type: {
-                type: Sequelize.ENUM('INSTAGRAM', 'LINKEDIN', 'FACEBOOK', 'TWITTER', 'TIKTOK', 'WHATSAPP', 'TELEGRAM', 'OTHER'),
+                type: Sequelize.ENUM(
+                    'INSTAGRAM',
+                    'LINKEDIN',
+                    'FACEBOOK',
+                    'TWITTER',
+                    'TIKTOK',
+                    'WHATSAPP',
+                    'TELEGRAM',
+                    'OTHER',
+                ),
                 allowNull: false,
             },
             username: {

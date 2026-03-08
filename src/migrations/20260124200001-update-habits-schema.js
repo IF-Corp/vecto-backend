@@ -6,41 +6,41 @@ module.exports = {
         await queryInterface.addColumn('habits', 'category', {
             type: Sequelize.STRING(100),
             allowNull: true,
-            defaultValue: 'Geral'
+            defaultValue: 'Geral',
         });
 
         await queryInterface.addColumn('habits', 'description', {
             type: Sequelize.TEXT,
-            allowNull: true
+            allowNull: true,
         });
 
         await queryInterface.addColumn('habits', 'time_period', {
             type: Sequelize.ENUM('morning', 'afternoon', 'evening', 'anytime'),
             allowNull: true,
-            defaultValue: 'anytime'
+            defaultValue: 'anytime',
         });
 
         await queryInterface.addColumn('habits', 'estimated_duration', {
             type: Sequelize.INTEGER,
             allowNull: true,
-            comment: 'Duration in minutes'
+            comment: 'Duration in minutes',
         });
 
         await queryInterface.addColumn('habits', 'best_streak', {
             type: Sequelize.INTEGER,
             defaultValue: 0,
-            allowNull: false
+            allowNull: false,
         });
 
         await queryInterface.addColumn('habits', 'status', {
             type: Sequelize.ENUM('active', 'archived'),
             defaultValue: 'active',
-            allowNull: false
+            allowNull: false,
         });
 
         // Add index for status filtering
         await queryInterface.addIndex('habits', ['user_id', 'status'], {
-            name: 'habits_user_status_idx'
+            name: 'habits_user_status_idx',
         });
     },
 
@@ -56,5 +56,5 @@ module.exports = {
         // Drop ENUMs
         await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_habits_time_period";');
         await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_habits_status";');
-    }
+    },
 };

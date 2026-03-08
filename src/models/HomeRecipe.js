@@ -46,7 +46,7 @@ const HomeRecipe = sequelize.define(
         tableName: 'home_recipes',
         timestamps: true,
         underscored: true,
-    }
+    },
 );
 
 module.exports = HomeRecipe;

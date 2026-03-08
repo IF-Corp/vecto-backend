@@ -6,453 +6,641 @@ async function workRoutes(fastify, options) {
     fastify.addHook('preHandler', fastify.authenticate);
 
     // ==================== WORK PROFILE ====================
-    fastify.get('/users/:userId/work/profile', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get work profile for a user',
-            tags: ['Work - Profile'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.get(
+        '/users/:userId/work/profile',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get work profile for a user',
+                tags: ['Work - Profile'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.getWorkProfile);
+        workController.getWorkProfile,
+    );
 
-    fastify.put('/users/:userId/work/profile', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Update work profile',
-            tags: ['Work - Profile'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.put(
+        '/users/:userId/work/profile',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Update work profile',
+                tags: ['Work - Profile'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.updateWorkProfile);
+        workController.updateWorkProfile,
+    );
 
     // ==================== TASK TYPES ====================
-    fastify.get('/users/:userId/work/task-types', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get all task types for a user',
-            tags: ['Work - Task Types'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.get(
+        '/users/:userId/work/task-types',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get all task types for a user',
+                tags: ['Work - Task Types'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.getTaskTypes);
+        workController.getTaskTypes,
+    );
 
-    fastify.post('/users/:userId/work/task-types', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a custom task type',
-            tags: ['Work - Task Types'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.post(
+        '/users/:userId/work/task-types',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a custom task type',
+                tags: ['Work - Task Types'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.createTaskType);
+        workController.createTaskType,
+    );
 
-    fastify.put('/users/:userId/work/task-types/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Update a task type',
-            tags: ['Work - Task Types'],
-            security: [{ bearerAuth: [] }],
+    fastify.put(
+        '/users/:userId/work/task-types/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Update a task type',
+                tags: ['Work - Task Types'],
+                security: [{ bearerAuth: [] }],
+            },
         },
-    }, workController.updateTaskType);
+        workController.updateTaskType,
+    );
 
-    fastify.delete('/users/:userId/work/task-types/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Delete a task type',
-            tags: ['Work - Task Types'],
-            security: [{ bearerAuth: [] }],
+    fastify.delete(
+        '/users/:userId/work/task-types/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Delete a task type',
+                tags: ['Work - Task Types'],
+                security: [{ bearerAuth: [] }],
+            },
         },
-    }, workController.deleteTaskType);
+        workController.deleteTaskType,
+    );
 
     // ==================== TASK STATUSES ====================
-    fastify.get('/users/:userId/work/task-statuses', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get all task statuses for a user',
-            tags: ['Work - Task Statuses'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.get(
+        '/users/:userId/work/task-statuses',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get all task statuses for a user',
+                tags: ['Work - Task Statuses'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.getTaskStatuses);
+        workController.getTaskStatuses,
+    );
 
-    fastify.post('/users/:userId/work/task-statuses', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a custom task status',
-            tags: ['Work - Task Statuses'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.post(
+        '/users/:userId/work/task-statuses',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a custom task status',
+                tags: ['Work - Task Statuses'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.createTaskStatus);
+        workController.createTaskStatus,
+    );
 
-    fastify.put('/users/:userId/work/task-statuses/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Update a task status',
-            tags: ['Work - Task Statuses'],
-            security: [{ bearerAuth: [] }],
+    fastify.put(
+        '/users/:userId/work/task-statuses/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Update a task status',
+                tags: ['Work - Task Statuses'],
+                security: [{ bearerAuth: [] }],
+            },
         },
-    }, workController.updateTaskStatus);
+        workController.updateTaskStatus,
+    );
 
-    fastify.put('/users/:userId/work/task-statuses/reorder', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Reorder task statuses',
-            tags: ['Work - Task Statuses'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.put(
+        '/users/:userId/work/task-statuses/reorder',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Reorder task statuses',
+                tags: ['Work - Task Statuses'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.reorderTaskStatuses);
+        workController.reorderTaskStatuses,
+    );
 
-    fastify.delete('/users/:userId/work/task-statuses/:id', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Delete a task status',
-            tags: ['Work - Task Statuses'],
-            security: [{ bearerAuth: [] }],
+    fastify.delete(
+        '/users/:userId/work/task-statuses/:id',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Delete a task status',
+                tags: ['Work - Task Statuses'],
+                security: [{ bearerAuth: [] }],
+            },
         },
-    }, workController.deleteTaskStatus);
+        workController.deleteTaskStatus,
+    );
 
     // ==================== CLIENTS ====================
-    fastify.get('/users/:userId/work/clients', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get all clients for a user',
-            tags: ['Work - Clients'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.get(
+        '/users/:userId/work/clients',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get all clients for a user',
+                tags: ['Work - Clients'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.getClients);
+        workController.getClients,
+    );
 
-    fastify.get('/work/clients/:id', {
-        schema: {
-            description: 'Get a specific client',
-            tags: ['Work - Clients'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
+    fastify.get(
+        '/work/clients/:id',
+        {
+            schema: {
+                description: 'Get a specific client',
+                tags: ['Work - Clients'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
         },
-    }, workController.getClient);
+        workController.getClient,
+    );
 
-    fastify.get('/work/clients/:id/details', {
-        schema: {
-            description: 'Get client details with stats and history',
-            tags: ['Work - Clients'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
+    fastify.get(
+        '/work/clients/:id/details',
+        {
+            schema: {
+                description: 'Get client details with stats and history',
+                tags: ['Work - Clients'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
         },
-    }, workController.getClientDetails);
+        workController.getClientDetails,
+    );
 
-    fastify.post('/users/:userId/work/clients', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a client',
-            tags: ['Work - Clients'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.post(
+        '/users/:userId/work/clients',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a client',
+                tags: ['Work - Clients'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.createClient);
+        workController.createClient,
+    );
 
-    fastify.put('/work/clients/:id', {
-        schema: {
-            description: 'Update a client',
-            tags: ['Work - Clients'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
+    fastify.put(
+        '/work/clients/:id',
+        {
+            schema: {
+                description: 'Update a client',
+                tags: ['Work - Clients'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
         },
-    }, workController.updateClient);
+        workController.updateClient,
+    );
 
-    fastify.delete('/work/clients/:id', {
-        schema: {
-            description: 'Delete a client',
-            tags: ['Work - Clients'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
+    fastify.delete(
+        '/work/clients/:id',
+        {
+            schema: {
+                description: 'Delete a client',
+                tags: ['Work - Clients'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
         },
-    }, workController.deleteClient);
+        workController.deleteClient,
+    );
 
     // ==================== PROJECTS ====================
-    fastify.get('/users/:userId/work/projects', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get all work projects for a user',
-            tags: ['Work - Projects'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.get(
+        '/users/:userId/work/projects',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get all work projects for a user',
+                tags: ['Work - Projects'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.getProjects);
+        workController.getProjects,
+    );
 
-    fastify.get('/work/projects/:id', {
-        schema: {
-            description: 'Get a specific work project',
-            tags: ['Work - Projects'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
+    fastify.get(
+        '/work/projects/:id',
+        {
+            schema: {
+                description: 'Get a specific work project',
+                tags: ['Work - Projects'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
         },
-    }, workController.getProject);
+        workController.getProject,
+    );
 
-    fastify.post('/users/:userId/work/projects', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a work project',
-            tags: ['Work - Projects'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.post(
+        '/users/:userId/work/projects',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a work project',
+                tags: ['Work - Projects'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.createProject);
+        workController.createProject,
+    );
 
-    fastify.put('/work/projects/:id', {
-        schema: {
-            description: 'Update a work project',
-            tags: ['Work - Projects'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
+    fastify.put(
+        '/work/projects/:id',
+        {
+            schema: {
+                description: 'Update a work project',
+                tags: ['Work - Projects'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
         },
-    }, workController.updateProject);
+        workController.updateProject,
+    );
 
-    fastify.delete('/work/projects/:id', {
-        schema: {
-            description: 'Delete a work project',
-            tags: ['Work - Projects'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
+    fastify.delete(
+        '/work/projects/:id',
+        {
+            schema: {
+                description: 'Delete a work project',
+                tags: ['Work - Projects'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
         },
-    }, workController.deleteProject);
+        workController.deleteProject,
+    );
 
-    fastify.get('/work/projects/:id/analysis', {
-        schema: {
-            description: 'Get project analysis with progress, prediction and suggestions',
-            tags: ['Work - Projects'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
+    fastify.get(
+        '/work/projects/:id/analysis',
+        {
+            schema: {
+                description: 'Get project analysis with progress, prediction and suggestions',
+                tags: ['Work - Projects'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
         },
-    }, workController.getProjectAnalysis);
+        workController.getProjectAnalysis,
+    );
 
     // ==================== PROJECT MEMBERS ====================
-    fastify.get('/work/projects/:projectId/members', {
-        schema: {
-            description: 'Get all members of a project',
-            tags: ['Work - Project Members'],
-            security: [{ bearerAuth: [] }],
+    fastify.get(
+        '/work/projects/:projectId/members',
+        {
+            schema: {
+                description: 'Get all members of a project',
+                tags: ['Work - Project Members'],
+                security: [{ bearerAuth: [] }],
+            },
         },
-    }, workController.getProjectMembers);
+        workController.getProjectMembers,
+    );
 
-    fastify.post('/work/projects/:projectId/members', {
-        schema: {
-            description: 'Add a member to a project',
-            tags: ['Work - Project Members'],
-            security: [{ bearerAuth: [] }],
+    fastify.post(
+        '/work/projects/:projectId/members',
+        {
+            schema: {
+                description: 'Add a member to a project',
+                tags: ['Work - Project Members'],
+                security: [{ bearerAuth: [] }],
+            },
         },
-    }, workController.createProjectMember);
+        workController.createProjectMember,
+    );
 
-    fastify.put('/work/project-members/:id', {
-        schema: {
-            description: 'Update a project member',
-            tags: ['Work - Project Members'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
+    fastify.put(
+        '/work/project-members/:id',
+        {
+            schema: {
+                description: 'Update a project member',
+                tags: ['Work - Project Members'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
         },
-    }, workController.updateProjectMember);
+        workController.updateProjectMember,
+    );
 
-    fastify.delete('/work/project-members/:id', {
-        schema: {
-            description: 'Remove a member from a project',
-            tags: ['Work - Project Members'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
+    fastify.delete(
+        '/work/project-members/:id',
+        {
+            schema: {
+                description: 'Remove a member from a project',
+                tags: ['Work - Project Members'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
         },
-    }, workController.deleteProjectMember);
+        workController.deleteProjectMember,
+    );
 
     // ==================== PROJECT MILESTONES ====================
-    fastify.get('/work/projects/:projectId/milestones', {
-        schema: {
-            description: 'Get all milestones of a project',
-            tags: ['Work - Project Milestones'],
-            security: [{ bearerAuth: [] }],
+    fastify.get(
+        '/work/projects/:projectId/milestones',
+        {
+            schema: {
+                description: 'Get all milestones of a project',
+                tags: ['Work - Project Milestones'],
+                security: [{ bearerAuth: [] }],
+            },
         },
-    }, workController.getProjectMilestones);
+        workController.getProjectMilestones,
+    );
 
-    fastify.post('/work/projects/:projectId/milestones', {
-        schema: {
-            description: 'Add a milestone to a project',
-            tags: ['Work - Project Milestones'],
-            security: [{ bearerAuth: [] }],
+    fastify.post(
+        '/work/projects/:projectId/milestones',
+        {
+            schema: {
+                description: 'Add a milestone to a project',
+                tags: ['Work - Project Milestones'],
+                security: [{ bearerAuth: [] }],
+            },
         },
-    }, workController.createProjectMilestone);
+        workController.createProjectMilestone,
+    );
 
-    fastify.put('/work/project-milestones/:id', {
-        schema: {
-            description: 'Update a project milestone',
-            tags: ['Work - Project Milestones'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
+    fastify.put(
+        '/work/project-milestones/:id',
+        {
+            schema: {
+                description: 'Update a project milestone',
+                tags: ['Work - Project Milestones'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
         },
-    }, workController.updateProjectMilestone);
+        workController.updateProjectMilestone,
+    );
 
-    fastify.delete('/work/project-milestones/:id', {
-        schema: {
-            description: 'Delete a project milestone',
-            tags: ['Work - Project Milestones'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
+    fastify.delete(
+        '/work/project-milestones/:id',
+        {
+            schema: {
+                description: 'Delete a project milestone',
+                tags: ['Work - Project Milestones'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
         },
-    }, workController.deleteProjectMilestone);
+        workController.deleteProjectMilestone,
+    );
 
-    fastify.put('/work/projects/:projectId/milestones/reorder', {
-        schema: {
-            description: 'Reorder project milestones',
-            tags: ['Work - Project Milestones'],
-            security: [{ bearerAuth: [] }],
+    fastify.put(
+        '/work/projects/:projectId/milestones/reorder',
+        {
+            schema: {
+                description: 'Reorder project milestones',
+                tags: ['Work - Project Milestones'],
+                security: [{ bearerAuth: [] }],
+            },
         },
-    }, workController.reorderProjectMilestones);
+        workController.reorderProjectMilestones,
+    );
 
     // ==================== TASKS ====================
-    fastify.get('/users/:userId/work/tasks', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get all work tasks for a user',
-            tags: ['Work - Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.get(
+        '/users/:userId/work/tasks',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get all work tasks for a user',
+                tags: ['Work - Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.getTasks);
+        workController.getTasks,
+    );
 
-    fastify.get('/work/tasks/:id', {
-        schema: {
-            description: 'Get a specific work task',
-            tags: ['Work - Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
+    fastify.get(
+        '/work/tasks/:id',
+        {
+            schema: {
+                description: 'Get a specific work task',
+                tags: ['Work - Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
         },
-    }, workController.getTask);
+        workController.getTask,
+    );
 
-    fastify.post('/users/:userId/work/tasks', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a work task',
-            tags: ['Work - Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.post(
+        '/users/:userId/work/tasks',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a work task',
+                tags: ['Work - Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.createTask);
+        workController.createTask,
+    );
 
-    fastify.put('/work/tasks/:id', {
-        schema: {
-            description: 'Update a work task',
-            tags: ['Work - Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
+    fastify.put(
+        '/work/tasks/:id',
+        {
+            schema: {
+                description: 'Update a work task',
+                tags: ['Work - Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
         },
-    }, workController.updateTask);
+        workController.updateTask,
+    );
 
-    fastify.delete('/work/tasks/:id', {
-        schema: {
-            description: 'Delete a work task',
-            tags: ['Work - Tasks'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
+    fastify.delete(
+        '/work/tasks/:id',
+        {
+            schema: {
+                description: 'Delete a work task',
+                tags: ['Work - Tasks'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
         },
-    }, workController.deleteTask);
+        workController.deleteTask,
+    );
 
     // ==================== TIME ENTRIES ====================
-    fastify.get('/users/:userId/work/time-entries', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get time entries for a user',
-            tags: ['Work - Time Tracking'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.get(
+        '/users/:userId/work/time-entries',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get time entries for a user',
+                tags: ['Work - Time Tracking'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.getTimeEntries);
+        workController.getTimeEntries,
+    );
 
-    fastify.post('/users/:userId/work/time-entries', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Create a time entry',
-            tags: ['Work - Time Tracking'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.post(
+        '/users/:userId/work/time-entries',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Create a time entry',
+                tags: ['Work - Time Tracking'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.createTimeEntry);
+        workController.createTimeEntry,
+    );
 
-    fastify.put('/work/time-entries/:id', {
-        schema: {
-            description: 'Update a time entry',
-            tags: ['Work - Time Tracking'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
+    fastify.put(
+        '/work/time-entries/:id',
+        {
+            schema: {
+                description: 'Update a time entry',
+                tags: ['Work - Time Tracking'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
         },
-    }, workController.updateTimeEntry);
+        workController.updateTimeEntry,
+    );
 
-    fastify.delete('/work/time-entries/:id', {
-        schema: {
-            description: 'Delete a time entry',
-            tags: ['Work - Time Tracking'],
-            security: [{ bearerAuth: [] }],
-            params: common.idParams,
+    fastify.delete(
+        '/work/time-entries/:id',
+        {
+            schema: {
+                description: 'Delete a time entry',
+                tags: ['Work - Time Tracking'],
+                security: [{ bearerAuth: [] }],
+                params: common.idParams,
+            },
         },
-    }, workController.deleteTimeEntry);
+        workController.deleteTimeEntry,
+    );
 
-    fastify.post('/users/:userId/work/timer/start', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Start a timer',
-            tags: ['Work - Time Tracking'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.post(
+        '/users/:userId/work/timer/start',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Start a timer',
+                tags: ['Work - Time Tracking'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.startTimer);
+        workController.startTimer,
+    );
 
-    fastify.post('/users/:userId/work/timer/stop', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Stop the running timer',
-            tags: ['Work - Time Tracking'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.post(
+        '/users/:userId/work/timer/stop',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Stop the running timer',
+                tags: ['Work - Time Tracking'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.stopTimer);
+        workController.stopTimer,
+    );
 
-    fastify.get('/users/:userId/work/timer/running', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get the running timer',
-            tags: ['Work - Time Tracking'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.get(
+        '/users/:userId/work/timer/running',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get the running timer',
+                tags: ['Work - Time Tracking'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.getRunningTimer);
+        workController.getRunningTimer,
+    );
 
     // ==================== STATS ====================
-    fastify.get('/users/:userId/work/estimation-accuracy', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get estimation accuracy stats',
-            tags: ['Work - Stats'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.get(
+        '/users/:userId/work/estimation-accuracy',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get estimation accuracy stats',
+                tags: ['Work - Stats'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.getEstimationAccuracy);
+        workController.getEstimationAccuracy,
+    );
 
-    fastify.get('/users/:userId/work/suggest-estimate', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get suggested estimate for a task',
-            tags: ['Work - Stats'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.get(
+        '/users/:userId/work/suggest-estimate',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get suggested estimate for a task',
+                tags: ['Work - Stats'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.suggestEstimate);
+        workController.suggestEstimate,
+    );
 
-    fastify.get('/users/:userId/work/dashboard', {
-        preHandler: [fastify.authorizeUser],
-        schema: {
-            description: 'Get work dashboard stats',
-            tags: ['Work - Stats'],
-            security: [{ bearerAuth: [] }],
-            params: common.userIdParams,
+    fastify.get(
+        '/users/:userId/work/dashboard',
+        {
+            preHandler: [fastify.authorizeUser],
+            schema: {
+                description: 'Get work dashboard stats',
+                tags: ['Work - Stats'],
+                security: [{ bearerAuth: [] }],
+                params: common.userIdParams,
+            },
         },
-    }, workController.getWorkDashboard);
+        workController.getWorkDashboard,
+    );
 }
 
 module.exports = workRoutes;

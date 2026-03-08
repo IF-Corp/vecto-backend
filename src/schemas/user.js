@@ -6,10 +6,10 @@ const createUserBody = {
     type: 'object',
     properties: {
         email: { type: 'string', format: 'email', maxLength: 255 },
-        name: { type: 'string', minLength: 2, maxLength: 100 }
+        name: { type: 'string', minLength: 2, maxLength: 100 },
     },
     required: ['email'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateUserBody = {
@@ -17,18 +17,18 @@ const updateUserBody = {
     properties: {
         name: { type: 'string', minLength: 2, maxLength: 100 },
         birth_date: { type: 'string', format: 'date', nullable: true },
-        avatar_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true }
+        avatar_url: { type: 'string', format: 'uri', maxLength: 500, nullable: true },
     },
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const updateOnboardingBody = {
     type: 'object',
     properties: {
-        is_onboarded: { type: 'boolean' }
+        is_onboarded: { type: 'boolean' },
     },
     required: ['is_onboarded'],
-    additionalProperties: false
+    additionalProperties: false,
 };
 
 const userResponse = {
@@ -45,15 +45,15 @@ const userResponse = {
                 birth_date: { type: 'string', nullable: true },
                 avatar_url: { type: 'string', nullable: true },
                 created_at: { type: 'string' },
-                updated_at: { type: 'string' }
-            }
-        }
-    }
+                updated_at: { type: 'string' },
+            },
+        },
+    },
 };
 
 module.exports = {
     createUserBody,
     updateUserBody,
     updateOnboardingBody,
-    userResponse
+    userResponse,
 };
